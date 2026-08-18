@@ -1,0 +1,78 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "BKK: Run website locally",
+      "type": "shell",
+      "command": "php",
+      "args": [
+        "-S",
+        "127.0.0.1:8080",
+        "-t",
+        "public",
+        "public/router.php"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/services/web"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "bkk-web-server",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "BKK: Check website PHP syntax",
+      "type": "shell",
+      "command": "find app public -type f -name '*.php' -print0 | xargs -0 -n1 php -l",
+      "options": {
+        "cwd": "${workspaceFolder}/services/web"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "BKK: Run Android unit tests",
+      "type": "shell",
+      "command": "./gradlew",
+      "args": [
+        "testDebugUnitTest"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/apps/android"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "bkk-android-checks",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "BKK: Check and build Android debug app",
+      "type": "shell",
+      "command": "./gradlew",
+      "args": [
+        "lintDebug",
+        "assembleDebug"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/apps/android"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "bkk-android-checks",
+        "clear": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}

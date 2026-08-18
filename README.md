@@ -28,3 +28,5 @@ Every member should use their own GitHub account, work on a branch, make real fo
 Read [the platform explainer and viva guide](docs/PLATFORM_EXPLAINER_AND_VIVA.md) before changing the project.
 
 For exact setup steps on another group member's computer, read [GETTING_STARTED.md](GETTING_STARTED.md).
+
+For the shared Visual Studio Code workflow and one-click safety checks, read [docs/VISUAL_STUDIO_CODE_WORKFLOW.md](docs/VISUAL_STUDIO_CODE_WORKFLOW.md) and open `BKKCommunity-Platform.code-workspace`.

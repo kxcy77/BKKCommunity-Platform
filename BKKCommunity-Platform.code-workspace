@@ -1,0 +1,26 @@
+{
+  "folders": [
+    {
+      "path": ".",
+      "name": "BKK Community Platform"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/vendor": true,
+      "**/build": true,
+      "**/.gradle": true,
+      "**/.build": true,
+      "**/.kotlin": true
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/vendor": true,
+      "**/build": true,
+      "**/.gradle": true,
+      "**/.build": true,
+      "**/.kotlin": true
+    }
+  }
+}
