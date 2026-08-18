@@ -26,3 +26,5 @@ The deployed website and mobile JSON API are in `services/web/` and use PHP/MySQ
 Every member should use their own GitHub account, work on a branch, make real focused commits, open a pull request, and describe what they changed and tested. Do not rewrite history or use someone else’s identity. The initial commit is a truthful consolidation snapshot, not evidence that one person authored every earlier file.
 
 Read [the platform explainer and viva guide](docs/PLATFORM_EXPLAINER_AND_VIVA.md) before changing the project.
+
+For exact setup steps on another group member's computer, read [GETTING_STARTED.md](GETTING_STARTED.md).
