@@ -1,0 +1,41 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "BKK: Run web app locally",
+      "type": "shell",
+      "command": "php",
+      "args": [
+        "-S",
+        "127.0.0.1:8080",
+        "-t",
+        "public",
+        "public/router.php"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "bkk-web-server",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "BKK: Check PHP syntax",
+      "type": "shell",
+      "command": "find app public -type f -name '*.php' -print0 | xargs -0 -n1 php -l",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}

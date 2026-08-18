@@ -1,0 +1,178 @@
+// This is your Prisma schema file.
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Member {
+  id                    Int           @id @default(autoincrement())
+  fullName              String        @db.VarChar(120) @map("full_name")
+  email                 String        @unique @db.VarChar(254)
+  phone                 String?       @db.VarChar(30)
+  passwordHash          String        @db.VarChar(255) @map("password_hash")
+  isAdmin               Boolean       @default(false) @map("is_admin")
+  notificationsEnabled  Boolean       @default(true) @map("notifications_enabled")
+  eventRemindersEnabled Boolean       @default(true) @map("event_reminders_enabled")
+  discountAlertsEnabled Boolean       @default(true) @map("discount_alerts_enabled")
+  failedAttempts        Int           @default(0) @map("failed_attempts")
+  lockedUntil           DateTime?     @map("locked_until")
+  createdAt             DateTime      @default(now()) @map("created_at")
+  updatedAt             DateTime      @updatedAt @map("updated_at")
+
+  attendance            Attendance[]
+  sessions              AuthSession[]
+  deviceTokens          DeviceToken[]
+  passwordResets        PasswordReset[]
+  notificationLogs      NotificationLog[]
+
+  @@map("members")
+}
+
+model Event {
+  id          Int          @id @default(autoincrement())
+  title       String       @db.VarChar(200)
+  description String       @db.Text
+  startAt     DateTime     @map("start_at")
+  endAt       DateTime     @map("end_at")
+  location    String       @db.VarChar(255)
+  directions  String?      @db.Text
+  category    String       @db.VarChar(100)
+  colourHex   String       @default("#315C24") @db.Char(7) @map("colour_hex")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  attendance  Attendance[]
+
+  @@map("events")
+}
+
+model Attendance {
+  id       Int    @id @default(autoincrement())
+  memberId Int    @map("member_id")
+  eventId  Int    @map("event_id")
+  status   String @default("attending") @db.VarChar(20) // attending | cancelled
+
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  event    Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([memberId, eventId])
+  @@map("attendance")
+}
+
+model Discount {
+  id                Int      @id @default(autoincrement())
+  storeName         String   @db.VarChar(180) @map("store_name")
+  title             String   @db.VarChar(200)
+  details           String   @db.Text
+  eligibility       String   @db.Text
+  claimInstructions String   @db.Text @map("claim_instructions")
+  category          String   @db.VarChar(100)
+  validFrom         DateTime? @map("valid_from")
+  validUntil        DateTime? @map("valid_until")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("discounts")
+}
+
+model LocalService {
+  id           Int     @id @default(autoincrement())
+  type         String  @db.VarChar(100)
+  name         String  @db.VarChar(180)
+  address      String  @db.VarChar(255)
+  phone        String  @db.VarChar(30)
+  directions   String? @db.Text
+  openingHours String? @db.VarChar(255) @map("opening_hours")
+
+  @@map("local_services")
+}
+
+model ContactMessage {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(120)
+  email     String   @db.VarChar(254)
+  message   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("contact_messages")
+}
+
+model DeviceToken {
+  id                   Int      @id @default(autoincrement())
+  memberId             Int      @map("member_id")
+  fcmToken             String   @unique @db.VarChar(512) @map("fcm_token")
+  platform             String   @default("android") @db.VarChar(20)
+  notificationsEnabled Boolean  @default(true) @map("notifications_enabled")
+  lastSeenAt           DateTime @default(now()) @map("last_seen_at")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  notificationLogs NotificationLog[]
+
+  @@map("device_tokens")
+}
+
+model PasswordReset {
+  id           Int       @id @default(autoincrement())
+  memberId     Int       @map("member_id")
+  codeHash     String    @unique @db.Char(64) @map("code_hash")
+  failedAttempts Int     @default(0) @map("failed_attempts")
+  expiresAt    DateTime  @map("expires_at")
+  usedAt       DateTime? @map("used_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@map("password_resets")
+}
+
+model AuthSession {
+  id        Int       @id @default(autoincrement())
+  memberId  Int       @map("member_id")
+  tokenId   String    @unique @db.Char(36) @map("token_id")
+  expiresAt DateTime  @map("expires_at")
+  revokedAt DateTime? @map("revoked_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([memberId, expiresAt])
+  @@map("auth_sessions")
+}
+
+model NotificationLog {
+  id                Int          @id @default(autoincrement())
+  memberId          Int?         @map("member_id")
+  deviceTokenId     Int?         @map("device_token_id")
+  notificationType  String       @db.VarChar(40) @map("notification_type")
+  providerMessageId String?      @db.VarChar(255) @map("provider_message_id")
+  dedupeKey         String?      @unique @db.VarChar(191) @map("dedupe_key")
+  status            String       @db.VarChar(30)
+  errorCode         String?      @db.VarChar(100) @map("error_code")
+  createdAt         DateTime     @default(now()) @map("created_at")
+
+  member      Member?      @relation(fields: [memberId], references: [id], onDelete: SetNull)
+  deviceToken DeviceToken? @relation(fields: [deviceTokenId], references: [id], onDelete: SetNull)
+
+  @@index([memberId, createdAt])
+  @@map("notification_logs")
+}
+
+model AdminAuditLog {
+  id           Int      @id @default(autoincrement())
+  adminMemberId Int     @map("admin_member_id")
+  action       String   @db.VarChar(60)
+  entityType   String   @db.VarChar(60) @map("entity_type")
+  entityId     Int?     @map("entity_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([adminMemberId, createdAt])
+  @@map("admin_audit_logs")
+}

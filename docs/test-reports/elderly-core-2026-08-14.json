@@ -1,0 +1,95 @@
+{
+  "reportVersion": 1,
+  "journeyId": "elderly-core",
+  "executedAt": "2026-08-14T10:11:00+02:00",
+  "overallStatus": "failed",
+  "environments": {
+    "web": "Google Chrome mobile viewport 390x844 against local PHP build and live Railway access checks",
+    "android": "Android 8.0 API 26 emulator, Android Studio bundled OpenJDK 25.0.2",
+    "ios": "iPhone 17 Pro simulator, iOS 26.5, Xcode 26.6",
+    "api": "Railway PHP/MySQL HTTPS /api/v1"
+  },
+  "summary": {
+    "passed": 8,
+    "failed": 2,
+    "interrupted": 1,
+    "notRun": 3
+  },
+  "results": [
+    {
+      "platform": "web",
+      "name": "Signed-out login gate",
+      "status": "failed",
+      "severity": "critical",
+      "evidence": "Both /index.php and /discounts.php returned HTTP 200 without a session; the local browser also opened home without redirecting to login."
+    },
+    {
+      "platform": "web",
+      "name": "Member sign-in",
+      "status": "passed",
+      "evidence": "The local member demo signed in successfully and reached profile, then home. Credentials were not written to this report."
+    },
+    {
+      "platform": "web",
+      "name": "Simplified navigation and scrolling",
+      "status": "passed",
+      "evidence": "Four primary task cards, five menu destinations, all primary pages, and scrolling at 200 percent browser zoom passed."
+    },
+    {
+      "platform": "android",
+      "name": "Build and unit tests",
+      "status": "passed",
+      "evidence": "Debug build passed on OpenJDK 25.0.2; 6 unit tests passed with zero failures."
+    },
+    {
+      "platform": "android",
+      "name": "API 26 connected UI tests",
+      "status": "passed",
+      "evidence": "6 device tests passed with zero failures: login gate, recovery and registration reachability, home actions, scrolling, schedule filtering, persistence, and demonstration-event safety."
+    },
+    {
+      "platform": "android",
+      "name": "Mouse or touch scrolling on login",
+      "status": "passed",
+      "evidence": "The page scrolled from the upper login fields to Sign In and Create an Account on the API 26 emulator."
+    },
+    {
+      "platform": "ios",
+      "name": "Build and safety tests",
+      "status": "passed",
+      "evidence": "Xcode test succeeded; both CommunityEventSafetyTests passed."
+    },
+    {
+      "platform": "ios",
+      "name": "Fresh signed-out launch",
+      "status": "passed",
+      "evidence": "A clean install launched on the redesigned login screen with Sign In, Register, Forgot Password, and Create an Account visible."
+    },
+    {
+      "platform": "ios",
+      "name": "Full UI login and five-tab navigation",
+      "status": "interrupted",
+      "severity": "test-gap",
+      "evidence": "Simulator UI control was confirmed, but the coordinate-driven sign-in attempt was interrupted before a valid end-to-end assertion. No pass is claimed."
+    },
+    {
+      "platform": "api",
+      "name": "Live authentication lifecycle",
+      "status": "passed",
+      "evidence": "Health 200, readiness 200, registration 201, login 200, authenticated profile 200, and account deletion 200. All disposable accounts were deleted."
+    },
+    {
+      "platform": "api",
+      "name": "Live password-reset email",
+      "status": "failed",
+      "severity": "critical",
+      "evidence": "Forgot-password returned HTTP 503 because a verified SMTP sender is not configured. A six-digit code cannot currently reach a real inbox."
+    }
+  ],
+  "notRun": [
+    "Manual TalkBack and VoiceOver journeys",
+    "Manual 200 percent system font-scale journey on both mobile platforms",
+    "UAT with six elderly BKK participants"
+  ],
+  "releaseDecision": "NO-GO until the website login gate and live reset-email delivery are fixed and retested."
+}

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<journey id="elderly-core" title="BKK elderly member core journey" version="2026-08-14">
+  <preconditions>
+    <condition>A signed-out test device is available.</condition>
+    <condition>No real member credentials are used.</condition>
+    <condition>Any disposable live account is deleted after the journey.</condition>
+  </preconditions>
+  <steps>
+    <step order="1" action="Launch the platform while signed out" assertion="The login screen is the only platform entry point." />
+    <step order="2" action="Scroll through the complete login screen" assertion="Forgot password, Sign In, and Create an Account are reachable." />
+    <step order="3" action="Sign in with a disposable member account" assertion="The server confirms the credentials before the member area opens." />
+    <step order="4" action="Review the home screen" assertion="Events, Discounts, Local Info or Services, and Contact are clearly presented." />
+    <step order="5" action="Use every primary navigation destination" assertion="There are no more than five primary destinations and each is reachable." />
+    <step order="6" action="Open the labelled demonstration event" assertion="Attendance, calendar, travel, and share actions are unavailable." />
+    <step order="7" action="Repeat at 200 percent text size" assertion="Content remains readable and scrollable without hiding required actions." />
+    <step order="8" action="Sign out and relaunch" assertion="The platform returns to login and does not expose the previous session." />
+  </steps>
+</journey>

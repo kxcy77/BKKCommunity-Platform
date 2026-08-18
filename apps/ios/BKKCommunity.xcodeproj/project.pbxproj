@@ -1,0 +1,427 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		BB000000000000000000B001 /* CommunityEventSafetyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000A001 /* CommunityEventSafetyTests.swift */; };
+		0042DF706C004367A60E04DD /* Views/ServicesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C6C135DAE84EB1A8018AB9 /* Views/ServicesView.swift */; };
+		38951CFA419B483A919B3CB1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A6F0BAF553874BA3B97B4AAC /* Assets.xcassets */; };
+		4EC8BEFE7DDA4F708604A0AA /* BKKCommunityApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C69FE8DB804CBCAD121ADC /* BKKCommunityApp.swift */; };
+		70F6DEACFEDA4FE587833E68 /* Views/MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC98D2562AA64F029434EFD4 /* Views/MainTabView.swift */; };
+		729E2DE7B4534847AEC8CAFC /* ViewModels/BKKViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E2E201DA524F5EB7F68E0C /* ViewModels/BKKViewModel.swift */; };
+		7A4B5380AA244833A9E7A119 /* Services/DateFormatter+SAST.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B88B943A990479DA3E4C77D /* Services/DateFormatter+SAST.swift */; };
+		89068E067A4745A5BCBA9092 /* Views/HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FD4D6EB51DA4559B74AD534 /* Views/HomeView.swift */; };
+		A9743DCE70064250B63EB73A /* Models/Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74A2D77ED2A4C98BF1E975A /* Models/Models.swift */; };
+		C36F9210A68A4845AAC7559E /* Services/NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A96918D2AB94580AAED90CF /* Services/NotificationManager.swift */; };
+		CA68B529C59F4B76A6177F3D /* Services/DemoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4FE515A7F614FA3B8D1EE92 /* Services/DemoStore.swift */; };
+		E2E56ADEDC9349BDB31ABC6D /* Views/DiscountsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F927C9D96EAD4750858A78DE /* Views/DiscountsView.swift */; };
+		E3A2DFBB380742F1AC5BD097 /* Services/APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11BC94E8ADC4440A067A59F /* Services/APIClient.swift */; };
+		F3794450BC54483AAC2C67ED /* Views/Components/WhatsAppIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C15251AB44B84946A4DE6FC0 /* Views/Components/WhatsAppIconView.swift */; };
+		F7BED5C39329426EA6313C33 /* Views/EventsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F58017C8EF4FB981301877 /* Views/EventsView.swift */; };
+		FA2F54A5017A4D79B2D58C25 /* Views/AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A236B6CB7A6415A9853985F /* Views/AccountView.swift */; };
+		AA112233445566778899B001 /* Theme/BkkTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA112233445566778899A001 /* Theme/BkkTheme.swift */; };
+		AA112233445566778899B002 /* Views/Components/BkkComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA112233445566778899A002 /* Views/Components/BkkComponents.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		BB000000000000000000A001 /* CommunityEventSafetyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityEventSafetyTests.swift; sourceTree = "<group>"; };
+		BB000000000000000000A002 /* BKKCommunityTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BKKCommunityTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0A236B6CB7A6415A9853985F /* Views/AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/AccountView.swift; sourceTree = "<group>"; };
+		16C69FE8DB804CBCAD121ADC /* BKKCommunityApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BKKCommunityApp.swift; sourceTree = "<group>"; };
+		1B88B943A990479DA3E4C77D /* Services/DateFormatter+SAST.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/DateFormatter+SAST.swift"; sourceTree = "<group>"; };
+		2ECA54778E584AAF9FE07891 /* BKKCommunity.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BKKCommunity.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		30F4A00066424AFF9E5A1526 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6FD4D6EB51DA4559B74AD534 /* Views/HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/HomeView.swift; sourceTree = "<group>"; };
+		8A96918D2AB94580AAED90CF /* Services/NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/NotificationManager.swift; sourceTree = "<group>"; };
+		A6F0BAF553874BA3B97B4AAC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B0E2E201DA524F5EB7F68E0C /* ViewModels/BKKViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModels/BKKViewModel.swift; sourceTree = "<group>"; };
+		B11BC94E8ADC4440A067A59F /* Services/APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/APIClient.swift; sourceTree = "<group>"; };
+		B5C6C135DAE84EB1A8018AB9 /* Views/ServicesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ServicesView.swift; sourceTree = "<group>"; };
+		C15251AB44B84946A4DE6FC0 /* Views/Components/WhatsAppIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Components/WhatsAppIconView.swift; sourceTree = "<group>"; };
+		C74A2D77ED2A4C98BF1E975A /* Models/Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/Models.swift; sourceTree = "<group>"; };
+		C8F58017C8EF4FB981301877 /* Views/EventsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/EventsView.swift; sourceTree = "<group>"; };
+		DC98D2562AA64F029434EFD4 /* Views/MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MainTabView.swift; sourceTree = "<group>"; };
+		E4FE515A7F614FA3B8D1EE92 /* Services/DemoStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/DemoStore.swift; sourceTree = "<group>"; };
+		F927C9D96EAD4750858A78DE /* Views/DiscountsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/DiscountsView.swift; sourceTree = "<group>"; };
+		AA112233445566778899A001 /* Theme/BkkTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme/BkkTheme.swift; sourceTree = "<group>"; };
+		AA112233445566778899A002 /* Views/Components/BkkComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Components/BkkComponents.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BB000000000000000000A003 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		464C7AB4B0BF48689B464E79 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0491C7A696EE4C75955DDBD0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2ECA54778E584AAF9FE07891 /* BKKCommunity.app */,
+				BB000000000000000000A002 /* BKKCommunityTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4B6F83987A944CAC8FC6F2DF /* BKKCommunity */ = {
+			isa = PBXGroup;
+			children = (
+				16C69FE8DB804CBCAD121ADC /* BKKCommunityApp.swift */,
+				C74A2D77ED2A4C98BF1E975A /* Models/Models.swift */,
+				E4FE515A7F614FA3B8D1EE92 /* Services/DemoStore.swift */,
+				B11BC94E8ADC4440A067A59F /* Services/APIClient.swift */,
+				8A96918D2AB94580AAED90CF /* Services/NotificationManager.swift */,
+				1B88B943A990479DA3E4C77D /* Services/DateFormatter+SAST.swift */,
+				B0E2E201DA524F5EB7F68E0C /* ViewModels/BKKViewModel.swift */,
+				6FD4D6EB51DA4559B74AD534 /* Views/HomeView.swift */,
+				C8F58017C8EF4FB981301877 /* Views/EventsView.swift */,
+				F927C9D96EAD4750858A78DE /* Views/DiscountsView.swift */,
+				B5C6C135DAE84EB1A8018AB9 /* Views/ServicesView.swift */,
+				0A236B6CB7A6415A9853985F /* Views/AccountView.swift */,
+				DC98D2562AA64F029434EFD4 /* Views/MainTabView.swift */,
+				C15251AB44B84946A4DE6FC0 /* Views/Components/WhatsAppIconView.swift */,
+				AA112233445566778899A001 /* Theme/BkkTheme.swift */,
+				AA112233445566778899A002 /* Views/Components/BkkComponents.swift */,
+				A6F0BAF553874BA3B97B4AAC /* Assets.xcassets */,
+				30F4A00066424AFF9E5A1526 /* Info.plist */,
+			);
+			path = BKKCommunity;
+			sourceTree = "<group>";
+		};
+		84C9D4C4551641048FAE0ADF = {
+			isa = PBXGroup;
+			children = (
+				4B6F83987A944CAC8FC6F2DF /* BKKCommunity */,
+				BB000000000000000000A012 /* BKKCommunityTests */,
+				0491C7A696EE4C75955DDBD0 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		BB000000000000000000A012 /* BKKCommunityTests */ = {
+			isa = PBXGroup;
+			children = (
+				BB000000000000000000A001 /* CommunityEventSafetyTests.swift */,
+			);
+			path = BKKCommunityTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXContainerItemProxy section */
+		BB000000000000000000A010 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29505BB0BD204738B71F5958 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C67CA3E8A38B410AAD00A968;
+			remoteInfo = BKKCommunity;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXNativeTarget section */
+		BB000000000000000000A006 /* BKKCommunityTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BB000000000000000000A009 /* Build configuration list for PBXNativeTarget "BKKCommunityTests" */;
+			buildPhases = (
+				BB000000000000000000A004 /* Sources */,
+				BB000000000000000000A003 /* Frameworks */,
+				BB000000000000000000A005 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BB000000000000000000A011 /* PBXTargetDependency */,
+			);
+			name = BKKCommunityTests;
+			productName = BKKCommunityTests;
+			productReference = BB000000000000000000A002 /* BKKCommunityTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		C67CA3E8A38B410AAD00A968 /* BKKCommunity */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EB90D731E3FE4E228EF55121 /* Build configuration list for PBXNativeTarget "BKKCommunity" */;
+			buildPhases = (
+				B23639B585B94094A79B955E /* Sources */,
+				464C7AB4B0BF48689B464E79 /* Frameworks */,
+				7BAD66CC279546C29AB080D2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BKKCommunity;
+			productName = BKKCommunity;
+			productReference = 2ECA54778E584AAF9FE07891 /* BKKCommunity.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29505BB0BD204738B71F5958 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					BB000000000000000000A006 = {
+						CreatedOnToolsVersion = 15.0;
+						TestTargetID = C67CA3E8A38B410AAD00A968;
+					};
+					C67CA3E8A38B410AAD00A968 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = 3B7F9049E5414159983A9CFA /* Build configuration list for PBXProject "BKKCommunity" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 84C9D4C4551641048FAE0ADF;
+			productRefGroup = 0491C7A696EE4C75955DDBD0 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C67CA3E8A38B410AAD00A968 /* BKKCommunity */,
+				BB000000000000000000A006 /* BKKCommunityTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		BB000000000000000000A005 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7BAD66CC279546C29AB080D2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				38951CFA419B483A919B3CB1 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BB000000000000000000A004 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BB000000000000000000B001 /* CommunityEventSafetyTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B23639B585B94094A79B955E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4EC8BEFE7DDA4F708604A0AA /* BKKCommunityApp.swift in Sources */,
+				A9743DCE70064250B63EB73A /* Models/Models.swift in Sources */,
+				CA68B529C59F4B76A6177F3D /* Services/DemoStore.swift in Sources */,
+				E3A2DFBB380742F1AC5BD097 /* Services/APIClient.swift in Sources */,
+				C36F9210A68A4845AAC7559E /* Services/NotificationManager.swift in Sources */,
+				7A4B5380AA244833A9E7A119 /* Services/DateFormatter+SAST.swift in Sources */,
+				729E2DE7B4534847AEC8CAFC /* ViewModels/BKKViewModel.swift in Sources */,
+				89068E067A4745A5BCBA9092 /* Views/HomeView.swift in Sources */,
+				F7BED5C39329426EA6313C33 /* Views/EventsView.swift in Sources */,
+				E2E56ADEDC9349BDB31ABC6D /* Views/DiscountsView.swift in Sources */,
+				0042DF706C004367A60E04DD /* Views/ServicesView.swift in Sources */,
+				FA2F54A5017A4D79B2D58C25 /* Views/AccountView.swift in Sources */,
+				70F6DEACFEDA4FE587833E68 /* Views/MainTabView.swift in Sources */,
+				F3794450BC54483AAC2C67ED /* Views/Components/WhatsAppIconView.swift in Sources */,
+				AA112233445566778899B001 /* Theme/BkkTheme.swift in Sources */,
+				AA112233445566778899B002 /* Views/Components/BkkComponents.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		BB000000000000000000A007 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				PRODUCT_BUNDLE_IDENTIFIER = za.co.bkkcommunity.ios.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BKKCommunity.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BKKCommunity";
+			};
+			name = Debug;
+		};
+		BB000000000000000000A008 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				PRODUCT_BUNDLE_IDENTIFIER = za.co.bkkcommunity.ios.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BKKCommunity.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BKKCommunity";
+			};
+			name = Release;
+		};
+		367AAD877BD7491792DAC7FA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		5B395EAE6C7848B69CCA4028 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D60FA935EFCD4AF6A76578EA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = GQ236499L2;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = BKKCommunity/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = za.co.bkkcommunity.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D95239E3CE34401D902E60C5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = GQ236499L2;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = BKKCommunity/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = za.co.bkkcommunity.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BB000000000000000000A009 /* Build configuration list for PBXNativeTarget "BKKCommunityTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BB000000000000000000A007 /* Debug */,
+				BB000000000000000000A008 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3B7F9049E5414159983A9CFA /* Build configuration list for PBXProject "BKKCommunity" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				367AAD877BD7491792DAC7FA /* Debug */,
+				5B395EAE6C7848B69CCA4028 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EB90D731E3FE4E228EF55121 /* Build configuration list for PBXNativeTarget "BKKCommunity" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D60FA935EFCD4AF6A76578EA /* Debug */,
+				D95239E3CE34401D902E60C5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin PBXTargetDependency section */
+		BB000000000000000000A011 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C67CA3E8A38B410AAD00A968 /* BKKCommunity */;
+			targetProxy = BB000000000000000000A010 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+	};
+	rootObject = 29505BB0BD204738B71F5958 /* Project object */;
+}

@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BKK Community — Admin CMS</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --surface: #111827;
+      --surface-hover: #1f2937;
+      --card: #111827;
+      --border: #1f2937;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --accent: #3b82f6;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --radius: 8px;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.96) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: var(--font-family); 
+      background: radial-gradient(circle at 50% -20%, #1e1b4b 0%, #0b0f19 60%);
+      color: var(--text); 
+      min-height: 100vh; 
+      display: flex; 
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── TOP NAV ── */
+    nav {
+      background: rgba(17, 24, 39, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky; top: 0; z-index: 200;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-logo {
+      width: 32px; height: 32px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 16px;
+      box-shadow: 0 0 12px rgba(37, 99, 235, 0.3);
+      transition: transform 0.2s ease;
+    }
+    .brand-logo:hover { transform: scale(1.05); }
+    .brand-name { font-size: 16px; font-weight: 600; letter-spacing: -0.2px; }
+    .brand-tag { 
+      font-size: 11px; color: var(--muted); 
+      margin-left: 6px; 
+      padding: 2px 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    #nav-status { display: flex; align-items: center; gap: 16px; }
+    .status-indicator { display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); transition: background 0.3s; }
+    .dot.online { background: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.5); }
+    #nav-user { font-size: 13px; font-weight: 500; color: var(--muted); }
+    #btn-logout { 
+      background: transparent; 
+      border: 1px solid var(--border); 
+      color: var(--text); 
+      padding: 6px 12px; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-family: inherit; 
+      font-size: 13px; 
+      font-weight: 500;
+      transition: all 0.2s ease; 
+    }
+    #btn-logout:hover { background: rgba(239, 68, 68, 0.1); border-color: var(--danger); color: var(--danger); transform: translateY(-1px); }
+
+    /* ── AUTH SCREENS (LOGIN / RESET) ── */
+    .auth-screen {
+      flex: 1; display: none; align-items: center; justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    
+    .login-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 40px;
+      width: 100%; max-width: 400px;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .login-card h2 { font-size: 22px; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.3px; }
+    .login-card p { color: var(--muted); font-size: 14px; margin-bottom: 24px; line-height: 1.4; }
+    .form-field { margin-bottom: 16px; text-align: left; }
+    .form-field label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-field input, .form-field select, .form-field textarea {
+      width: 100%; padding: 10px 12px;
+      background: #0b0f19;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: inherit; font-size: 14px;
+      outline: none; transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus { 
+      border-color: var(--primary); 
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+    .form-field select option { background: #111827; color: white; }
+    
+    .login-error-msg { color: #ef4444; font-size: 13px; margin-top: 12px; display: none; background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.2); animation: fadeIn 0.2s ease; }
+    
+    .btn-primary {
+      width: 100%; padding: 10px;
+      background: var(--primary);
+      color: white; border: none;
+      border-radius: 6px;
+      font-family: inherit; font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s ease;
+      margin-top: 8px;
+    }
+    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* ── MAIN LAYOUT ── */
+    #app { display: none; flex: 1; max-width: 1200px; width: 100%; margin: 24px auto; padding: 0 24px; animation: fadeIn 0.3s ease-out forwards; }
+
+    /* ── TABS ── */
+    .tabs {
+      display: flex; gap: 4px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .tab {
+      padding: 8px 16px;
+      background: transparent; border: none;
+      color: var(--muted); font-family: inherit; font-size: 14px; font-weight: 500;
+      cursor: pointer; border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: all 0.2s ease;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+
+    /* ── SECTION ── */
+    .section { display: none; }
+    .section.active { display: block; animation: fadeIn 0.25s ease-out forwards; }
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .section-header h2 { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; }
+    .btn-add {
+      padding: 8px 16px;
+      background: var(--primary); color: white; border: none;
+      border-radius: 6px; font-family: inherit; font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s ease;
+    }
+    .btn-add:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    thead { background: #0b0f19; }
+    th { padding: 12px 16px; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
+    td { padding: 14px 16px; font-size: 14px; border-bottom: 1px solid var(--border); color: #e5e7eb; transition: background 0.15s ease; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.03); }
+    
+    .badge {
+      display: inline-block; padding: 2px 8px;
+      border-radius: 4px; font-size: 12px; font-weight: 500;
+      transition: transform 0.15s ease;
+    }
+    .badge:hover { transform: translateY(-1px); }
+    .badge-exercise { background: rgba(16, 185, 129, 0.1); color: #34d399; }
+    .badge-social   { background: rgba(59, 130, 246, 0.1); color: #60a5fa; }
+    .badge-health   { background: rgba(239, 68, 68, 0.1); color: #f87171; }
+    .badge-pharmacy { background: rgba(245, 158, 11, 0.1); color: #fbbf24; }
+    .badge-admin    { background: rgba(139, 92, 246, 0.1); color: #a78bfa; }
+    
+    .row-actions { display: flex; gap: 8px; }
+    .btn-edit, .btn-delete {
+      padding: 4px 10px; border-radius: 4px; font-family: inherit; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); transition: all 0.15s ease;
+    }
+    .btn-edit { background: transparent; color: var(--text); }
+    .btn-edit:hover { background: var(--surface-hover); transform: translateY(-1px); }
+    .btn-delete { background: transparent; color: #ef4444; border-color: rgba(239, 68, 68, 0.2); }
+    .btn-delete:hover { background: rgba(239, 68, 68, 0.15); transform: translateY(-1px); }
+    
+    .loading { text-align: center; padding: 40px; color: var(--muted); font-size: 14px; }
+    .empty { text-align: center; padding: 40px; color: var(--muted); font-size: 14px; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 300;
+      display: none; align-items: center; justify-content: center;
+      animation: fadeIn 0.2s ease-out forwards;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      width: 100%; max-width: 520px;
+      max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6);
+      animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .modal h3 { font-size: 18px; font-weight: 600; margin-bottom: 20px; letter-spacing: -0.2px; }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 24px; }
+    .btn-cancel {
+      padding: 8px 16px; background: transparent;
+      border: 1px solid var(--border); color: var(--text);
+      border-radius: 6px; font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s ease;
+    }
+    .btn-cancel:hover { background: var(--surface-hover); }
+    .btn-save {
+      padding: 8px 20px; background: var(--primary);
+      color: white; border: none; border-radius: 6px;
+      font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s ease;
+    }
+    .btn-save:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 999;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 12px 18px;
+      font-size: 14px; font-weight: 500;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4);
+      transform: translateY(40px) scale(0.95); opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+    }
+    #toast.show { transform: translateY(0) scale(1); opacity: 1; }
+    #toast.success { border-left: 3px solid #10b981; }
+    #toast.error { border-left: 3px solid #ef4444; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">
+    <div class="brand-logo">B</div>
+    <div>
+      <span class="brand-name">BKK Community</span>
+      <span class="brand-tag">Admin CMS</span>
+    </div>
+  </div>
+  <div id="nav-status">
+    <div class="status-indicator">
+      <div class="dot" id="api-dot"></div>
+      <span style="font-size: 12px; color: var(--muted); font-weight: 600;">API</span>
+    </div>
+    <span id="nav-user" style="display:none"></span>
+    <button id="btn-logout" style="display:none" onclick="logout()">Sign Out</button>
+  </div>
+</nav>
+
+<!-- LOGIN -->
+<div id="login-screen" class="auth-screen" style="display:flex;">
+  <div class="login-card">
+    <h2>Admin Sign In</h2>
+    <p>This panel is restricted to authorised administrators only.</p>
+    <div class="form-field">
+      <label>Email Address</label>
+      <input type="email" id="login-email" placeholder="admin@bkkcommunity.co.za" autocomplete="username">
+    </div>
+    <div class="form-field">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div id="login-error" class="login-error-msg"></div>
+    <button class="btn-primary" id="btn-login" onclick="doLogin()">Sign In to Dashboard</button>
+    <div style="text-align: center; margin-top: 15px;">
+      <a href="#" style="color: var(--accent); font-size: 0.9em; text-decoration: none;" onclick="event.preventDefault(); showReset1()">Forgot Password?</a>
+    </div>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD 1: EMAIL -->
+<div id="reset-1-screen" class="auth-screen">
+  <div class="login-card">
+    <h2>Reset Password</h2>
+    <p>Enter the email address associated with your admin account.</p>
+    <div class="form-field">
+      <label>Email Address</label>
+      <input type="email" id="reset-email" placeholder="admin@bkkcommunity.co.za">
+    </div>
+    <div id="reset-1-error" class="login-error-msg"></div>
+    <button class="btn-primary" id="btn-reset-1" onclick="doReset1()">Send 6-Digit Reset Code</button>
+    <div style="text-align: center; margin-top: 15px;">
+      <a href="#" style="color: #888; font-size: 0.9em; text-decoration: none;" onclick="event.preventDefault(); showLogin()">Back to Login</a>
+    </div>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD 2: NEW PASSWORD -->
+<div id="reset-2-screen" class="auth-screen">
+  <div class="login-card">
+    <h2>Reset Password</h2>
+    <p id="reset-code-notice">Enter your 6-digit reset code and new password.</p>
+    <div class="form-field">
+      <label>6-Digit Reset Code</label>
+      <input type="text" id="reset-code-input" placeholder="123456" maxlength="6">
+    </div>
+    <div class="form-field">
+      <label>New Password (min 8 chars)</label>
+      <input type="password" id="reset-new-password" placeholder="••••••••">
+    </div>
+    <div id="reset-2-error" class="login-error-msg"></div>
+    <button class="btn-primary" id="btn-reset-2" onclick="doReset2()">Update Password</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('events', this)">Events</button>
+    <button class="tab" onclick="switchTab('discounts', this)">Discounts</button>
+    <button class="tab" onclick="switchTab('services', this)">Services</button>
+    <button class="tab" onclick="switchTab('members', this)">Members</button>
+  </div>
+
+  <!-- EVENTS -->
+  <div class="section active" id="section-events">
+    <div class="section-header">
+      <h2>Community Events</h2>
+      <button class="btn-add" onclick="openModal('event', null)">+ Add Event</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Title</th><th>Category</th><th>Location</th><th>Start Date</th><th>RSVPs</th><th>Actions</th></tr></thead>
+        <tbody id="events-body"><tr><td colspan="6" class="loading">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DISCOUNTS -->
+  <div class="section" id="section-discounts">
+    <div class="section-header">
+      <h2>Senior Discounts</h2>
+      <button class="btn-add" onclick="openModal('discount', null)">+ Add Discount</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Store</th><th>Title</th><th>Category</th><th>Eligibility</th><th>Valid Until</th><th>Actions</th></tr></thead>
+        <tbody id="discounts-body"><tr><td colspan="6" class="loading">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SERVICES -->
+  <div class="section" id="section-services">
+    <div class="section-header">
+      <h2>Local Services</h2>
+      <button class="btn-add" onclick="openModal('service', null)">+ Add Service</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Type</th><th>Name</th><th>Address</th><th>Phone</th><th>Hours</th><th>Actions</th></tr></thead>
+        <tbody id="services-body"><tr><td colspan="6" class="loading">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MEMBERS -->
+  <div class="section" id="section-members">
+    <div class="section-header">
+      <h2>Members</h2>
+      <span style="color:var(--muted);font-size:13px">Registered community members</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Admin</th><th>Actions</th></tr></thead>
+        <tbody id="members-body"><tr><td colspan="6" class="loading">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <h3 id="modal-title">Add</h3>
+    <div id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" id="btn-save" onclick="saveRecord()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="./config.js"></script>
+<script>
+  // Same-origin is safest. A separate admin deployment may define
+  // window.BKK_API_BASE_URL before this script runs.
+  const API = (window.BKK_API_BASE_URL || '/api/v1').replace(/\/$/, '')
+  let token = sessionStorage.getItem('bkk_admin_token') || ''
+  let editingId = null
+  let currentType = null
+
+  // ── UTILS ──────────────────────────────────────────────────────────────────
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast')
+    t.textContent = msg
+    t.className = 'show ' + type
+    setTimeout(() => t.className = '', 3000)
+  }
+
+  async function api(path, options = {}) {
+    const res = await fetch(API + path, {
+      ...options,
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, ...(options.headers || {}) }
+    })
+    if (res.status === 401) { logout(); throw new Error('Your session expired. Please sign in again.') }
+    if (res.status === 403) { showToast('Access denied — admin only', 'error'); return null }
+    if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error?.message || 'Request failed') }
+    return res.json()
+  }
+
+  function fmt(iso) {
+    if (!iso) return '—'
+    return new Date(iso).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })
+  }
+
+  function toLocalDateTimeValue(iso) {
+    if (!iso) return ''
+    const date = new Date(iso)
+    const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+    return local.toISOString().slice(0, 16)
+  }
+
+  function toIso(value, dateOnly = false) {
+    if (!value) return null
+    const date = new Date(dateOnly ? `${value}T00:00:00` : value)
+    if (Number.isNaN(date.getTime())) throw new Error('Enter a valid date and time.')
+    return date.toISOString()
+  }
+
+  // ── AUTH ───────────────────────────────────────────────────────────────────
+  async function doLogin() {
+    const email = document.getElementById('login-email').value.trim()
+    const password = document.getElementById('login-password').value
+    const errEl = document.getElementById('login-error')
+    const btn = document.getElementById('btn-login')
+    errEl.style.display = 'none'
+    btn.disabled = true; btn.textContent = 'Signing in…'
+    try {
+      const res = await fetch(API + '/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error?.message || 'Invalid credentials')
+      token = data.data.token
+      sessionStorage.setItem('bkk_admin_token', token)
+      // Verify admin access
+      const adminCheck = await fetch(API + '/admin/members', { headers: { 'Authorization': 'Bearer ' + token } })
+      if (!adminCheck.ok) throw new Error(adminCheck.status === 403 ? 'Your account does not have admin access.' : 'Could not verify administrator access.')
+      enterApp(data.data.user.full_name)
+    } catch (e) {
+      token = ''
+      sessionStorage.removeItem('bkk_admin_token')
+      errEl.textContent = e.message
+      errEl.style.display = 'block'
+    } finally {
+      btn.disabled = false; btn.textContent = 'Sign In to Dashboard'
+    }
+  }
+
+  function showLogin() {
+    document.getElementById('login-screen').style.display = 'flex'
+    document.getElementById('reset-1-screen').style.display = 'none'
+    document.getElementById('reset-2-screen').style.display = 'none'
+  }
+
+  function showReset1() {
+    document.getElementById('login-screen').style.display = 'none'
+    document.getElementById('reset-1-screen').style.display = 'flex'
+    document.getElementById('reset-2-screen').style.display = 'none'
+    document.getElementById('reset-email').value = document.getElementById('login-email').value
+  }
+
+  async function doReset1() {
+    const email = document.getElementById('reset-email').value.trim()
+    const errEl = document.getElementById('reset-1-error')
+    const btn = document.getElementById('btn-reset-1')
+    errEl.style.display = 'none'
+    if(!email) { errEl.textContent = 'Email is required'; errEl.style.display = 'block'; return }
+    
+    btn.disabled = true; btn.textContent = 'Sending…'
+    try {
+      const res = await fetch(API + '/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error?.message || 'Error requesting reset')
+      
+      document.getElementById('reset-code-input').value = ''
+      document.getElementById('reset-code-notice').textContent = `A 6-digit reset code has been sent to ${email}. Please check your email inbox.`
+      document.getElementById('reset-1-screen').style.display = 'none'
+      document.getElementById('reset-2-screen').style.display = 'flex'
+    } catch (e) {
+      errEl.textContent = e.message
+      errEl.style.display = 'block'
+    } finally {
+      btn.disabled = false; btn.textContent = 'Send 6-Digit Reset Code'
+    }
+  }
+
+  async function doReset2() {
+    const code = document.getElementById('reset-code-input').value.trim()
+    const password = document.getElementById('reset-new-password').value
+    const errEl = document.getElementById('reset-2-error')
+    const btn = document.getElementById('btn-reset-2')
+    errEl.style.display = 'none'
+    const email = document.getElementById('reset-email').value.trim()
+    if(!/^\d{6}$/.test(code)) { errEl.textContent = 'Enter the 6-digit code from your email'; errEl.style.display = 'block'; return }
+    if(password.length < 8 || !/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) { errEl.textContent = 'Password must be at least 8 characters and include a letter and number'; errEl.style.display = 'block'; return }
+    
+    btn.disabled = true; btn.textContent = 'Updating…'
+    try {
+      const res = await fetch(API + '/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, token: code, password })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error?.message || 'Error resetting password')
+      
+      showToast('Password reset successfully. Please sign in.', 'success')
+      showLogin()
+    } catch (e) {
+      errEl.textContent = e.message
+      errEl.style.display = 'block'
+    } finally {
+      btn.disabled = false; btn.textContent = 'Update Password'
+    }
+  }
+
+  function enterApp(name) {
+    document.getElementById('login-screen').style.display = 'none'
+    document.getElementById('app').style.display = 'block'
+    document.getElementById('nav-user').style.display = 'inline'
+    document.getElementById('nav-user').textContent = name || 'Admin'
+    document.getElementById('btn-logout').style.display = 'inline'
+    document.getElementById('api-dot').className = 'dot online'
+    loadAll()
+  }
+
+  function logout() {
+    if (token) fetch(API + '/auth/session', { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } }).catch(() => {})
+    token = ''; sessionStorage.removeItem('bkk_admin_token')
+    document.getElementById('login-screen').style.display = 'flex'
+    document.getElementById('app').style.display = 'none'
+    document.getElementById('nav-user').style.display = 'none'
+    document.getElementById('btn-logout').style.display = 'none'
+    document.getElementById('api-dot').className = 'dot'
+  }
+
+  // ── AUTO LOGIN ─────────────────────────────────────────────────────────────
+  if (token) {
+    fetch(API + '/admin/members', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(r => { if (r.ok) { r.json().then(() => enterApp(null)); } else logout(); })
+      .catch(() => {})
+  }
+
+  // ── TAB ────────────────────────────────────────────────────────────────────
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'))
+    if (btn) btn.classList.add('active')
+    document.getElementById('section-' + name).classList.add('active')
+  }
+
+  // ── LOAD DATA ──────────────────────────────────────────────────────────────
+  function loadAll() { loadEvents(); loadDiscounts(); loadServices(); loadMembers(); }
+
+  let eventsData = [], discountsData = [], servicesData = []
+
+  // Escapes HTML special characters to prevent XSS and attribute breakage
+  function esc(str) {
+    if (str === null || str === undefined) return '';
+    return String(str).replace(/[&<>'"]/g, tag => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    }[tag]));
+  }
+
+  async function loadEvents() {
+    try {
+      const data = await api('/admin/events')
+      if (!data) return
+      eventsData = data.data || []
+      const body = document.getElementById('events-body')
+      if (!eventsData.length) { body.innerHTML = '<tr><td colspan="6" class="empty">No events yet.</td></tr>'; return }
+      body.innerHTML = eventsData.map(e => `
+        <tr>
+          <td><strong>${esc(e.title)}</strong></td>
+          <td><span class="badge badge-${esc(e.category).toLowerCase()}">${esc(e.category)}</span></td>
+          <td>${esc(e.location)}</td>
+          <td>${fmt(e.startAt)}</td>
+          <td>${e.rsvp_count || 0} attending</td>
+          <td><div class="row-actions">
+            <button class="btn-edit" onclick="openModal('event', ${e.id})">Edit</button>
+            <button class="btn-delete" onclick="deleteRecord('event', ${e.id})">Delete</button>
+          </div></td>
+        </tr>`).join('')
+    } catch (e) { document.getElementById('events-body').innerHTML = `<tr><td colspan="6" class="empty">${esc(e.message)}</td></tr>` }
+  }
+
+  async function loadDiscounts() {
+    try {
+      const data = await api('/admin/discounts')
+      if (!data) return
+      discountsData = data.data || []
+      const body = document.getElementById('discounts-body')
+      if (!discountsData.length) { body.innerHTML = '<tr><td colspan="6" class="empty">No discounts yet.</td></tr>'; return }
+      body.innerHTML = discountsData.map(d => `
+        <tr>
+          <td><strong>${esc(d.storeName)}</strong></td>
+          <td>${esc(d.title)}</td>
+          <td><span class="badge badge-pharmacy">${esc(d.category)}</span></td>
+          <td>${esc(d.eligibility)}</td>
+          <td>${fmt(d.validUntil)}</td>
+          <td><div class="row-actions">
+            <button class="btn-edit" onclick="openModal('discount', ${d.id})">Edit</button>
+            <button class="btn-delete" onclick="deleteRecord('discount', ${d.id})">Delete</button>
+          </div></td>
+        </tr>`).join('')
+    } catch (e) { document.getElementById('discounts-body').innerHTML = `<tr><td colspan="6" class="empty">${esc(e.message)}</td></tr>` }
+  }
+
+  async function loadServices() {
+    try {
+      const data = await api('/admin/services')
+      if (!data) return
+      servicesData = data.data || []
+      const body = document.getElementById('services-body')
+      if (!servicesData.length) { body.innerHTML = '<tr><td colspan="6" class="empty">No services yet.</td></tr>'; return }
+      body.innerHTML = servicesData.map(s => `
+        <tr>
+          <td><span class="badge badge-pharmacy">${esc(s.type)}</span></td>
+          <td><strong>${esc(s.name)}</strong></td>
+          <td>${esc(s.address)}</td>
+          <td>${esc(s.phone)}</td>
+          <td>${esc(s.openingHours || '—')}</td>
+          <td><div class="row-actions">
+            <button class="btn-edit" onclick="openModal('service', ${s.id})">Edit</button>
+            <button class="btn-delete" onclick="deleteRecord('service', ${s.id})">Delete</button>
+          </div></td>
+        </tr>`).join('')
+    } catch (e) { document.getElementById('services-body').innerHTML = `<tr><td colspan="6" class="empty">${esc(e.message)}</td></tr>` }
+  }
+
+  async function loadMembers() {
+    try {
+      const data = await api('/admin/members')
+      if (!data) return
+      const body = document.getElementById('members-body')
+      if (!data.data.length) { body.innerHTML = '<tr><td colspan="6" class="empty">No members yet.</td></tr>'; return }
+      body.innerHTML = data.data.map(m => `
+        <tr>
+          <td><strong>${esc(m.fullName)}</strong></td>
+          <td>${esc(m.email)}</td>
+          <td>${esc(m.phone || '—')}</td>
+          <td>${fmt(m.createdAt)}</td>
+          <td>${m.isAdmin ? '<span class="badge badge-admin">Admin</span>' : '<span style="color:var(--muted)">Member</span>'}</td>
+          <td><div class="row-actions">
+            <button class="btn-edit" onclick='toggleAdmin(${m.id}, ${!m.isAdmin})'>${m.isAdmin ? 'Remove Admin' : 'Make Admin'}</button>
+          </div></td>
+        </tr>`).join('')
+    } catch (e) { document.getElementById('members-body').innerHTML = `<tr><td colspan="6" class="empty">${esc(e.message)}</td></tr>` }
+  }
+
+  // ── MODAL ──────────────────────────────────────────────────────────────────
+  function openModal(type, idOrRecord) {
+    let record = idOrRecord
+    if (typeof idOrRecord === 'number') {
+      if (type === 'event') record = eventsData.find(x => x.id === idOrRecord)
+      if (type === 'discount') record = discountsData.find(x => x.id === idOrRecord)
+      if (type === 'service') record = servicesData.find(x => x.id === idOrRecord)
+    }
+    currentType = type; editingId = record?.id || null
+    document.getElementById('modal-title').textContent = (editingId ? 'Edit' : 'Add') + ' ' + {event:'Event',discount:'Discount',service:'Service'}[type]
+    document.getElementById('modal-body').innerHTML = buildForm(type, record)
+    document.getElementById('modal-overlay').classList.add('open')
+  }
+
+  function closeModal() { document.getElementById('modal-overlay').classList.remove('open') }
+
+  function buildForm(type, r) {
+    if (type === 'event') return `
+      <div class="form-field"><label>Title *</label><input id="f-title" value="${esc(r?.title)}"></div>
+      <div class="form-field"><label>Location *</label><input id="f-location" value="${esc(r?.location)}"></div>
+      <div class="form-field"><label>Directions (Google Maps Link)</label><input id="f-directions" value="${esc(r?.directions)}"></div>
+      <div class="form-field"><label>Description *</label><textarea id="f-description" rows="3">${esc(r?.description)}</textarea></div>
+      <div class="form-row">
+        <div class="form-field"><label>Category *</label><select id="f-category">
+          <option value="Exercise" ${r?.category==='Exercise'?'selected':''}>Exercise</option>
+          <option value="Social" ${r?.category==='Social'?'selected':''}>Social</option>
+          <option value="Health" ${r?.category==='Health'?'selected':''}>Health</option>
+        </select></div>
+        <div class="form-field"><label>Colour Hex</label><input id="f-colourHex" value="${esc(r?.colourHex)||'#315C24'}" placeholder="#315C24"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label>Start Date & Time *</label><input type="datetime-local" id="f-startAt" value="${toLocalDateTimeValue(r?.startAt)}"></div>
+        <div class="form-field"><label>End Date & Time *</label><input type="datetime-local" id="f-endAt" value="${toLocalDateTimeValue(r?.endAt)}"></div>
+      </div>`
+    if (type === 'discount') return `
+      <div class="form-field"><label>Store Name *</label><input id="f-storeName" value="${esc(r?.storeName)}"></div>
+      <div class="form-row">
+        <div class="form-field"><label>Title (Offer) *</label><input id="f-title" value="${esc(r?.title)}"></div>
+        <div class="form-field"><label>Category *</label><input id="f-category" value="${esc(r?.category)}"></div>
+      </div>
+      <div class="form-field"><label>Details *</label><textarea id="f-details" rows="2">${esc(r?.details)}</textarea></div>
+      <div class="form-field"><label>Eligibility *</label><input id="f-eligibility" value="${esc(r?.eligibility)}" placeholder="e.g. Present BKK tag"></div>
+      <div class="form-field"><label>Claim Instructions *</label><input id="f-claimInstructions" value="${esc(r?.claimInstructions)}"></div>
+      <div class="form-row">
+        <div class="form-field"><label>Valid From</label><input type="date" id="f-validFrom" value="${r?.validFrom?r.validFrom.slice(0,10):''}"></div>
+        <div class="form-field"><label>Valid Until</label><input type="date" id="f-validUntil" value="${r?.validUntil?r.validUntil.slice(0,10):''}"></div>
+      </div>`
+    if (type === 'service') return `
+      <div class="form-row">
+        <div class="form-field"><label>Type *</label><select id="f-type">
+          ${['Pharmacy','Clinic','Hospital','Doctor','Dentist','Optometrist','Physiotherapist','Other'].map(t=>`<option value="${t}" ${r?.type===t?'selected':''}>${t}</option>`).join('')}
+        </select></div>
+        <div class="form-field"><label>Phone *</label><input id="f-phone" value="${esc(r?.phone)}"></div>
+      </div>
+      <div class="form-field"><label>Name *</label><input id="f-name" value="${esc(r?.name)}"></div>
+      <div class="form-field"><label>Address *</label><input id="f-address" value="${esc(r?.address)}"></div>
+      <div class="form-field"><label>Directions / Maps URL</label><input id="f-directions" value="${esc(r?.directions)}"></div>
+      <div class="form-field"><label>Opening Hours</label><input id="f-openingHours" value="${esc(r?.openingHours)}" placeholder="e.g. Mon–Fri 08:00–17:00"></div>`
+  }
+
+  function val(id) { const el = document.getElementById(id); return el ? el.value.trim() : undefined }
+
+  async function saveRecord() {
+    const btn = document.getElementById('btn-save')
+    btn.disabled = true; btn.textContent = 'Saving…'
+    try {
+      let body = {}
+      if (currentType === 'event') {
+        const title = val('f-title'), description = val('f-description'), category = val('f-category') || 'Exercise', colourHex = val('f-colourHex'), location = val('f-location'), directions = val('f-directions'), startAt = val('f-startAt'), endAt = val('f-endAt');
+        if (!title || !description || !startAt || !endAt || !location) throw new Error('Please fill in all required fields (marked with *).');
+        body = { title, description, category, colourHex, location, directions, startAt: toIso(startAt), endAt: toIso(endAt) };
+      }
+      if (currentType === 'discount') {
+        const storeName = val('f-storeName'), category = val('f-category'), title = val('f-title'), details = val('f-details'), eligibility = val('f-eligibility'), claimInstructions = val('f-claimInstructions'), validFrom = val('f-validFrom'), validUntil = val('f-validUntil');
+        if (!storeName || !title || !details || !eligibility || !claimInstructions || !category) throw new Error('Please fill in all required fields (marked with *).');
+        body = { storeName, category, title, details, eligibility, claimInstructions, validFrom: toIso(validFrom, true), validUntil: toIso(validUntil, true) };
+      }
+      if (currentType === 'service') {
+        const type = val('f-type'), name = val('f-name'), address = val('f-address'), phone = val('f-phone'), directions = val('f-directions'), openingHours = val('f-openingHours');
+        if (!type || !name || !address || !phone) throw new Error('Please fill in all required fields (marked with *).');
+        body = { type, name, address, phone, directions, openingHours };
+      }
+
+      const paths = { event: 'events', discount: 'discounts', service: 'services' }
+      const path = '/admin/' + paths[currentType] + (editingId ? '/' + editingId : '')
+      await api(path, { method: editingId ? 'PUT' : 'POST', body: JSON.stringify(body) })
+      showToast((editingId ? 'Updated' : 'Created') + ' successfully!', 'success')
+      closeModal()
+      loadAll()
+    } catch (e) {
+      showToast(e.message, 'error')
+    } finally {
+      btn.disabled = false; btn.textContent = 'Save'
+    }
+  }
+
+  async function deleteRecord(type, id) {
+    if (!confirm(`Delete this ${type}? This cannot be undone.`)) return
+    const paths = { event: 'events', discount: 'discounts', service: 'services' }
+    try {
+      await api('/admin/' + paths[type] + '/' + id, { method: 'DELETE' })
+      showToast('Deleted successfully', 'success')
+      loadAll()
+    } catch (e) { showToast(e.message, 'error') }
+  }
+
+  async function toggleAdmin(id, makeAdmin) {
+    if (!confirm(`${makeAdmin ? 'Grant' : 'Revoke'} admin access for this member?`)) return
+    try {
+      await api('/admin/members/' + id + '/admin', { method: 'PATCH', body: JSON.stringify({ isAdmin: makeAdmin }) })
+      showToast(`Admin access ${makeAdmin ? 'granted' : 'revoked'}`, 'success')
+      loadMembers()
+    } catch (e) { showToast(e.message, 'error') }
+  }
+
+  // Enter on login
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && document.getElementById('login-screen').style.display !== 'none') doLogin()
+  })
+</script>
+</body>
+</html>

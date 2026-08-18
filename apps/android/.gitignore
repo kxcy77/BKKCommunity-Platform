@@ -1,0 +1,22 @@
+# Android Studio and Gradle generated files
+.gradle/
+.idea/
+.kotlin/
+**/build/
+local.properties
+*.iml
+
+# Signing files and service credentials
+google-services.json
+**/google-services.json
+*.jks
+*.keystore
+keystore.properties
+
+# Native build and capture output
+.externalNativeBuild/
+.cxx/
+captures/
+
+# macOS metadata
+.DS_Store

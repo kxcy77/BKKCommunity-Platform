@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+project_dir="$(cd "$(dirname "$0")/.." && pwd)"
+test_port="${BKK_TEST_PORT:-8091}"
+base_url="http://127.0.0.1:${test_port}"
+server_log="$(mktemp /tmp/bkk-web-server.XXXXXX)"
+cookie_jar="$(mktemp /tmp/bkk-web-cookie.XXXXXX)"
+
+php -S "127.0.0.1:${test_port}" -t "${project_dir}/public" "${project_dir}/public/router.php" >"${server_log}" 2>&1 &
+server_pid=$!
+trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+for attempt in {1..20}; do
+  if curl -fsS "${base_url}/index.php" >/dev/null 2>&1; then
+    break
+  fi
+  sleep 0.2
+done
+
+for route in index.php events.php discounts.php info.php contact.php login.php register.php reset-password.php new-password.php; do
+  code="$(curl -sS -o /dev/null -w '%{http_code}' "${base_url}/${route}")"
+  [[ "$code" == "200" ]] || { echo "FAIL ${route}: HTTP ${code}"; exit 1; }
+  echo "PASS ${route}: HTTP ${code}"
+done
+
+home_html="$(curl -fsS "${base_url}/index.php")"
+nav_count="$(printf '%s' "$home_html" | php -r '$html=stream_get_contents(STDIN); preg_match("/<div class=\"nav-links\">(.*?)<\\/div>/s", $html, $match); preg_match_all("/<a\\s/i", $match[1] ?? "", $links); echo count($links[0]);')"
+[[ "$nav_count" == "5" ]] || { echo "FAIL primary navigation has ${nav_count} choices"; exit 1; }
+printf '%s' "$home_html" | grep -q 'What would you like to do today?' || { echo 'FAIL simplified home task prompt'; exit 1; }
+echo 'PASS primary navigation is limited to five choices and Home has a single task prompt'
+
+php -r 'require "app/repository.php"; $demo=["category"=>"Demonstration","title"=>"BKK App Demonstration Event - Not a Real Event","description"=>"TEST CONTENT ONLY","location"=>"Demonstration only - do not travel"]; if (!is_demonstration_event($demo)) exit(1); if (is_demonstration_event(["category"=>"Social","title"=>"Community lunch","description"=>"Meet neighbours","location"=>"BKK Hall"])) exit(1);' \
+  || { echo 'FAIL demonstration event safety rule'; exit 1; }
+echo 'PASS demonstration events are identified independently of their database ID'
+
+health_code="$(curl -sS -o /tmp/bkk-health.json -w '%{http_code}' "${base_url}/health")"
+[[ "$health_code" == "200" ]] || { echo "FAIL health: HTTP ${health_code}"; exit 1; }
+php -r '$json=json_decode(file_get_contents("/tmp/bkk-health.json"), true); if (($json["data"]["status"] ?? null) !== "ok") exit(1);'
+echo 'PASS health reports the running service'
+
+ready_code="$(curl -sS -o /tmp/bkk-ready.json -w '%{http_code}' "${base_url}/ready")"
+[[ "$ready_code" == "503" ]] || { echo "FAIL unconfigured readiness: HTTP ${ready_code}"; exit 1; }
+php -r '$json=json_decode(file_get_contents("/tmp/bkk-ready.json"), true); if (($json["error"]["code"] ?? null) !== "database_unavailable") exit(1);'
+echo 'PASS readiness fails closed without a database'
+
+unknown_code="$(curl -sS -o /dev/null -w '%{http_code}' "${base_url}/not-a-real-route")"
+[[ "$unknown_code" == "404" ]] || { echo "FAIL unknown route: HTTP ${unknown_code}"; exit 1; }
+echo 'PASS unknown routes return 404'
+
+large_body_code="$(php -r 'echo str_repeat("x", 33000);' | curl -sS -o /tmp/bkk-large-body.json -w '%{http_code}' -H 'Content-Type: application/json' --data-binary @- "${base_url}/api/v1/auth/login")"
+[[ "$large_body_code" == "413" ]] || { echo "FAIL oversized API body: HTTP ${large_body_code}"; exit 1; }
+php -r '$json=json_decode(file_get_contents("/tmp/bkk-large-body.json"), true); if (($json["error"]["code"] ?? null) !== "payload_too_large") exit(1);'
+echo 'PASS oversized API bodies are rejected'
+
+for route in profile.php admin/index.php admin/events.php admin/discounts.php admin/services.php admin/messages.php; do
+  code="$(curl -sS -o /dev/null -w '%{http_code}' "${base_url}/${route}")"
+  [[ "$code" == "302" ]] || { echo "FAIL guest protection ${route}: HTTP ${code}"; exit 1; }
+  echo "PASS guest protection ${route}: HTTP ${code}"
+done
+
+csrf_code="$(curl -sS -o /dev/null -w '%{http_code}' --data 'action=logout&csrf_token=invalid' "${base_url}/actions.php")"
+[[ "$csrf_code" == "419" ]] || { echo "FAIL CSRF protection: HTTP ${csrf_code}"; exit 1; }
+echo "PASS CSRF protection: HTTP ${csrf_code}"
+
+login_html="$(curl -sS -c "$cookie_jar" "${base_url}/login.php")"
+csrf="$(printf '%s' "$login_html" | sed -n 's/.*name="csrf_token" value="\([^"]*\)".*/\1/p' | head -1)"
+curl -fsS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null \
+  --data-urlencode "csrf_token=${csrf}" \
+  --data-urlencode 'action=login' \
+  --data-urlencode 'email=member@bkk.demo' \
+  --data-urlencode 'password=MemberDemo!26' \
+  "${base_url}/actions.php"
+
+profile_html="$(curl -fsS -b "$cookie_jar" "${base_url}/profile.php")"
+printf '%s' "$profile_html" | grep -q 'Thandiwe Nkosi' || { echo 'FAIL member login'; exit 1; }
+echo 'PASS member login and protected profile'
+
+admin_cookie="$(mktemp /tmp/bkk-web-admin-cookie.XXXXXX)"
+admin_login_html="$(curl -sS -c "$admin_cookie" "${base_url}/login.php")"
+admin_csrf="$(printf '%s' "$admin_login_html" | sed -n 's/.*name="csrf_token" value="\([^"]*\)".*/\1/p' | head -1)"
+curl -fsS -b "$admin_cookie" -c "$admin_cookie" -o /dev/null \
+  --data-urlencode "csrf_token=${admin_csrf}" \
+  --data-urlencode 'action=login' \
+  --data-urlencode 'email=admin@bkk.demo' \
+  --data-urlencode 'password=AdminDemo!26' \
+  "${base_url}/actions.php"
+admin_html="$(curl -fsS -b "$admin_cookie" "${base_url}/admin/index.php")"
+printf '%s' "$admin_html" | grep -q 'Dashboard overview' || { echo 'FAIL admin login'; exit 1; }
+echo 'PASS admin login and protected dashboard'
+
+for route in admin/events.php admin/discounts.php admin/services.php admin/messages.php; do
+  code="$(curl -sS -b "$admin_cookie" -o /dev/null -w '%{http_code}' "${base_url}/${route}")"
+  [[ "$code" == "200" ]] || { echo "FAIL authenticated ${route}: HTTP ${code}"; exit 1; }
+  echo "PASS authenticated ${route}: HTTP ${code}"
+done

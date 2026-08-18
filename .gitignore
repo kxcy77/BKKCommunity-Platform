@@ -1,0 +1,32 @@
+# Secrets and machine-specific configuration
+.env
+.env.*
+!.env.example
+local.properties
+google-services.json
+GoogleService-Info.plist
+*.keystore
+*.jks
+*.p12
+*.mobileprovision
+
+# Generated dependencies and build output
+node_modules/
+vendor/
+dist/
+build/
+.gradle/
+.kotlin/
+.build/
+.swiftpm/
+DerivedData/
+coverage/
+*.apk
+*.aab
+*.ipa
+
+# Editor and operating-system files
+.DS_Store
+*.log
+**/xcuserdata/
+*.xcuserstate

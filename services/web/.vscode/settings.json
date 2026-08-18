@@ -1,0 +1,8 @@
+{
+  "php.validate.executablePath": "/opt/homebrew/bin/php",
+  "php.validate.run": "onSave",
+  "files.exclude": {
+    "**/.appdeploy-work": true,
+    "**/vendor": true
+  }
+}
