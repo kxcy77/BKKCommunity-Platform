@@ -2,6 +2,8 @@
 
 This is the clean, source-only backup repository for the BKK Community group project. It combines the Android app, iOS app, canonical website/API, shared documentation and development-reference code in one place.
 
+**New to the project? Start with [START_HERE.md](START_HERE.md).**
+
 ## Start here
 
 | Area | Location | Purpose |
