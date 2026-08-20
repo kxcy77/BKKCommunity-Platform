@@ -5,6 +5,7 @@ CREATE TABLE users (
     phone VARCHAR(30) NULL,
     password_hash VARCHAR(255) NOT NULL,
     role ENUM('member', 'admin') NOT NULL DEFAULT 'member',
+    auth_version INT UNSIGNED NOT NULL DEFAULT 1,
     notifications_enabled BOOLEAN NOT NULL DEFAULT TRUE,
     event_reminders_enabled BOOLEAN NOT NULL DEFAULT TRUE,
     discount_alerts_enabled BOOLEAN NOT NULL DEFAULT TRUE,
@@ -53,6 +54,7 @@ CREATE TABLE events (
     location VARCHAR(190) NOT NULL,
     directions TEXT NULL,
     status ENUM('draft', 'published', 'cancelled') NOT NULL DEFAULT 'published',
+    row_version INT UNSIGNED NOT NULL DEFAULT 1,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_event_category FOREIGN KEY (category_id) REFERENCES event_categories(id),
@@ -88,6 +90,7 @@ CREATE TABLE discounts (
     valid_from DATE NULL,
     valid_until DATE NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    row_version INT UNSIGNED NOT NULL DEFAULT 1,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_discount_category FOREIGN KEY (category_id) REFERENCES discount_categories(id),
@@ -103,6 +106,7 @@ CREATE TABLE local_services (
     directions TEXT NULL,
     opening_hours VARCHAR(190) NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    row_version INT UNSIGNED NOT NULL DEFAULT 1,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_local_service_type_active (type, is_active)
@@ -162,4 +166,20 @@ CREATE TABLE api_rate_limits (
     expires_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_api_rate_limit_expiry (expires_at)
+);
+
+CREATE TABLE admin_audit_log (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    admin_user_id BIGINT UNSIGNED NULL,
+    action VARCHAR(80) NOT NULL,
+    entity_type VARCHAR(50) NOT NULL,
+    entity_id BIGINT UNSIGNED NULL,
+    before_json JSON NULL,
+    after_json JSON NULL,
+    reason VARCHAR(255) NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_admin_audit_user FOREIGN KEY (admin_user_id) REFERENCES users(id) ON DELETE SET NULL,
+    INDEX idx_admin_audit_created (created_at),
+    INDEX idx_admin_audit_entity (entity_type, entity_id),
+    INDEX idx_admin_audit_admin (admin_user_id, created_at)
 );

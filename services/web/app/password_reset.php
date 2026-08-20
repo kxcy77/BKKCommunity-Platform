@@ -96,7 +96,8 @@ function consume_password_reset_code(string $email, string $code, string $passwo
         }
 
         $completedAt = gmdate('Y-m-d H:i:s');
-        $db->prepare('UPDATE users SET password_hash = ? WHERE id = ?')->execute([$passwordHash, (int) $userId]);
+        $db->prepare('UPDATE users SET password_hash = ?, auth_version = auth_version + 1 WHERE id = ?')
+            ->execute([$passwordHash, (int) $userId]);
         $db->prepare('UPDATE password_reset_tokens SET used_at = ? WHERE user_id = ? AND used_at IS NULL')
             ->execute([$completedAt, (int) $userId]);
         $db->prepare('UPDATE auth_sessions SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL')

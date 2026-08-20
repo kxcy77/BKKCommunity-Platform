@@ -14,8 +14,8 @@ Responsive evidence is also available in [the mobile home capture](docs/screensh
 - Member registration, login, password reset, profile, RSVP/attendance history and notification preferences.
 - Senior-discount filters with eligibility and claim instructions.
 - Local-service directory and contact form.
-- Administrator dashboard with event, discount, local-service and contact-inbox management.
-- Session-only demonstration mode when MySQL is not configured.
+- Administrator dashboard with validated event, discount and local-service editing, audited archive/restore, paginated contact-message management and an audit-history viewer.
+- Explicit local-only demonstration mode configured through uncommitted environment variables. Production fails closed when MySQL is unavailable.
 - Shared MySQL schema compatible with the BKK Android/API project, plus sample content for persistent mode.
 - CSRF protection, secure session cookies, database-backed IP/account abuse throttling and strict response security headers.
 - Versioned JSON API for the Android app with hashed bearer sessions and database-required writes.
@@ -34,10 +34,10 @@ Responsive evidence is also available in [the mobile home capture](docs/screensh
 
 ```bash
 cd /path/to/BKKCommunity-Web
-php -S 127.0.0.1:8080 -t public public/router.php
+APP_ENV=development ALLOW_DEMO_MODE=true php -S 127.0.0.1:8080 -t public public/router.php
 ```
 
-Open <http://127.0.0.1:8080>. Without a `.env` file containing database credentials, the application clearly identifies itself as a session-only demo.
+Open <http://127.0.0.1:8080>. Persistent mode requires MySQL. To use session-only demonstration mode locally, set `ALLOW_DEMO_MODE=true` and configure unique `DEMO_MEMBER_*` and `DEMO_ADMIN_*` values in an uncommitted `.env` file. Demonstration mode is always disabled when `APP_ENV=production`.
 
 The `/api/v1` routes deliberately do not use the browser's session-only demo mode. If MySQL is unavailable they return HTTP 503 and confirm that nothing was saved. This prevents the Android app from displaying false success for contact, account or attendance actions.
 
@@ -46,10 +46,6 @@ The `/api/v1` routes deliberately do not use the browser's session-only demo mod
 This repository includes a ready-to-use Visual Studio Code workspace setup. Open this folder in Visual Studio Code, press `Command + Shift + B`, then choose **BKK: Run web app locally**. Open <http://127.0.0.1:8080> to view it.
 
 PHP is run by a web server rather than compiled into an executable. Visual Studio for Mac is retired, so the correct and supportable Microsoft tool on this Mac is **Visual Studio Code**. See [the Visual Studio Code setup guide](docs/VISUAL_STUDIO_CODE.md) for the exact workflow and report wording.
-
-Demo member: `member@bkk.demo` / `MemberDemo!26`
-
-Demo administrator: `admin@bkk.demo` / `AdminDemo!26`
 
 ## Configure MySQL
 
@@ -75,6 +71,9 @@ Set these Railway service variables:
 - `APP_ENV=production`
 - `APP_URL=https://bkk-community-platform-production.up.railway.app`
 - `APP_TRUST_PROXY=true`
+- `ALLOW_DEMO_MODE=false`
+- `ADMIN_IDLE_TIMEOUT_SECONDS=1800` and `ADMIN_ABSOLUTE_TIMEOUT_SECONDS=28800`
+- `CONTACT_RETENTION_DAYS=365`
 - the five `DB_*` variables supplied by Railway MySQL
 - `RUN_DATABASE_INITIALIZATION=false` after the first schema creation; safe numbered migrations still run on startup
 - `RESET_CODE_SECRET` generated with `php -r 'echo bin2hex(random_bytes(32)), PHP_EOL;'`
@@ -85,6 +84,8 @@ Set these Railway service variables:
 The SMTP variables are now fallback-only and may be omitted when Resend is configured. Use a sender address on a domain verified by the provider. Never commit the API key or a normal email-account password. After deployment, `/health` must return 200 and `/ready` must return 200 before the mobile apps are tested.
 
 The migration adds one unmistakably labelled demonstration event so event details and RSVP can be verified without pretending it is authentic BKK information. Replace it through the protected administrator page once the stakeholder supplies a real event; its location explicitly tells users not to travel.
+
+Run `./bin/purge-resolved-contact-messages.php` from a protected scheduled Railway job to remove resolved contact messages older than the configured retention period. Each purge writes a summary to the administrator audit log.
 
 ## Verify
 

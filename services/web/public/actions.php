@@ -254,116 +254,23 @@ if ($action === 'delete_account') {
     redirect_to('index.php');
 }
 
-if ($action === 'admin_create_event') {
-    require_admin();
-    $event = [
-        'title' => trim((string) ($_POST['title'] ?? '')),
-        'date' => trim((string) ($_POST['date'] ?? '')),
-        'time' => trim((string) ($_POST['time'] ?? '')),
-        'end_time' => trim((string) ($_POST['end_time'] ?? '')),
-        'location' => trim((string) ($_POST['location'] ?? '')),
-        'category' => trim((string) ($_POST['category'] ?? 'Community')),
-        'tone' => trim((string) ($_POST['tone'] ?? 'blue')),
-        'description' => trim((string) ($_POST['description'] ?? '')),
-    ];
-    $startAt = DateTimeImmutable::createFromFormat('!Y-m-d H:i', $event['date'] . ' ' . $event['time']);
-    $endAt = DateTimeImmutable::createFromFormat('!Y-m-d H:i', $event['date'] . ' ' . $event['end_time']);
-    $exactStart = $startAt && $startAt->format('Y-m-d H:i') === $event['date'] . ' ' . $event['time'];
-    $exactEnd = $endAt && $endAt->format('Y-m-d H:i') === $event['date'] . ' ' . $event['end_time'];
-    if (mb_strlen($event['title']) < 3 || !$exactStart || !$exactEnd || $endAt <= $startAt || $startAt <= new DateTimeImmutable('now') || mb_strlen($event['location']) < 3 || mb_strlen($event['description']) < 10) {
-        flash('error', 'Complete every event field with valid information.');
-        redirect_to('admin/events.php');
-    }
-    admin_create_event($event);
-    flash('success', 'The event was added' . (is_demo_mode() ? ' for this demo session.' : '.'));
-    redirect_to('admin/events.php');
-}
-
-if ($action === 'admin_delete_event') {
-    require_admin();
-    $eventId = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
-    if (!$eventId) {
-        flash('error', 'That event could not be found.');
-        redirect_to('admin/events.php');
-    }
-    admin_delete_event((int) $eventId);
-    flash('success', 'The event was deleted.');
-    redirect_to('admin/events.php');
-}
-
-if ($action === 'admin_create_discount') {
-    require_admin();
-    $discount = [
-        'store_name' => trim((string) ($_POST['store_name'] ?? '')),
-        'category' => trim((string) ($_POST['category'] ?? '')),
-        'deal' => trim((string) ($_POST['deal'] ?? '')),
-        'eligibility' => trim((string) ($_POST['eligibility'] ?? '')),
-        'claim_instructions' => trim((string) ($_POST['claim_instructions'] ?? '')),
-        'tone' => trim((string) ($_POST['tone'] ?? 'gold')),
-    ];
-    if (mb_strlen($discount['store_name']) < 2 || mb_strlen($discount['category']) < 2 || mb_strlen($discount['deal']) < 5 || mb_strlen($discount['eligibility']) < 3 || mb_strlen($discount['claim_instructions']) < 5) {
-        flash('error', 'Complete every discount field with clear information.');
-        redirect_to('admin/discounts.php');
-    }
-    admin_create_discount($discount);
-    flash('success', 'The discount was added' . (is_demo_mode() ? ' for this demo session.' : '.'));
-    redirect_to('admin/discounts.php');
-}
-
-if ($action === 'admin_delete_discount') {
-    require_admin();
-    $discountId = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
-    if (!$discountId) {
-        flash('error', 'That discount could not be found.');
-        redirect_to('admin/discounts.php');
-    }
-    admin_delete_discount((int) $discountId);
-    flash('success', 'The discount was deleted.');
-    redirect_to('admin/discounts.php');
-}
+require dirname(__DIR__) . '/app/admin_actions.php';
 
 if ($action === 'admin_update_message') {
     require_admin();
     $messageId = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
     $status = trim((string) ($_POST['status'] ?? ''));
-    if (!$messageId || !admin_update_contact_status((int) $messageId, $status)) {
+    try {
+        $updated = $messageId && admin_update_contact_status((int) $messageId, $status);
+    } catch (Throwable $exception) {
+        admin_failed_change($exception, 'admin/messages.php');
+    }
+    if (!$updated) {
         flash('error', 'The message status could not be updated.');
     } else {
         flash('success', 'The message status was updated.');
     }
     redirect_to('admin/messages.php');
-}
-
-if ($action === 'admin_create_service') {
-    require_admin();
-    $service = [
-        'type' => trim((string) ($_POST['type'] ?? '')),
-        'name' => trim((string) ($_POST['name'] ?? '')),
-        'address' => trim((string) ($_POST['address'] ?? '')),
-        'phone' => trim((string) ($_POST['phone'] ?? '')),
-        'directions' => trim((string) ($_POST['directions'] ?? '')),
-        'opening_hours' => trim((string) ($_POST['opening_hours'] ?? '')),
-    ];
-    $types = ['pharmacy', 'clinic', 'shop', 'support', 'transport'];
-    if (!in_array($service['type'], $types, true) || mb_strlen($service['name']) < 2 || mb_strlen($service['address']) < 4 || mb_strlen($service['phone']) < 5 || mb_strlen($service['phone']) > 30 || mb_strlen($service['directions']) < 5 || mb_strlen($service['opening_hours']) < 3) {
-        flash('error', 'Complete every local-service field with valid information.');
-        redirect_to('admin/services.php');
-    }
-    admin_create_service($service);
-    flash('success', 'The local service was added' . (is_demo_mode() ? ' for this demo session.' : '.'));
-    redirect_to('admin/services.php');
-}
-
-if ($action === 'admin_delete_service') {
-    require_admin();
-    $serviceId = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
-    if (!$serviceId) {
-        flash('error', 'That local service could not be found.');
-        redirect_to('admin/services.php');
-    }
-    admin_delete_service((int) $serviceId);
-    flash('success', 'The local service was deleted.');
-    redirect_to('admin/services.php');
 }
 
 http_response_code(400);

@@ -46,7 +46,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     exit(1);
 }
 
-$lookup = $db->prepare('SELECT id, full_name FROM users WHERE email = ? LIMIT 1');
+$lookup = $db->prepare('SELECT id, full_name, role FROM users WHERE email = ? LIMIT 1');
 $lookup->execute([$email]);
 $existing = $lookup->fetch();
 
@@ -56,7 +56,9 @@ if ($existing) {
         fwrite(STDOUT, "No changes made.\n");
         exit(0);
     }
-    $db->prepare("UPDATE users SET role = 'admin', deleted_at = NULL WHERE id = ?")->execute([$existing['id']]);
+    $db->prepare("UPDATE users SET role = 'admin', deleted_at = NULL, auth_version = auth_version + 1 WHERE id = ?")
+        ->execute([$existing['id']]);
+    admin_audit_log('grant_admin_cli', 'user', (int) $existing['id'], ['role' => $existing['role']], ['role' => 'admin'], 'Administrator role granted through the protected CLI command.');
     fwrite(STDOUT, "Administrator access granted.\n");
     exit(0);
 }
@@ -72,5 +74,5 @@ if (mb_strlen($name) < 2 || !$strong) {
 
 $statement = $db->prepare("INSERT INTO users (full_name, email, phone, password_hash, role) VALUES (?, ?, ?, ?, 'admin')");
 $statement->execute([$name, $email, $phone !== '' ? $phone : null, password_hash($password, PASSWORD_DEFAULT)]);
+admin_audit_log('create_admin_cli', 'user', (int) $db->lastInsertId(), null, ['role' => 'admin'], 'Administrator account created through the protected CLI command.');
 fwrite(STDOUT, "Administrator account created.\n");
-

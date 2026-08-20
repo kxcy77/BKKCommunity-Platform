@@ -45,12 +45,11 @@ require __DIR__ . '/partials/header.php';
             </ul>
             <?php if (is_demo_mode()): ?>
                 <div class="demo-credentials">
-                    <strong>Member demo</strong><code>member@bkk.demo</code><code>MemberDemo!26</code>
-                    <br><strong>Administrator demo</strong><code>admin@bkk.demo</code><code>AdminDemo!26</code>
+                    <strong>Local demonstration mode</strong>
+                    <p>Development accounts are configured privately through environment variables.</p>
                 </div>
             <?php endif; ?>
         </aside>
     </div>
 </section>
 <?php require __DIR__ . '/partials/footer.php'; ?>
-

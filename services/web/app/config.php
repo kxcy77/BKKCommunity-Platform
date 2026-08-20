@@ -31,13 +31,29 @@ function env_value(string $key, ?string $default = null): ?string
 
 load_environment(dirname(__DIR__) . '/.env');
 
+$appEnvironment = strtolower((string) env_value('APP_ENV', 'development'));
+$allowDemoMode = $appEnvironment !== 'production'
+    && filter_var(env_value('ALLOW_DEMO_MODE', 'false'), FILTER_VALIDATE_BOOL);
+
 return [
-    'app_env' => env_value('APP_ENV', 'development'),
+    'app_env' => $appEnvironment,
     'app_url' => rtrim((string) env_value('APP_URL', 'http://localhost:8080'), '/'),
     'base_path' => rtrim((string) env_value('APP_BASE_PATH', ''), '/'),
     'session_name' => env_value('APP_SESSION_NAME', 'bkk_community_session'),
     'trust_proxy' => filter_var(env_value('APP_TRUST_PROXY', 'false'), FILTER_VALIDATE_BOOL),
     'reset_code_secret' => env_value('RESET_CODE_SECRET', ''),
+    'allow_demo_mode' => $allowDemoMode,
+    'admin_idle_timeout_seconds' => max(300, (int) env_value('ADMIN_IDLE_TIMEOUT_SECONDS', '1800')),
+    'admin_absolute_timeout_seconds' => max(900, (int) env_value('ADMIN_ABSOLUTE_TIMEOUT_SECONDS', '28800')),
+    'contact_retention_days' => max(30, (int) env_value('CONTACT_RETENTION_DAYS', '365')),
+    'demo' => [
+        'member_email' => strtolower((string) env_value('DEMO_MEMBER_EMAIL', '')),
+        'member_password' => (string) env_value('DEMO_MEMBER_PASSWORD', ''),
+        'member_name' => (string) env_value('DEMO_MEMBER_NAME', 'Demo Member'),
+        'admin_email' => strtolower((string) env_value('DEMO_ADMIN_EMAIL', '')),
+        'admin_password' => (string) env_value('DEMO_ADMIN_PASSWORD', ''),
+        'admin_name' => (string) env_value('DEMO_ADMIN_NAME', 'Demo Administrator'),
+    ],
     'mail' => [
         'resend_api_key' => env_value('RESEND_API_KEY', ''),
         'host' => env_value('SMTP_HOST', ''),

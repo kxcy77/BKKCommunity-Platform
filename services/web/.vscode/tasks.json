@@ -13,7 +13,11 @@
         "public/router.php"
       ],
       "options": {
-        "cwd": "${workspaceFolder}"
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "APP_ENV": "development",
+          "ALLOW_DEMO_MODE": "true"
+        }
       },
       "presentation": {
         "reveal": "always",

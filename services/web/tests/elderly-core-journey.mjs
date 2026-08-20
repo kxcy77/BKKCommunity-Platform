@@ -1,6 +1,8 @@
 import { chromium } from "/Users/videomacbookpro/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/index.mjs";
 
 const baseUrl = process.env.BKK_WEB_URL ?? "http://127.0.0.1:8092";
+const memberEmail = process.env.BKK_TEST_MEMBER_EMAIL;
+const memberPassword = process.env.BKK_TEST_MEMBER_PASSWORD;
 const results = [];
 
 async function check(name, operation) {
@@ -29,9 +31,10 @@ try {
   });
 
   await check("A member can sign in and reach the platform", async () => {
+    if (!memberEmail || !memberPassword) throw new Error("Set BKK_TEST_MEMBER_EMAIL and BKK_TEST_MEMBER_PASSWORD for this test.");
     await page.goto(`${baseUrl}/login.php`, { waitUntil: "networkidle" });
-    await page.getByLabel("Email address").fill("member@bkk.demo");
-    await page.getByLabel("Password", { exact: true }).fill("MemberDemo!26");
+    await page.getByLabel("Email address").fill(memberEmail);
+    await page.getByLabel("Password", { exact: true }).fill(memberPassword);
     await page.getByRole("button", { name: "Log in" }).click();
     await page.waitForLoadState("networkidle");
     if (!page.url().includes("profile.php")) throw new Error(`Unexpected destination: ${page.url()}`);
