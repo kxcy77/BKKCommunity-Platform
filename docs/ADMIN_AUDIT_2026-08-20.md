@@ -2,16 +2,16 @@
 
 **Audit date:** 20 August 2026
 **Scope:** PHP administrator pages, authentication/authorization, content-management actions, MySQL repository functions, responsive administration CSS, existing automated tests, and safe unauthenticated checks against `https://www.bkkcommunity.online`.
-**Method:** Read-only source review, PHP syntax validation, local smoke tests, and non-destructive production HTTP checks.
-**Production writes performed:** None.
+**Method:** Source review, PHP syntax validation, local smoke tests, isolated-MySQL integration and restore tests, Railway deployment verification, and non-destructive production HTTP checks.
+**Production writes performed:** Application revision and database migration deployment only. No event, discount, service, contact-message or user content was created, edited or deleted for this audit.
 
 ## Executive decision
 
-**Status: SOURCE REMEDIATED; STAGING DATABASE AND PRODUCTION DEPLOYMENT VERIFICATION STILL REQUIRED.**
+**Status: REMEDIATION DEPLOYED AND TECHNICALLY VERIFIED; AUTHENTICATED MANUAL ACCESSIBILITY/UAT AND RETENTION SCHEDULING STILL REQUIRED.**
 
-The original audit identified one Critical, four High and five Medium findings. All source-code changes that can be completed without production credentials or human UAT have now been implemented. Production now fails closed without MySQL, demonstration accounts require explicit local-only environment configuration, administrator roles and session versions are revalidated, content supports edit/archive/restore, changes are audited, and contact messages are paginated and searchable.
+The original audit identified one Critical, four High and five Medium findings. The remediated revision is now deployed from the combined public GitHub repository. Production fails closed without MySQL, demonstration accounts require explicit local-only environment configuration, administrator roles and session versions are revalidated, content supports edit/archive/restore, changes are audited, and contact messages are paginated and searchable.
 
-This does **not** prove that the deployed Railway service has the new migration or code. Do not treat the findings as closed in production until migration `007_admin_security_and_audit.sql` is applied, the persistent MySQL test is run in staging, the deployment is checked, and manual responsive/accessibility testing is recorded.
+Railway reports the combined-repository deployment as successful. Live `/health` and `/ready` checks returned `200`, the protected audit route is present, signed-out administrator routes redirect to login, and the production database records `007_admin_security_and_audit.sql` as applied. A compressed production backup was integrity-checked and successfully restored into a temporary isolated MySQL database before that temporary database was removed. These technical checks do **not** replace authenticated administrator UAT, keyboard/screen-reader evidence, 200% zoom checks or testing by elderly participants.
 
 ## Remediation verification added on 20 August 2026
 
@@ -48,7 +48,7 @@ This does **not** prove that the deployed Railway service has the new migration 
 
 **Severity:** Critical
 **Confidence:** High
-**Status:** Fixed in source; deployment verification pending
+**Status:** Fixed, deployed and unauthenticated production smoke verified
 
 When `DB_HOST` is empty, `database()` returns `null`. The application then treats the request as demo mode. `attempt_login()` contains hard-coded member and administrator credentials in the public source code, including `admin@bkk.demo` and its password. `APP_ENV` is loaded but is not used to prohibit demo mode in production.
 
@@ -73,7 +73,7 @@ The live login page did not expose demo markers during the audit, which indicate
 
 **Severity:** High
 **Confidence:** High
-**Status:** Fixed in source and isolated MySQL verified; deployment verification pending
+**Status:** Fixed, deployed and isolated MySQL verified; authenticated production lifecycle UAT pending
 
 Events, discounts and local services support Create, Read and Delete only. There are no edit forms, update handlers or update repository functions. An administrator who notices a spelling mistake, changed event time, expired discount or changed service telephone number must delete and recreate the entire record.
 
@@ -98,7 +98,7 @@ This does not satisfy full CRUD and creates avoidable mistakes in a platform des
 
 **Severity:** High
 **Confidence:** High
-**Status:** Fixed in source; role revocation verified in isolated MySQL, production timing verification pending
+**Status:** Fixed and deployed; role revocation verified in isolated MySQL, manual production timing evidence pending
 
 The web application stores the complete user role in `$_SESSION['user']`. `current_user()` returns this cached session record and `is_admin()` trusts the cached `role`. There is no administrator idle timeout, absolute session lifetime, or database revalidation. If an administrator is demoted or deleted in MySQL, an existing PHP session may retain administrator access until it is manually logged out or expires according to server defaults.
 
@@ -120,7 +120,7 @@ The web application stores the complete user role in `$_SESSION['user']`. `curre
 
 **Severity:** High
 **Confidence:** High
-**Status:** Fixed in source and isolated MySQL verified; deployment verification pending
+**Status:** Fixed, deployed and isolated MySQL verified; authenticated audit-history UAT pending
 
 Delete actions execute permanent SQL `DELETE` statements. Confirmation is a browser `window.confirm` prompt only. There is no archive/restore process, no reason field and no administrator activity log identifying who changed or deleted content. Event deletion can cascade into attendance records, damaging attendance history and evidence.
 
@@ -166,7 +166,7 @@ Creation handlers enforce useful minimum lengths but omit many maximum lengths. 
 
 **Severity:** Medium
 **Confidence:** High
-**Status:** Fixed in source; deployment verification pending
+**Status:** Fixed and deployed; authenticated failure-path UAT pending
 
 The database supports discount validity dates and active flags, and local services have an active flag. The admin forms do not expose validity dates, active/inactive status or archive controls. This encourages permanent deletion and makes stale discounts or temporarily unavailable services harder to manage safely.
 
