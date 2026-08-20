@@ -1,0 +1,5 @@
+*
+!services/
+services/*
+!services/web/
+!services/web/**
