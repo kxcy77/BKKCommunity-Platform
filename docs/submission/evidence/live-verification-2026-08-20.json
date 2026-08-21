@@ -1,0 +1,229 @@
+{
+  "executed_at": "2026-08-20T20:52:25.305183+02:00",
+  "target": "https://www.bkkcommunity.online",
+  "account": "disposable test account deleted after run",
+  "results": [
+    {
+      "method": "GET",
+      "path": "/health",
+      "status": 200,
+      "result": {
+        "data": {
+          "status": "ok",
+          "service": "bkk-community-platform"
+        }
+      },
+      "security_headers": {
+        "Strict-Transport-Security": null,
+        "X-Content-Type-Options": null,
+        "Content-Security-Policy": null
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/ready",
+      "status": 200,
+      "result": {
+        "data": {
+          "status": "ready",
+          "database": "connected"
+        }
+      },
+      "security_headers": {
+        "Strict-Transport-Security": null,
+        "X-Content-Type-Options": null,
+        "Content-Security-Policy": null
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/events",
+      "status": 200,
+      "result": {
+        "data": [
+          {
+            "id": 4,
+            "title": "BKK App Demonstration Event - Not a Real Event",
+            "description": "TEST CONTENT ONLY. This event exists so the group can verify event details and RSVP. Do not travel to attend it.",
+            "start_at": "2026-09-12T21:51:37Z",
+            "end_at": "2026-09-13T21:51:37Z",
+            "location": "Demonstration only - do not travel",
+            "directions": "No directions: this is not a real event.",
+            "category": "Demonstration",
+            "colour_hex": "#007C83",
+            "is_attending": false
+          }
+        ]
+      },
+      "security_headers": {
+        "Strict-Transport-Security": null,
+        "X-Content-Type-Options": null,
+        "Content-Security-Policy": null
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/discounts",
+      "status": 200,
+      "result": {
+        "data": [
+          {
+            "id": 2,
+            "store_name": "Checkers",
+            "title": "Tuesday senior savings",
+            "details": "Save 5% on qualifying grocery purchases every Tuesday.",
+            "eligibility": "Customers aged 60+.",
+            "claim_instructions": "Present your ID before the cashier completes the transaction.",
+            "category": "Grocery",
+            "valid_from": null,
+            "valid_until": null
+          },
+          {
+            "id": 1,
+            "store_name": "Clicks",
+            "title": "10% off selected prescriptions",
+            "details": "Selected prescription items qualify for a pensioner discount.",
+            "eligibility": "Customers aged 60+ with valid identification.",
+            "claim_instructions": "Ask at the pharmacy counter and show your ID card.",
+            "category": "Pharmacy",
+            "valid_from": null,
+            "valid_until": null
+          },
+          {
+            "id": 3,
+            "store_name": "Wimpy",
+            "title": "Senior breakfast special",
+            "details": "A reduced-price breakfast before 10:00 on weekdays.",
+            "eligibility": "Customers aged 60+.",
+            "claim_instructions": "Ask for the senior breakfast menu before ordering.",
+            "category": "Restaurant",
+            "valid_from": null,
+            "valid_until": null
+          }
+        ]
+      },
+      "security_headers": {
+        "Strict-Transport-Security": null,
+        "X-Content-Type-Options": null,
+        "Content-Security-Policy": null
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/local-services",
+      "status": 200,
+      "result": {
+        "data": [
+          {
+            "id": 2,
+            "type": "pharmacy",
+            "name": "Community Pharmacy",
+            "address": "18 Main Road, BKK",
+            "phone": "011 555 0102",
+            "directions": "Next to the grocery store.",
+            "opening_hours": "Mon\u2013Sat 08:00\u201318:00"
+          },
+          {
+            "id": 1,
+            "type": "clinic",
+            "name": "BKK Community Clinic",
+            "address": "12 Main Road, BKK",
+            "phone": "011 555 0101",
+            "directions": "Opposite the community hall.",
+            "opening_hours": "Mon\u2013Fri 08:00\u201316:00"
+          },
+          {
+            "id": 3,
+            "type": "support",
+            "name": "BKK Community Support Desk",
+            "address": "BKK Community Hall, Main Road",
+            "phone": "072 888 5030",
+            "directions": "Reception desk inside the main entrance.",
+            "opening_hours": "Weekdays 09:00\u201315:00"
+          }
+        ]
+      },
+      "security_headers": {
+        "Strict-Transport-Security": null,
+        "X-Content-Type-Options": null,
+        "Content-Security-Policy": null
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "result": {
+        "data": {
+          "id": 22,
+          "full_name": "Documentation Tester",
+          "email": "bkkdoc1787250617@example.com",
+          "phone": null,
+          "notifications_enabled": true,
+          "event_reminders_enabled": true,
+          "discount_alerts_enabled": true
+        }
+      },
+      "security_headers": {
+        "Strict-Transport-Security": null,
+        "X-Content-Type-Options": null,
+        "Content-Security-Policy": null
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "status": 401,
+      "result": {
+        "redacted": "authentication response"
+      },
+      "security_headers": {
+        "Strict-Transport-Security": null,
+        "X-Content-Type-Options": null,
+        "Content-Security-Policy": null
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/register",
+      "status": 409,
+      "result": {
+        "redacted": "authentication response"
+      },
+      "security_headers": {
+        "Strict-Transport-Security": null,
+        "X-Content-Type-Options": null,
+        "Content-Security-Policy": null
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/",
+      "status": 200,
+      "final_url": "https://www.bkkcommunity.online/",
+      "finding": "critical login-gate bypass"
+    },
+    {
+      "method": "GET",
+      "path": "/discounts.php",
+      "status": 200,
+      "final_url": "https://www.bkkcommunity.online/discounts.php",
+      "finding": "critical login-gate bypass"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/me",
+      "status": 200,
+      "result": {
+        "data": {
+          "deleted": true
+        }
+      },
+      "security_headers": {
+        "Strict-Transport-Security": null,
+        "X-Content-Type-Options": null,
+        "Content-Security-Policy": null
+      }
+    }
+  ]
+}
