@@ -49,4 +49,13 @@
       }
     });
   });
+
+  if ('serviceWorker' in navigator && window.isSecureContext) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js').catch(() => {
+        // Installation is optional. The website remains fully usable when the
+        // browser blocks service workers or registration fails.
+      });
+    });
+  }
 })();

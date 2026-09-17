@@ -19,7 +19,14 @@ $accountLabel = $user ? (is_admin() ? 'Admin' : 'My account') : 'My account';
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="BKK Community Group events, senior discounts and local support information.">
     <meta name="theme-color" content="#1F4E79">
+    <meta name="application-name" content="BKK Community">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="BKK Community">
     <title><?= h($pageTitle) ?> | BKK Community</title>
+    <link rel="manifest" href="<?= h(app_url('manifest.webmanifest')) ?>">
+    <link rel="icon" type="image/png" sizes="192x192" href="<?= h(app_url('assets/icons/bkk-192.png')) ?>">
+    <link rel="apple-touch-icon" sizes="180x180" href="<?= h(app_url('assets/icons/bkk-180.png')) ?>">
     <link rel="stylesheet" href="<?= h(app_url('assets/vendor/bootstrap/bootstrap.min.css')) ?>">
     <link rel="stylesheet" href="<?= h(app_url('assets/css/app.css')) ?>">
 </head>

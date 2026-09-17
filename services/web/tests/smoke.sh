@@ -32,11 +32,20 @@ for attempt in {1..20}; do
   sleep 0.2
 done
 
-for route in index.php events.php discounts.php info.php contact.php login.php register.php reset-password.php new-password.php; do
+for route in index.php events.php discounts.php info.php contact.php login.php register.php reset-password.php new-password.php offline.html manifest.webmanifest service-worker.js; do
   code="$(curl -sS -o /dev/null -w '%{http_code}' "${base_url}/${route}")"
   [[ "$code" == "200" ]] || { echo "FAIL ${route}: HTTP ${code}"; exit 1; }
   echo "PASS ${route}: HTTP ${code}"
 done
+
+manifest_file="$(mktemp /tmp/bkk-manifest.XXXXXX)"
+curl -fsS "${base_url}/manifest.webmanifest" >"${manifest_file}"
+php -r '$manifest=json_decode(file_get_contents($argv[1]), true, 512, JSON_THROW_ON_ERROR); if (($manifest["display"] ?? null) !== "standalone" || count($manifest["icons"] ?? []) < 2) exit(1);' "${manifest_file}"
+grep -q 'rel="manifest"' <(curl -fsS "${base_url}/index.php") || { echo 'FAIL web app manifest link'; exit 1; }
+for private_path in /api/ /admin/ /actions.php /login.php /register.php /reset-password.php /new-password.php /profile.php; do
+  grep -q "'${private_path}'" "${project_dir}/public/service-worker.js" || { echo "FAIL service worker private-path exclusion ${private_path}"; exit 1; }
+done
+echo 'PASS installable web app metadata and private-route cache exclusions'
 
 home_html="$(curl -fsS "${base_url}/index.php")"
 nav_count="$(printf '%s' "$home_html" | php -r '$html=stream_get_contents(STDIN); preg_match("/<div class=\"nav-links\">(.*?)<\\/div>/s", $html, $match); preg_match_all("/<a\\s/i", $match[1] ?? "", $links); echo count($links[0]);')"
