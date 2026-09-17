@@ -17,6 +17,31 @@ val releaseApiBaseUrl = providers.gradleProperty("BKK_API_BASE_URL")
 val debugApiBaseUrl = providers.gradleProperty("BKK_DEBUG_API_BASE_URL")
     .orElse(verifiedApiBaseUrl)
 
+fun releaseSecret(name: String) = providers.environmentVariable(name)
+    .orElse(providers.gradleProperty(name))
+
+val releaseStoreFile = releaseSecret("BKK_RELEASE_STORE_FILE").orNull
+val releaseStorePassword = releaseSecret("BKK_RELEASE_STORE_PASSWORD").orNull
+val releaseKeyAlias = releaseSecret("BKK_RELEASE_KEY_ALIAS").orNull
+val releaseKeyPassword = releaseSecret("BKK_RELEASE_KEY_PASSWORD").orNull
+val releaseSigningConfigured = listOf(
+    releaseStoreFile,
+    releaseStorePassword,
+    releaseKeyAlias,
+    releaseKeyPassword,
+).all { !it.isNullOrBlank() }
+val releaseTaskRequested = gradle.startParameter.taskNames.any {
+    it.contains("release", ignoreCase = true)
+}
+
+if (releaseTaskRequested && !releaseSigningConfigured) {
+    throw GradleException(
+        "Release signing is not configured. Set BKK_RELEASE_STORE_FILE, " +
+            "BKK_RELEASE_STORE_PASSWORD, BKK_RELEASE_KEY_ALIAS and " +
+            "BKK_RELEASE_KEY_PASSWORD outside Git before building a release."
+    )
+}
+
 android {
     namespace = "za.co.bkkcommunity.app"
     compileSdk = 35
@@ -33,6 +58,21 @@ android {
         buildConfigField("String", "API_BASE_URL", releaseApiBaseUrl.get().asBuildConfigString())
     }
 
+    signingConfigs {
+        if (releaseSigningConfigured) {
+            create("release") {
+                storeFile = file(requireNotNull(releaseStoreFile))
+                storePassword = requireNotNull(releaseStorePassword)
+                keyAlias = requireNotNull(releaseKeyAlias)
+                keyPassword = requireNotNull(releaseKeyPassword)
+                enableV1Signing = true
+                enableV2Signing = true
+                enableV3Signing = true
+                enableV4Signing = true
+            }
+        }
+    }
+
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
@@ -42,6 +82,7 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            signingConfig = signingConfigs.findByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }

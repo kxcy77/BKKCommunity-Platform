@@ -149,9 +149,14 @@ function api_password_is_strong(string $password): bool
 
 function api_health(): never
 {
+    $release = app_config('release');
     api_respond([
         'status' => 'ok',
         'service' => 'bkk-community-platform',
+        'environment' => app_config('app_env'),
+        'version' => $release['version'] ?? 'development',
+        'commit' => $release['commit'] ?? '',
+        'branch' => $release['branch'] ?? '',
     ]);
 }
 
@@ -165,9 +170,13 @@ function api_ready(): never
     if ((int) $statement->fetchColumn() !== count($requiredTables)) {
         api_error(503, 'The database schema is not ready.', 'schema_unavailable');
     }
+    $release = app_config('release');
     api_respond([
         'status' => 'ready',
         'database' => 'connected',
+        'environment' => app_config('app_env'),
+        'version' => $release['version'] ?? 'development',
+        'commit' => $release['commit'] ?? '',
     ]);
 }
 

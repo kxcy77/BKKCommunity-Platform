@@ -1,0 +1,42 @@
+name: Verify Production Deployment
+
+on:
+  workflow_run:
+    workflows:
+      - Production Quality Gates
+    types:
+      - completed
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Railway to deploy the tested commit
+        env:
+          EXPECTED_COMMIT: ${{ github.event.workflow_run.head_sha }}
+          PRODUCTION_BASE_URL: ${{ vars.PRODUCTION_BASE_URL || 'https://bkkcommunity-platform-2-production.up.railway.app' }}
+        run: |
+          set -euo pipefail
+          HEALTH_URL="${PRODUCTION_BASE_URL%/}/health"
+          READY_URL="${PRODUCTION_BASE_URL%/}/ready"
+          for attempt in $(seq 1 30); do
+            health="$(curl --fail --silent --show-error "$HEALTH_URL" || true)"
+            deployed="$(jq -r '.data.commit // empty' <<<"$health" 2>/dev/null || true)"
+            if [[ "$deployed" == "$EXPECTED_COMMIT" ]]; then
+              curl --fail --silent --show-error "$READY_URL" \
+                | jq -e --arg commit "$EXPECTED_COMMIT" \
+                    '.data.status == "ready" and .data.commit == $commit'
+              echo "Production is ready on commit $EXPECTED_COMMIT"
+              exit 0
+            fi
+            echo "Attempt $attempt: waiting for Railway commit $EXPECTED_COMMIT"
+            sleep 20
+          done
+          echo "Production did not reach the tested commit within ten minutes." >&2
+          exit 1
