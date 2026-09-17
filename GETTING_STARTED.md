@@ -47,7 +47,7 @@ Without an `.env` database configuration, the website intentionally opens in lab
 | Person | Recommended way to test |
 |---|---|
 | Android user | Android Studio emulator/phone, or the shared debug APK |
-| iPhone user without TestFlight | Open `https://www.bkkcommunity.online` in Safari and use **Add to Home Screen** |
+| iPhone user without TestFlight | Open `https://bkkcommunity-platform-2-production.up.railway.app` in Safari and use **Add to Home Screen** |
 | Person reviewing the website | Run `services/web` locally, or open the deployed website |
 
 ## If something does not start
@@ -58,6 +58,6 @@ Check these first:
 2. Has the required tool downloaded its dependencies?
 3. Is the device/emulator connected and selected?
 4. Is the internet available for the hosted API?
-5. Does `https://www.bkkcommunity.online/api/v1/health` respond before testing mobile live data?
+5. Does `https://bkkcommunity-platform-2-production.up.railway.app/api/v1/health` respond before testing mobile live data?
 
 If the app reports an API error, do not change passwords or URLs at random. Capture the exact message and check the backend health/readiness first.

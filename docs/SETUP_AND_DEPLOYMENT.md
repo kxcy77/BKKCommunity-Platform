@@ -33,7 +33,7 @@
 The mobile clients default to:
 
 ```text
-https://www.bkkcommunity.online/api/v1
+https://bkkcommunity-platform-2-production.up.railway.app/api/v1
 ```
 
 On 13 August 2026, `/health`, database-backed `/ready`, public reads, registration, session revocation, login, authenticated profile, labelled event details, duplicate RSVP prevention, attendance history, cancellation and account deletion passed over HTTPS. The canonical source is [kxcy77/BKKCommunity-Web](https://github.com/kxcy77/BKKCommunity-Web). Password-reset requests correctly return HTTP 503 `email_unavailable` until a verified SMTP provider is added; do not claim email delivery before an inbox receives a real code.

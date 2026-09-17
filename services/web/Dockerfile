@@ -7,7 +7,7 @@ RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --opt
 FROM php:8.3-fpm
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends default-mysql-client libonig-dev nginx \
+    && apt-get install -y --no-install-recommends default-mysql-client gnupg libonig-dev nginx \
     && docker-php-ext-install pdo_mysql mbstring \
     && rm -rf /var/lib/apt/lists/*
 

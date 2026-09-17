@@ -46,6 +46,11 @@ return [
     'admin_idle_timeout_seconds' => max(300, (int) env_value('ADMIN_IDLE_TIMEOUT_SECONDS', '1800')),
     'admin_absolute_timeout_seconds' => max(900, (int) env_value('ADMIN_ABSOLUTE_TIMEOUT_SECONDS', '28800')),
     'contact_retention_days' => max(30, (int) env_value('CONTACT_RETENTION_DAYS', '365')),
+    'release' => [
+        'version' => env_value('APP_VERSION', env_value('RAILWAY_GIT_COMMIT_SHA', 'development')),
+        'commit' => env_value('RAILWAY_GIT_COMMIT_SHA', ''),
+        'branch' => env_value('RAILWAY_GIT_BRANCH', ''),
+    ],
     'demo' => [
         'member_email' => strtolower((string) env_value('DEMO_MEMBER_EMAIL', '')),
         'member_password' => (string) env_value('DEMO_MEMBER_PASSWORD', ''),
