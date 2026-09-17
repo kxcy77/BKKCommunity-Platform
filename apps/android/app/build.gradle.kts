@@ -11,7 +11,7 @@ if (file("google-services.json").exists()) {
 
 fun String.asBuildConfigString(): String = "\"${replace("\\", "\\\\").replace("\"", "\\\"")}\""
 
-val verifiedApiBaseUrl = "https://www.bkkcommunity.online/api/v1/"
+val verifiedApiBaseUrl = "https://bkkcommunity-platform-2-production.up.railway.app/api/v1/"
 val releaseApiBaseUrl = providers.gradleProperty("BKK_API_BASE_URL")
     .orElse(verifiedApiBaseUrl)
 val debugApiBaseUrl = providers.gradleProperty("BKK_DEBUG_API_BASE_URL")

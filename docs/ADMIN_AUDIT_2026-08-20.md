@@ -1,7 +1,7 @@
 # BKK Community Platform — Administrator Audit
 
 **Audit date:** 20 August 2026
-**Scope:** PHP administrator pages, authentication/authorization, content-management actions, MySQL repository functions, responsive administration CSS, existing automated tests, and safe unauthenticated checks against `https://www.bkkcommunity.online`.
+**Scope:** PHP administrator pages, authentication/authorization, content-management actions, MySQL repository functions, responsive administration CSS, existing automated tests, and safe unauthenticated checks against the Railway-hosted production service.
 **Method:** Source review, PHP syntax validation, local smoke tests, isolated-MySQL integration and restore tests, Railway deployment verification, and non-destructive production HTTP checks.
 **Production writes performed:** Application revision and database migration deployment only. No event, discount, service, contact-message or user content was created, edited or deleted for this audit.
 

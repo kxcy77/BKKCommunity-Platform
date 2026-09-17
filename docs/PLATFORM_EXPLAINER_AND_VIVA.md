@@ -199,7 +199,7 @@ The Android app is in `BKKCommunity-Clean/android/` and opens directly in Androi
 - `data/local/` contains the Room database, entities and DAOs.
 - `notification/ReminderScheduler.kt` schedules reliable local reminders using WorkManager.
 
-Android supports API 26 and newer. It uses Material 3, scalable text, descriptive icons and 48–56dp control targets. Its build configuration points to `https://www.bkkcommunity.online/api/v1/` by default and blocks cleartext traffic in release configuration.
+Android supports API 26 and newer. It uses Material 3, scalable text, descriptive icons and 48–56dp control targets. Its build configuration points to `https://bkkcommunity-platform-2-production.up.railway.app/api/v1/` by default and blocks cleartext traffic in release configuration.
 
 ### iOS frontend
 
@@ -326,7 +326,7 @@ The canonical service is deployed on Railway behind HTTPS. The production Docker
 The mobile release base URL is:
 
 ```text
-https://www.bkkcommunity.online/api/v1/
+https://bkkcommunity-platform-2-production.up.railway.app/api/v1/
 ```
 
 For safety, the mobile app should be tested against `/health` and `/ready` before a build is handed to users. `/ready` must not report success when the database is unavailable.
