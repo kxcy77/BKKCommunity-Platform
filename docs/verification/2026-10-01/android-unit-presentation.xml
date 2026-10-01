@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="za.co.bkkcommunity.app.EventPresentationRulesTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-01T10:53:32.392Z" hostname="MacBookPro.ad.stadio.co.za" time="0.064">
+  <properties/>
+  <testcase name="eventPeriodFiltersAreMutuallyUseful" classname="za.co.bkkcommunity.app.EventPresentationRulesTest" time="0.032"/>
+  <testcase name="demonstrationEventsAreRecognisedEvenWithARealServerId" classname="za.co.bkkcommunity.app.EventPresentationRulesTest" time="0.025"/>
+  <testcase name="greetingMatchesSouthAfricanTimeOfDay" classname="za.co.bkkcommunity.app.EventPresentationRulesTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
