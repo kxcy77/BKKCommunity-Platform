@@ -14,7 +14,10 @@ service_name="Integration Service ${stamp}"
 cookie_jar="$(mktemp /tmp/bkk-admin-integration.XXXXXX)"
 
 mysql_test() { mysql -N -B -u "$database_user" -D "$database_name" -e "$1"; }
-csrf_from() { sed -n 's/.*name="csrf_token" value="\([^"]*\)".*/\1/p' | head -1; }
+csrf_from() { sed -n 's/.*name="csrf_token" value="\([^"]*\)".*/\1/p' | sed -n '1p'; }
+# Consume the whole response: grep -q can close a Linux pipe early and make
+# curl fail with write error 23 under pipefail despite a successful assertion.
+contains_text() { grep -F "$@" >/dev/null; }
 
 assert_api_field() {
   curl -fsS "${base_url}/api/v1/$1" | php -r '
@@ -54,7 +57,7 @@ curl -fsS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null \
   --data-urlencode "csrf_token=${csrf}" --data-urlencode 'action=login' \
   --data-urlencode "email=${test_email}" --data-urlencode 'password=StrongAdmin26' "${base_url}/actions.php"
 admin_html="$(curl -fsS -b "$cookie_jar" "${base_url}/admin/index.php")"
-printf '%s' "$admin_html" | grep -q 'Dashboard overview'
+printf '%s' "$admin_html" | contains_text 'Dashboard overview'
 echo 'PASS database administrator login'
 
 contact_html="$(curl -fsS -b "$cookie_jar" "${base_url}/contact.php")"
@@ -66,7 +69,7 @@ curl -fsS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null \
   --data-urlencode "message=Admin inbox integration message ${stamp}." "${base_url}/actions.php"
 message_id="$(mysql_test "SELECT id FROM contact_messages WHERE email='${test_email}' ORDER BY id DESC LIMIT 1;")"
 messages_html="$(curl -fsS -b "$cookie_jar" "${base_url}/admin/messages.php?search=${stamp}")"
-printf '%s' "$messages_html" | grep -q "Admin inbox integration message ${stamp}"
+printf '%s' "$messages_html" | contains_text "Admin inbox integration message ${stamp}"
 csrf="$(printf '%s' "$messages_html" | csrf_from)"
 curl -fsS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null \
   --data-urlencode "csrf_token=${csrf}" --data-urlencode 'action=admin_update_message' \
@@ -102,7 +105,7 @@ curl -fsS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null \
   --data-urlencode 'description=This stale database update must be rejected by row-version protection.' \
   --data-urlencode 'directions=This stale value must not persist.' "${base_url}/actions.php"
 [[ "$(mysql_test "SELECT title FROM events WHERE id=${event_id};")" == "$updated_event_title" ]]
-curl -fsS "${base_url}/events.php" | grep -q "$updated_event_title"
+curl -fsS "${base_url}/events.php" | contains_text "$updated_event_title"
 assert_api_field events "$event_id" title "$updated_event_title"
 assert_api_field events "$event_id" location 'Updated Integration Hall'
 echo 'PASS admin event edit reflected on website and Android API'
@@ -111,7 +114,7 @@ curl -fsS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null \
   --data-urlencode "id=${event_id}" --data-urlencode 'archived=1' --data-urlencode 'reason=Integration archive test' "${base_url}/actions.php"
 [[ "$(mysql_test "SELECT status FROM events WHERE id=${event_id};")" == 'cancelled' ]]
 assert_api_absent events "$event_id"
-if curl -fsS "${base_url}/events.php" | grep -q "$updated_event_title"; then exit 1; fi
+if curl -fsS "${base_url}/events.php" | contains_text "$updated_event_title"; then exit 1; fi
 curl -fsS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null \
   --data-urlencode "csrf_token=${csrf}" --data-urlencode 'action=admin_set_event_archived' \
   --data-urlencode "id=${event_id}" --data-urlencode 'archived=0' --data-urlencode 'reason=Integration restore test' "${base_url}/actions.php"
@@ -142,7 +145,7 @@ curl -fsS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null \
 assert_api_field discounts "$discount_id" title 'Updated senior savings'
 assert_api_field discounts "$discount_id" details 'Updated offer details without repeated title'
 assert_api_field 'discounts?category=Restaurant' "$discount_id" claim_instructions 'Show the updated membership card.'
-curl -fsS "${base_url}/discounts.php" | grep -q 'Updated senior savings: Updated offer details without repeated title'
+curl -fsS "${base_url}/discounts.php" | contains_text 'Updated senior savings: Updated offer details without repeated title'
 echo 'PASS admin discount edits and category filter reflected on website and Android API'
 curl -fsS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null \
   --data-urlencode "csrf_token=${csrf}" --data-urlencode 'action=admin_set_discount_archived' \
@@ -155,7 +158,7 @@ curl -fsS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null \
 assert_api_field discounts "$discount_id" title 'Updated senior savings'
 mysql_test "UPDATE discounts SET valid_until='2020-08-02' WHERE id=${discount_id};" >/dev/null
 assert_api_absent discounts "$discount_id"
-if curl -fsS "${base_url}/discounts.php" | grep -q "$discount_store"; then exit 1; fi
+if curl -fsS "${base_url}/discounts.php" | contains_text "$discount_store"; then exit 1; fi
 echo 'PASS expired discount hidden from website and Android API'
 echo 'PASS administrator discount create and archive'
 
@@ -178,14 +181,14 @@ curl -fsS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null \
   --data-urlencode 'directions=Use the accessible updated entrance.' "${base_url}/actions.php"
 assert_api_field local-services "$service_id" address '24 Updated Integration Road'
 assert_api_field 'local-services?type=pharmacy' "$service_id" phone '072 555 0203'
-curl -fsS "${base_url}/info.php" | grep -q '24 Updated Integration Road'
+curl -fsS "${base_url}/info.php" | contains_text '24 Updated Integration Road'
 echo 'PASS admin service edits and type filter reflected on website and Android API'
 curl -fsS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null \
   --data-urlencode "csrf_token=${csrf}" --data-urlencode 'action=admin_set_service_archived' \
   --data-urlencode "id=${service_id}" --data-urlencode 'archived=1' --data-urlencode 'reason=Integration archive test' "${base_url}/actions.php"
 [[ "$(mysql_test "SELECT is_active FROM local_services WHERE id=${service_id};")" == '0' ]]
 assert_api_absent local-services "$service_id"
-if curl -fsS "${base_url}/info.php" | grep -q "$service_name"; then exit 1; fi
+if curl -fsS "${base_url}/info.php" | contains_text "$service_name"; then exit 1; fi
 echo 'PASS administrator local-service create and archive'
 
 audit_count="$(mysql_test "SELECT COUNT(*) FROM admin_audit_log WHERE admin_user_id=(SELECT id FROM users WHERE email='${test_email}');")"
