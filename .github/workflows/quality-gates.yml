@@ -63,8 +63,8 @@ jobs:
       DB_PASSWORD: LocalCiFixtureOnly26
       MYSQL_PWD: LocalCiFixtureOnly26
       MYSQL_HOST: 127.0.0.1
-      RESET_CODE_SECRET: LocalCiResetFixtureOnly26
-      BKK_TEST_RESET_CODE_SECRET: LocalCiResetFixtureOnly26
+      RESET_CODE_SECRET: LocalCiResetFixtureOnly20261001LongerThan32Characters
+      BKK_TEST_RESET_CODE_SECRET: LocalCiResetFixtureOnly20261001LongerThan32Characters
       BKK_TEST_DB_NAME: bkk_ci_test
       BKK_BASE_URL: http://127.0.0.1:8090
     defaults:
