@@ -1,0 +1,41 @@
+PASS index.php: HTTP 200
+PASS events.php: HTTP 200
+PASS discounts.php: HTTP 200
+PASS info.php: HTTP 200
+PASS contact.php: HTTP 200
+PASS login.php: HTTP 200
+PASS register.php: HTTP 200
+PASS reset-password.php: HTTP 200
+PASS new-password.php: HTTP 200
+PASS offline.html: HTTP 200
+PASS manifest.webmanifest: HTTP 200
+PASS service-worker.js: HTTP 200
+PASS installable web app metadata and private-route cache exclusions
+PASS primary navigation is limited to five choices and Home has a single task prompt
+PASS demonstration events are identified independently of their database ID
+PASS administrator idle and absolute session-expiry rules
+PASS health reports the running service
+PASS readiness fails closed without a database
+PASS production fails closed when database configuration is absent
+PASS unknown routes return 404
+PASS oversized API bodies are rejected
+PASS guest protection profile.php: HTTP 302
+PASS guest protection admin/index.php: HTTP 302
+PASS guest protection admin/events.php: HTTP 302
+PASS guest protection admin/discounts.php: HTTP 302
+PASS guest protection admin/services.php: HTTP 302
+PASS guest protection admin/messages.php: HTTP 302
+PASS guest protection admin/audit.php: HTTP 302
+PASS CSRF protection: HTTP 419
+PASS login page does not expose demonstration credentials
+PASS member login and protected profile
+PASS signed-in members cannot enter administrator pages
+PASS admin login and protected dashboard
+PASS authenticated admin/events.php: HTTP 200
+PASS authenticated admin/discounts.php: HTTP 200
+PASS authenticated admin/services.php: HTTP 200
+PASS authenticated admin/messages.php: HTTP 200
+PASS authenticated admin/audit.php: HTTP 200
+PASS administrator event create, edit, archive, restore, audit and delete blocking
+PASS administrator discount create, edit and archive workflow
+PASS administrator local-service create, edit and archive workflow

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
 import za.co.bkkcommunity.app.AppContainer
 import za.co.bkkcommunity.app.data.BkkRepository
 import za.co.bkkcommunity.app.data.FeatureStore
@@ -47,6 +48,7 @@ class BkkViewModel(
     private val _state = MutableStateFlow(BkkUiState())
     val state: StateFlow<BkkUiState> = _state.asStateFlow()
     private var historyMemberId: Long? = null
+    private var backgroundRefresh: Job? = null
 
     init {
         viewModelScope.launch {
@@ -80,7 +82,33 @@ class BkkViewModel(
         }
     }
 
-    fun refresh() = runAction { repository.refreshAll().getOrThrow(); "Information updated." }
+    fun refresh() = runAction {
+        val result = repository.refreshAll()
+        applyRefreshResult(result)
+        result.getOrThrow()
+        "Information updated."
+    }
+
+    fun refreshInBackground() {
+        if (_state.value.member == null || _state.value.loading || _state.value.working ||
+            backgroundRefresh?.isActive == true) return
+        backgroundRefresh = viewModelScope.launch {
+            val result = repository.refreshAll()
+            applyRefreshResult(result)
+        }
+    }
+
+    private fun applyRefreshResult(result: Result<Unit>) {
+        _state.update {
+            it.copy(
+                dataWarning = result.exceptionOrNull()?.let(repository::errorMessage),
+                // Detail fallbacks must not resurrect records removed by an
+                // authoritative list refresh (for example an archived offer).
+                eventDetails = if (result.isSuccess) emptyMap() else it.eventDetails,
+                discountDetails = if (result.isSuccess) emptyMap() else it.discountDetails
+            )
+        }
+    }
 
     fun login(email: String, password: String, onSuccess: () -> Unit) = runAction(onSuccess) {
         repository.login(email, password).getOrThrow()

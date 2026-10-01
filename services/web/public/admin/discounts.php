@@ -14,7 +14,7 @@ if ($editId && !$editing) {
     flash('error', 'That discount could not be found.');
     redirect_to('admin/discounts.php');
 }
-$form = $editing ?? ['store_name' => '', 'category' => 'Pharmacy', 'deal' => '', 'eligibility' => '', 'claim_instructions' => '', 'tone' => 'blue', 'valid_from' => '', 'valid_until' => ''];
+$form = $editing ?? ['store_name' => '', 'category' => 'Pharmacy', 'title' => '', 'deal' => '', 'eligibility' => '', 'claim_instructions' => '', 'tone' => 'blue', 'valid_from' => '', 'valid_until' => ''];
 require dirname(__DIR__) . '/partials/header.php';
 ?>
 <div class="admin-shell">
@@ -27,6 +27,7 @@ require dirname(__DIR__) . '/partials/header.php';
             <div class="form-grid">
                 <div class="field"><label for="store_name">Business name</label><input id="store_name" name="store_name" value="<?= h($form['store_name']) ?>" required minlength="2" maxlength="160"></div>
                 <div class="field"><label for="category">Category</label><select id="category" name="category"><?php foreach (['Pharmacy', 'Grocery', 'Restaurant', 'Transport'] as $category): ?><option <?= $form['category'] === $category ? 'selected' : '' ?>><?= h($category) ?></option><?php endforeach; ?></select></div>
+                <div class="field field-full"><label for="title">Offer title</label><input id="title" name="title" value="<?= h($form['title']) ?>" required minlength="3" maxlength="190"></div>
                 <div class="field field-full"><label for="deal">Offer description</label><textarea id="deal" name="deal" required minlength="5" maxlength="5000"><?= h($form['deal']) ?></textarea></div>
                 <div class="field"><label for="eligibility">Who qualifies</label><input id="eligibility" name="eligibility" value="<?= h($form['eligibility']) ?>" required minlength="3" maxlength="255"></div>
                 <div class="field"><label for="claim_instructions">How to claim</label><input id="claim_instructions" name="claim_instructions" value="<?= h($form['claim_instructions']) ?>" required minlength="5" maxlength="2000"></div>

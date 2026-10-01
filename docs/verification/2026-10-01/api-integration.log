@@ -1,0 +1,15 @@
+PASS health and database readiness contracts
+PASS registration issued a bearer token
+PASS authenticated profile read and update persisted
+PASS fifth incorrect reset-code attempt invalidated the code
+PASS email-bound 6-digit password reset revoked old sessions and issued a new login token
+PASS event listing returned the Android JSON contract
+PASS RSVP persisted once and duplicate attendance was prevented
+PASS attendance history returned confirmed events
+PASS contact message persisted before success was returned
+PASS notification preferences persisted
+PASS FCM device token persisted uniquely
+PASS discount details and local-service contracts returned valid data
+PASS logout revoked the bearer token
+PASS account deletion removed member data and retained the contact audit record safely
+PASS repeated account login attempts were throttled with Retry-After

@@ -1,0 +1,13 @@
+<journey name="Logout returns to login and remains signed out">
+  <actions>
+    <action type="tap" target="Account">Open Account tab</action>
+    <action type="swipe">Scroll account settings down</action>
+    <action type="swipe">Continue scrolling account settings</action>
+    <action type="swipe">Reach the account exit controls</action>
+    <action type="swipe">Ensure the bottom controls are visible</action>
+    <action type="tap" target="Log out">Log out of the local test account</action>
+    <action type="assert" target="Welcome back" screenshot="android-after-logout.png">Verify return to login</action>
+    <action type="resume">Leave and return to the app while signed out</action>
+    <action type="assert" target="Account sign in">Verify login gate remains active</action>
+  </actions>
+</journey>

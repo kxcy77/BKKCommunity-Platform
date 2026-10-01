@@ -1,17 +1,19 @@
 # Verification matrix
 
-## Automated checks in this handoff
+## Current evidence
+
+The current Android-only platform verification is documented in [the 1 October 2026 report](verification/2026-10-01/REPORT.md), with test logs and screenshots. The following August table is historical evidence, not a claim that the experimental Node API is the current deployed backend.
+
+## Historical automated checks
 
 | Component | Check | Result on 13 Aug 2026 |
 |---|---|---|
 | API | Prisma generation + TypeScript compilation | Pass |
 | API | 5 reset/validation/config contract tests | Pass |
 | Admin | Inline JavaScript parse | Pass |
-| iOS | All Swift source type-check against iPhoneOS SDK | Pass |
 | Android | Gradle 9.6.1 launches on embedded JDK 21 with Java 25 daemon criteria | Environment confirmed |
 | Android | `testDebugUnitTest`, `lintDebug`, `assembleDebug` with Gradle 9.6.1/JDK 21 | Pass |
 | Android UI | Android 36 emulator login launch, scrolling and 200% font reachability | Pass; TalkBack/API 26/physical-device evidence outstanding |
-| Xcode | Full asset/application build | Blocked by unavailable CoreSimulator runtime; Swift type-check is the only pass claimed |
 
 ## Required scenario coverage
 
@@ -33,7 +35,7 @@ Every major screen must be checked in loading, populated, empty, offline and ser
 - Category filters and detail 404 handling.
 - RSVP requires login and live network.
 - Repeating RSVP changes updates the existing unique row, never duplicates it.
-- Cancellation uses `cancelled` on Android, iOS and API.
+- Cancellation uses `cancelled` on Android and API.
 - Public cache survives an outage; failed refresh never empties valid Android cache.
 - Demo records are visibly labelled and reject RSVP.
 

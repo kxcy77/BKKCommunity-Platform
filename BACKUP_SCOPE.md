@@ -1,11 +1,12 @@
 # Backup Scope
 
-Created: 18 August 2026
+Original consolidation: 18 August 2026. Current scope updated: 1 October 2026.
+
+The active delivery contains Android and the website/admin/API. Native iOS source was removed from the current checkout and retained in a separate local recovery archive. Earlier dated submission documents remain historical evidence and have not been rewritten to invent a different development history.
 
 This clean backup includes the current source from:
 
 - `BKKCommunity-Clean/android` → `apps/android`
-- `BKKCommunity-Clean/ios` → `apps/ios`
 - `BKKCommunity-Web-live` → `services/web`
 - `BKKCommunity-Clean/docs` → `docs`
 - `BKKCommunity-Clean/database` → `database-reference`

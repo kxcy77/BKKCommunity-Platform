@@ -1,0 +1,26 @@
+{
+  "journey": "Admin edit refreshes Android on resume",
+  "serial": "emulator-5554",
+  "results": [
+    {
+      "action": "Leave and return to the Android app",
+      "status": "PASSED",
+      "commands": [
+        "adb shell input keyevent 3",
+        "adb shell am start [MainActivity]"
+      ]
+    },
+    {
+      "action": "Verify updated offer without pressing Refresh",
+      "status": "PASSED",
+      "commands": [],
+      "screenshot": "android-updated-offer.png"
+    },
+    {
+      "action": "Verify obsolete title is absent",
+      "status": "PASSED",
+      "commands": []
+    }
+  ],
+  "status": "PASSED"
+}

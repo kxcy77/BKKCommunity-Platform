@@ -1,0 +1,9 @@
+<journey name="Archived details do not resurrect stale content">
+  <actions>
+    <action type="resume">Leave and return to the app after admin archive</action>
+    <action type="assert" target="Discount unavailable" screenshot="android-archived-details.png">Verify removal from the open details screen</action>
+    <action type="assert" target="Verification updated offer" absent="true">Verify old detail fallback is absent</action>
+    <action type="tap" target="Go back">Return to the discount list</action>
+    <action type="assert" target="Verification updated offer" absent="true" screenshot="android-archived-offer.png">Verify archived offer is absent from the list</action>
+  </actions>
+</journey>

@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="za.co.bkkcommunity.app.ContentRefreshTest" tests="11" failures="0" errors="0" skipped="0" time="41.555" timestamp="2026-10-01T10:55:05" hostname="localhost">
+  <properties>
+    <property name="device" value="medium_phone(AVD) - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="partialNetworkFailurePreservesWholeCacheAndRefreshTimestamp" classname="za.co.bkkcommunity.app.ContentRefreshTest" time="0.569" />
+  <testcase name="restartingOfflineDoesNotResurrectArchivedDemoRecords" classname="za.co.bkkcommunity.app.ContentRefreshTest" time="0.212" />
+  <testcase name="offlineRsvpNeverClaimsSuccessOrChangesAttendance" classname="za.co.bkkcommunity.app.ContentRefreshTest" time="0.121" />
+  <testcase name="adminEditsReplaceAllThreeCachedContentTypes" classname="za.co.bkkcommunity.app.ContentRefreshTest" time="0.087" />
+  <testcase name="archivedServerRecordsDisappearFromCache" classname="za.co.bkkcommunity.app.ContentRefreshTest" time="0.093" />
+  <testcase name="savedItemsAndNotificationHistoryPersist" classname="za.co.bkkcommunity.app.FeatureStoreTest" time="0.125" />
+  <testcase name="todayScheduleDoesNotShowFutureEvents" classname="za.co.bkkcommunity.app.HomeScreenTest" time="17.306" />
+  <testcase name="documentedHomeStructureIsVisibleAndActionable" classname="za.co.bkkcommunity.app.HomeScreenTest" time="5.833" />
+  <testcase name="demonstrationEventCannotOfferAttendanceOrTravelActions" classname="za.co.bkkcommunity.app.HomeScreenTest" time="3.205" />
+  <testcase name="signedOutUserLandsOnLogin" classname="za.co.bkkcommunity.app.LaunchAuthenticationTest" time="5.293" />
+  <testcase name="recoveryAndRegistrationRemainReachableFromLoginGate" classname="za.co.bkkcommunity.app.LaunchAuthenticationTest" time="6.483" />
+</testsuite>

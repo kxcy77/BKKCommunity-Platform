@@ -2,21 +2,20 @@
 
 **Purpose:** This is the group’s plain-language technical handover and viva guide. It explains what each part does, how data moves through the platform, where the source code lives, and what is still not complete.
 
-**Current status:** Development handover. The website, canonical PHP/MySQL API, Android app and iOS app are implemented. Some production evidence and third-party services are still outstanding; they are listed honestly in section 11.
+**Current status:** Development handover. The website, canonical PHP/MySQL API, Android app are implemented. Some production evidence and third-party services are still outstanding; they are listed honestly in section 11.
 
 ## 1. One-minute explanation
 
 BKK Community is an accessible information platform for older community members. It gives members one place to view community events, RSVP, find discounts, find useful local services, contact the BKK team and manage their own account.
 
-There are three user-facing clients:
+There are two user-facing clients:
 
 | Client | What it is for | Technology |
 |---|---|---|
 | Website | Public information and protected staff administration | PHP server-rendered pages, Bootstrap 5 and the BKK design system |
 | Android app | Member mobile experience | Kotlin, Jetpack Compose, Room, Retrofit and WorkManager |
-| iPhone/iPad app | Member mobile experience | Swift, SwiftUI, URLSession and Keychain |
 
-All three use one **canonical backend**: the PHP/MySQL service in the `BKKCommunity-Web` repository. That backend is responsible for the rules, database writes and security. This is important: the Node/Prisma `api/` folder in this handover is an experimental reference only. It is **not** the production server and must not be described as the deployed backend.
+Both use one **canonical backend**: the PHP/MySQL service in `services/web/` in this repository. That backend is responsible for the rules, database writes and security. The Node/Prisma code in `reference/node-api-experimental/` is an experimental reference only, not the production server.
 
 ## 2. Platform architecture
 
@@ -24,20 +23,17 @@ All three use one **canonical backend**: the PHP/MySQL service in the `BKKCommun
 flowchart TB
     Member["Member"] --> Web["Website\nPHP pages + Bootstrap"]
     Member --> Android["Android app\nKotlin + Jetpack Compose"]
-    Member --> IOS["iOS app\nSwiftUI"]
     Staff["Authorised BKK staff"] --> Admin["Protected admin dashboard"]
 
     Web -->|"HTTPS"| Backend
     Android -->|"HTTPS JSON /api/v1\nBearer token"| Backend
-    IOS -->|"HTTPS JSON /api/v1\nBearer token"| Backend
     Admin -->|"HTTPS + session cookie + CSRF token"| Backend
 
     Backend["Canonical PHP 8.3 backend\nNginx + PHP-FPM"] --> Database[("MySQL 8 database")]
     Backend --> Email["Resend or SMTP\npassword-reset email"]
     Android --> Cache["Room offline read cache"]
-    IOS --> IOSCache["UserDefaults read cache\nKeychain session token"]
     Android --> AndroidCache["DataStore + encrypted session token"]
-    Backend -. "future live provider delivery" .-> Push["FCM / APNs push notifications"]
+    Backend -. "future live provider delivery" .-> Push["FCM push notifications"]
 ```
 
 ### The most important idea
@@ -58,7 +54,7 @@ The home page gives the member a simple starting point: an overview, prominent q
 
 ![BKK Community website home page on a phone](assets/web-home-mobile.png)
 
-This shows that the same web app rearranges into a one-column mobile layout. It is the no-cost way iPhone users can test the platform in Safari and add it to their Home Screen.
+This shows that the same web app rearranges into a one-column mobile layout. It lets users access the website on a small screen through a normal mobile browser.
 
 ### Website events page
 
@@ -83,7 +79,7 @@ flowchart LR
     Logout --> Login
 ```
 
-Both the Android and iOS apps use this same mental model: authenticate first, then move through a small set of clearly named destinations. The visual styles are native to Android and iOS, but the features and API contract are shared.
+The Android app uses this mental model: authenticate first, then move through a small set of clearly named destinations. Its native Compose screens use the shared PHP API contract.
 
 ### Website and admin screen map
 
@@ -102,19 +98,19 @@ flowchart LR
 
 ## 4. What a member can do
 
-| Feature | Website | Android | iOS | How it is stored |
-|---|---:|---:|---:|---|
-| View events, discounts and local services | Yes | Yes | Yes | MySQL; mobile apps cache readable content |
-| Register, sign in and sign out | Yes | Yes | Yes | `users` and `auth_sessions` |
-| Reset password using six-digit email code | Yes | Yes | Yes | `password_reset_tokens` |
-| RSVP or cancel attendance | Yes | Yes | Yes | `attendance` |
-| View attendance history | Yes | Yes | Yes | `attendance` joined to events |
-| Update profile and notification preferences | Yes | Yes | Yes | `users` |
-| Submit a contact message | Yes | Yes | Yes | `contact_messages` |
-| Local 24-hour event reminder | N/A | Yes | Yes | Scheduled on the device after confirmed RSVP |
-| Staff manage public information | Yes | No | No | Protected admin pages and MySQL |
+| Feature | Website | Android | How it is stored |
+|---|---:|---:|---|
+| View events, discounts and local services | Yes | Yes | MySQL; mobile apps cache readable content |
+| Register, sign in and sign out | Yes | Yes | `users` and `auth_sessions` |
+| Reset password using six-digit email code | Yes | Yes | `password_reset_tokens` |
+| RSVP or cancel attendance | Yes | Yes | `attendance` |
+| View attendance history | Yes | Yes | `attendance` joined to events |
+| Update profile and notification preferences | Yes | Yes | `users` |
+| Submit a contact message | Yes | Yes | `contact_messages` |
+| Local 24-hour event reminder | N/A | Yes | Scheduled on the device after confirmed RSVP |
+| Staff manage public information | Yes | No | Protected admin pages and MySQL |
 
-The website lets people browse public information before signing in. The mobile apps require sign-in before access to the member platform. RSVP, history, profile changes, account deletion and device registration always require a valid member session.
+The website lets people browse public information before signing in. The Android app requires sign-in before access to the member platform. RSVP, history, profile changes, account deletion and device registration require a valid member session.
 
 ## 5. Typical user journeys
 
@@ -124,7 +120,7 @@ The website lets people browse public information before signing in. The mobile 
 2. The app/website sends the credentials to `POST /api/v1/auth/login` (or the website’s protected form action).
 3. The backend verifies the password hash and creates a random session token.
 4. Only a SHA-256 hash of the mobile bearer token is stored in MySQL. The raw bearer token is returned once to the mobile app.
-5. Android stores its session securely; iOS stores it in Keychain. The website uses a secure, HttpOnly session cookie.
+5. Android stores its session securely using Android Keystore. The website uses a secure, HttpOnly session cookie.
 6. Later protected requests send the token/cookie. The backend checks that the session exists, is not expired and has not been revoked.
 
 ### B. Password reset
@@ -148,7 +144,7 @@ The website lets people browse public information before signing in. The mobile 
 1. An authorised administrator signs into the website administration area.
 2. They create or edit a discount with store, offer, eligibility, claim instructions and validity dates.
 3. The server validates the fields and saves the record in `discounts`.
-4. Website and app users see it on their next refresh. Mobile readable content is cached locally after it is fetched.
+4. Website users see it on their next page load. Android fetches updates on startup, sign-in, return to the foreground or manual Refresh, and keeps readable content in Room. Changes are not continuously streamed to an already-open screen.
 
 This is currently an administrator-managed workflow. Restaurants and pharmacies do not automatically feed discounts into the platform yet; authentic partner information must be verified by BKK staff before publishing.
 
@@ -157,7 +153,7 @@ This is currently an administrator-managed workflow. Restaurants and pharmacies 
 ```mermaid
 sequenceDiagram
     participant M as Member
-    participant A as Android or iOS app
+    participant A as Android app
     participant API as PHP API
     participant DB as MySQL
     participant R as Local reminder
@@ -178,7 +174,7 @@ If the API or database cannot confirm the save, the final two steps do not happe
 
 ### Website frontend
 
-The web app is in `BKKCommunity-Web/public/`.
+The web app is in `services/web/public/`.
 
 - `index.php`, `events.php`, `discounts.php`, `info.php` and `contact.php` are the public pages.
 - `login.php`, `register.php`, `reset-password.php`, `new-password.php` and `profile.php` are account pages.
@@ -190,7 +186,7 @@ The user interface follows the documented design language: navy and blue BKK bra
 
 ### Android frontend
 
-The Android app is in `BKKCommunity-Clean/android/` and opens directly in Android Studio.
+The Android app is in `apps/android/` and opens directly in Android Studio.
 
 - `ui/BkkApp.kt` and `ui/screens/BkkScreens.kt` provide the Compose navigation and screens.
 - `ui/BkkViewModel.kt` holds screen state and calls the repository.
@@ -201,19 +197,9 @@ The Android app is in `BKKCommunity-Clean/android/` and opens directly in Androi
 
 Android supports API 26 and newer. It uses Material 3, scalable text, descriptive icons and 48–56dp control targets. Its build configuration points to `https://bkkcommunity-platform-2-production.up.railway.app/api/v1/` by default and blocks cleartext traffic in release configuration.
 
-### iOS frontend
-
-The iOS app is in `BKKCommunity-Clean/ios/` and opens in Xcode through `BKKCommunity.xcodeproj`.
-
-- `Views/` contains the SwiftUI views: Home, Events, Discounts, Services and Account.
-- `ViewModels/BKKViewModel.swift` owns the screen state and refresh logic.
-- `Services/APIClient.swift` creates HTTPS requests and handles API responses.
-- The bearer session is stored in iOS Keychain, not in a normal preference file.
-- Last-read public content is cached locally so the app can show it when the network is unavailable.
-
 ## 7. Backend: how the server works
 
-The canonical backend is `BKKCommunity-Web`, built with PHP 8.3+, MySQL 8, Nginx and PHP-FPM.
+The canonical backend is `services/web/` in this repository, built with PHP 8.3+, MySQL 8, Nginx and PHP-FPM.
 
 | Backend area | Main files | Responsibility |
 |---|---|---|
@@ -252,7 +238,7 @@ The primary route groups are:
 
 ## 8. Database: what is stored and why
 
-MySQL is the permanent source of truth. The schema is in `BKKCommunity-Web/database/schema.sql`; migrations are in `database/migrations/`.
+MySQL is the permanent source of truth. The schema is in `services/web/database/schema.sql`; migrations are in `services/web/database/migrations/`.
 
 | Table | What it stores | Key protection/rule |
 |---|---|---|
@@ -293,13 +279,13 @@ These are intentional design decisions, not buzzwords:
 - **No direct database access from apps:** MySQL credentials stay on the server.
 - **Passwords are hashed:** the server uses PHP password hashing/verification, not readable passwords.
 - **Bearer tokens are hashed in MySQL:** theft of the database does not reveal a ready-to-use mobile token.
-- **iOS Keychain / Android secure storage:** mobile tokens are not placed in ordinary app text files.
+- **Android secure storage:** mobile tokens are not placed in ordinary app text files.
 - **CSRF protection:** browser-changing requests require a CSRF token.
 - **Secure web cookies:** website session cookies are HttpOnly and SameSite.
 - **Rate limiting:** login, registration, reset and contact endpoints are throttled by IP/account buckets.
 - **Prepared database queries and validation:** protects against SQL injection and malformed input.
 - **No fake offline writes:** RSVP and other protected writes do not show success unless the API confirms a saved database operation.
-- **Secrets outside Git:** `.env`, database credentials, Resend keys, Firebase files, Android signing keys and Apple provisioning files are not committed.
+- **Secrets outside Git:** `.env`, database credentials, Resend keys, Firebase files, Android signing keys are not committed.
 
 ## 10. How it is run and deployed
 
@@ -309,7 +295,6 @@ These are intentional design decisions, not buzzwords:
 |---|---|
 | Website/API | Visual Studio Code plus PHP 8.3+ and MySQL 8 |
 | Android | Android Studio, JDK 17+ (the project uses JVM target 17) |
-| iOS | Xcode on macOS |
 
 For the website locally, configure a local `.env` outside Git, then start PHP with:
 
@@ -339,7 +324,7 @@ Testing happens in layers:
 2. **Integration checks:** migration, registration, login, logout, duplicate RSVP prevention, cancellation, account deletion and admin CRUD/read-back.
 3. **User-interface checks:** loading, populated, empty, error and offline states; navigation and no horizontal overflow on small screens.
 4. **Security checks:** secret scan, access-control checks, CSRF, session revocation, rate limits and safe logging.
-5. **Accessibility and UAT:** TalkBack/VoiceOver, 200% text scaling, contrast, large targets and at least six elderly participants.
+5. **Accessibility and UAT:** TalkBack, 200% text scaling, contrast, large targets and at least six elderly participants.
 
 The critical answer for an examiner is: automated tests prove some technical rules, but they do not replace real elderly-user testing or real-device accessibility evidence.
 
@@ -348,10 +333,10 @@ The critical answer for an examiner is: automated tests prove some technical rul
 Do **not** say these are complete unless evidence is captured:
 
 - authentic BKK events, discounts, partner details, branding assets and imagery;
-- fresh real-device evidence on both Android and iPhone;
-- TalkBack, VoiceOver and 200% text-scale evidence;
+- fresh real-device evidence on Android;
+- TalkBack and 200% text-scale evidence;
 - six-person elderly-user UAT, with at least 80% independent task completion and 4/5 average feedback;
-- Firebase/APNs credentials and real push-notification delivery evidence;
+- Firebase credentials and real push-notification delivery evidence;
 - automated encrypted backups, uptime monitoring and an edge/WAF service;
 - final POPIA/privacy notice, data-retention policy and stakeholder sign-off.
 
@@ -370,7 +355,7 @@ Password-reset email works only when a verified Resend domain or working SMTP se
 | How is the platform usable for elderly members? | We limit primary navigation, use large controls and readable text, give visible labels, avoid colour-only status, keep actions within a few steps and plan real elderly-user UAT. |
 | What does the admin dashboard do? | It allows authorised staff to create, update and manage published events, discounts, services and contact messages without editing source code. |
 | What is not production-ready yet? | Real notification delivery evidence, real accessibility/UAT evidence, approved live content and final operational/legal controls. We do not claim those are complete. |
-| What is the difference between the Node API and PHP API folders? | Node/Prisma is an experimental development reference. The deployed API used by the website and mobile apps is the PHP/MySQL API in `BKKCommunity-Web`. |
+| What is the difference between the Node API and PHP API folders? | Node/Prisma is an experimental development reference. The deployed API used by the website and Android app is the PHP/MySQL API in `services/web/`. |
 
 ## 14. Group presentation checklist
 

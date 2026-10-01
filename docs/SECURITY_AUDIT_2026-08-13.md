@@ -1,3 +1,5 @@
+> Historical record: this report describes the scope and results on its original date. The active project scope from 1 October 2026 is Android plus the website, admin and PHP/MySQL API. Earlier native iOS work is excluded from the current delivery.
+
 # BKK Community Full-App Security and Stress Audit
 
 > Historical baseline: this report describes the unsafe source bundle before remediation. See `REMEDIATION_STATUS_2026-08-13.md` for the cleaned handoff status. Old paths and findings below are preserved as audit evidence, not current claims.

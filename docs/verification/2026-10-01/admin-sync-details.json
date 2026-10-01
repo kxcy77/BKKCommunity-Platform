@@ -1,0 +1,39 @@
+{
+  "journey": "Open the updated admin offer details",
+  "serial": "emulator-5554",
+  "results": [
+    {
+      "action": "Verify authenticated home after reinstall",
+      "status": "PASSED",
+      "commands": []
+    },
+    {
+      "action": "Open Discounts tab",
+      "status": "PASSED",
+      "commands": [
+        "adb shell input tap 540 2274"
+      ]
+    },
+    {
+      "action": "Scroll to the updated verification offer",
+      "status": "PASSED",
+      "commands": [
+        "adb shell input swipe 540 1649 540 693 500"
+      ]
+    },
+    {
+      "action": "Open the offer details",
+      "status": "PASSED",
+      "commands": [
+        "adb shell input tap 381 1702"
+      ]
+    },
+    {
+      "action": "Verify the offer details screen",
+      "status": "PASSED",
+      "commands": [],
+      "screenshot": "android-updated-offer-details.png"
+    }
+  ],
+  "status": "PASSED"
+}

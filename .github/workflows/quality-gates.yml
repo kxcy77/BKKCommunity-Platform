@@ -37,6 +37,64 @@ jobs:
       - name: Run fail-closed web smoke suite
         run: bash tests/smoke.sh
 
+  database:
+    name: MySQL admin, member and API integration
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: LocalCiFixtureOnly26
+          MYSQL_DATABASE: bkk_ci_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -pLocalCiFixtureOnly26"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      APP_ENV: development
+      ALLOW_DEMO_MODE: 'false'
+      DB_HOST: 127.0.0.1
+      DB_PORT: '3306'
+      DB_NAME: bkk_ci_test
+      DB_USER: root
+      DB_PASSWORD: LocalCiFixtureOnly26
+      MYSQL_PWD: LocalCiFixtureOnly26
+      MYSQL_HOST: 127.0.0.1
+      RESET_CODE_SECRET: LocalCiResetFixtureOnly26
+      BKK_TEST_RESET_CODE_SECRET: LocalCiResetFixtureOnly26
+      BKK_TEST_DB_NAME: bkk_ci_test
+      BKK_BASE_URL: http://127.0.0.1:8090
+    defaults:
+      run:
+        working-directory: services/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo_mysql
+          coverage: none
+      - run: composer install --no-interaction --no-progress --prefer-dist
+      - name: Initialize disposable test database
+        run: RUN_DATABASE_INITIALIZATION=true BKK_APP_ROOT="$PWD" sh bin/migrate.sh
+      - name: Start local API
+        run: |
+          php -S 127.0.0.1:8090 -t public public/router.php > /tmp/bkk-ci-server.log 2>&1 &
+          for attempt in {1..20}; do
+            if curl -fsS http://127.0.0.1:8090/api/v1/ready; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - name: Verify admin edits reach website and Android API
+        run: bash tests/admin-database-integration.sh
+      - name: Verify member workflows
+        run: bash tests/database-integration.sh
+      - name: Verify API authentication and security boundaries
+        run: bash tests/api-integration.sh
+
   android:
     name: Android unit, lint and debug build
     runs-on: ubuntu-latest

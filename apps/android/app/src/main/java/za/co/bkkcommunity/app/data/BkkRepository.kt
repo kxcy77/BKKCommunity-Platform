@@ -2,6 +2,12 @@ package za.co.bkkcommunity.app.data
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.json.JSONObject
 import androidx.room.withTransaction
 import retrofit2.HttpException
@@ -41,29 +47,44 @@ class BkkRepository(
     private val sessionStore: SessionStore,
     private val featureStore: FeatureStore
 ) {
+    private val refreshMutex = Mutex()
     val eventStream: Flow<List<CommunityEvent>> = events.observeAll().map { rows -> rows.map { it.toDomain() } }
     val discountStream: Flow<List<Discount>> = discounts.observeAll().map { rows -> rows.map { it.toDomain() } }
     val serviceStream: Flow<List<LocalService>> = services.observeAll().map { rows -> rows.map { it.toDomain() } }
     val memberStream: Flow<Member?> = sessionStore.member
 
     suspend fun initialize(): String? {
-        seedDemoIfEmpty()
+        // A successful empty server response is real data, not permission to
+        // resurrect demo records the next time the app starts offline.
+        if (featureStore.lastUpdated.first() == null) seedDemoIfEmpty()
         return refreshAll().exceptionOrNull()?.let(::messageFor)
     }
 
-    suspend fun refreshAll(): Result<Unit> = runCatching {
-        val remoteEvents = api.events().data.map { it.toEntity() }
-        val remoteDiscounts = api.discounts().data.map { it.toEntity() }
-        val remoteServices = api.localServices().data.map { it.toEntity() }
-        database.withTransaction {
-            events.clear()
-            discounts.clear()
-            services.clear()
-            events.replaceAll(remoteEvents)
-            discounts.replaceAll(remoteDiscounts)
-            services.replaceAll(remoteServices)
+    suspend fun refreshAll(): Result<Unit> = try {
+        refreshMutex.withLock {
+            coroutineScope {
+                val eventRequest = async { api.events().data.map { it.toEntity() } }
+                val discountRequest = async { api.discounts().data.map { it.toEntity() } }
+                val serviceRequest = async { api.localServices().data.map { it.toEntity() } }
+                val remoteEvents = eventRequest.await()
+                val remoteDiscounts = discountRequest.await()
+                val remoteServices = serviceRequest.await()
+                database.withTransaction {
+                    events.clear()
+                    discounts.clear()
+                    services.clear()
+                    events.replaceAll(remoteEvents)
+                    discounts.replaceAll(remoteDiscounts)
+                    services.replaceAll(remoteServices)
+                }
+                featureStore.recordSuccessfulRefresh()
+            }
         }
-        featureStore.recordSuccessfulRefresh()
+        Result.success(Unit)
+    } catch (cancelled: CancellationException) {
+        throw cancelled
+    } catch (error: Exception) {
+        Result.failure(error)
     }
 
     suspend fun eventDetail(id: Long): Result<CommunityEvent> = runCatching {

@@ -64,7 +64,7 @@ Never commit `.env`, database passwords, SMTP credentials or hosting credentials
 
 ## Railway configuration
 
-This PHP/MySQL repository is the canonical backend currently serving the website, Android app and iOS app. Do not deploy the separate experimental Node/Prisma API on the same hostname unless the clients, schema and deployment are deliberately migrated together.
+This PHP/MySQL repository is the canonical backend currently serving the website, Android app. Do not deploy the separate experimental Node/Prisma API on the same hostname unless the clients, schema and deployment are deliberately migrated together.
 
 Set these Railway service variables:
 
@@ -99,7 +99,7 @@ BKK_BASE_URL=http://127.0.0.1:8080 ./tests/api-integration.sh
 
 See [docs/API.md](docs/API.md) for the Android API contract and authentication rules.
 
-The checked-in milestone was also exercised in headless Chrome at 1440px, 390px and 320px. Public-page Axe scans returned zero violations, mobile navigation and mouse-wheel scrolling worked, 320px pages had no horizontal overflow, guest admin access was blocked, and administrator event creation completed successfully. These automated checks do not replace real TalkBack/VoiceOver or elderly-user UAT.
+The checked-in milestone was also exercised in headless Chrome at 1440px, 390px and 320px. Public-page Axe scans returned zero violations, mobile navigation and mouse-wheel scrolling worked, 320px pages had no horizontal overflow, guest admin access was blocked, and administrator event creation completed successfully. These automated checks do not replace real TalkBack or elderly-user UAT.
 
 ## Production status and remaining blockers
 

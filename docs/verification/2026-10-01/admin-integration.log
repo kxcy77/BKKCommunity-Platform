@@ -1,0 +1,12 @@
+PASS database administrator login
+PASS paginated contact inbox and audited status management
+PASS admin event edit reflected on website and Android API
+PASS administrator event create, edit, stale-update rejection and archive
+PASS admin discount edits and category filter reflected on website and Android API
+PASS expired discount hidden from website and Android API
+PASS administrator discount create and archive
+PASS admin service edits and type filter reflected on website and Android API
+PASS administrator local-service create and archive
+PASS database audit records were persisted
+PASS administrator role revocation invalidates the active session
+PASS persistent administrator journey complete

@@ -29,6 +29,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
@@ -160,7 +162,13 @@ fun BkkApp(container: AppContainer, deepLink: Uri?) {
         }
     }
     LaunchedEffect(state.member?.id) {
-        if (state.member != null) registerFcmToken(viewModel)
+        if (state.member != null) {
+            registerFcmToken(viewModel)
+            viewModel.refreshInBackground()
+        }
+    }
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.refreshInBackground()
     }
 
     val backStack by navController.currentBackStackEntryAsState()

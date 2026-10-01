@@ -31,5 +31,6 @@ coverage/
 # Editor and operating-system files
 .DS_Store
 *.log
+!docs/verification/2026-10-01/*.log
 **/xcuserdata/
 *.xcuserstate
