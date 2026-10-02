@@ -1,0 +1,39 @@
+{
+  "journey": "Archived details do not resurrect stale content",
+  "serial": "emulator-5554",
+  "results": [
+    {
+      "action": "Leave and return to the app after admin archive",
+      "status": "PASSED",
+      "commands": [
+        "adb shell input keyevent 3",
+        "adb shell am start [MainActivity]"
+      ]
+    },
+    {
+      "action": "Verify removal from the open details screen",
+      "status": "PASSED",
+      "commands": [],
+      "screenshot": "android-archived-details.png"
+    },
+    {
+      "action": "Verify old detail fallback is absent",
+      "status": "PASSED",
+      "commands": []
+    },
+    {
+      "action": "Return to the discount list",
+      "status": "PASSED",
+      "commands": [
+        "adb shell input tap 110 107"
+      ]
+    },
+    {
+      "action": "Verify archived offer is absent from the list",
+      "status": "PASSED",
+      "commands": [],
+      "screenshot": "android-archived-offer.png"
+    }
+  ],
+  "status": "PASSED"
+}

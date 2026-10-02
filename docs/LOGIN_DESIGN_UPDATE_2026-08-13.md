@@ -1,3 +1,5 @@
+> Historical record: this report describes the scope and results on its original date. The active project scope from 1 October 2026 is Android plus the website, admin and PHP/MySQL API. Earlier native iOS work is excluded from the current delivery.
+
 # Login design update — 13 August 2026
 
 ## What changed

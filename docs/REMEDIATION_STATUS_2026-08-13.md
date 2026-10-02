@@ -1,3 +1,5 @@
+> Historical record: this report describes the scope and results on its original date. The active project scope from 1 October 2026 is Android plus the website, admin and PHP/MySQL API. Earlier native iOS work is excluded from the current delivery.
+
 # Security remediation status
 
 This maps the 13 August baseline audit to the cleaned source. “Fixed in source” still requires deployment/device evidence.

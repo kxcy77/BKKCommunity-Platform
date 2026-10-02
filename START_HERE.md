@@ -12,7 +12,6 @@
 | Folder | Open it when you need to... |
 |---|---|
 | `apps/android` | Edit or run the Android app in Android Studio |
-| `apps/ios` | Edit or run the iPhone app in Xcode |
 | `services/web` | Edit or run the PHP website, API and admin dashboard |
 | `docs` | Read documentation, visual diagrams, tests and release gates |
 | `database-reference` | Review the shared data-model reference |

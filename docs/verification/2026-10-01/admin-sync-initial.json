@@ -1,0 +1,54 @@
+{
+  "journey": "Local admin offer reaches Android",
+  "serial": "emulator-5554",
+  "results": [
+    {
+      "action": "Verify signed-out login gate",
+      "status": "PASSED",
+      "commands": [],
+      "screenshot": "android-login.png"
+    },
+    {
+      "action": "Enter local test email",
+      "status": "PASSED",
+      "commands": [
+        "adb shell input tap 540 1159",
+        "adb shell input text [REDACTED_TEST_INPUT]",
+        "adb shell input keyevent 4"
+      ]
+    },
+    {
+      "action": "Enter redacted local test password",
+      "status": "PASSED",
+      "commands": [
+        "adb shell input tap 540 1401",
+        "adb shell input text [REDACTED_TEST_INPUT]",
+        "adb shell input keyevent 4"
+      ]
+    },
+    {
+      "action": "Tap Sign In",
+      "status": "PASSED",
+      "commands": [
+        "adb shell input tap 496 1780"
+      ]
+    },
+    {
+      "action": "Verify authenticated home",
+      "status": "FAILED",
+      "commands": [],
+      "comment": "Expected visible state not found: Today\u2019s Schedule"
+    },
+    {
+      "action": "Open Discounts tab",
+      "status": "SKIPPED",
+      "commands": []
+    },
+    {
+      "action": "Verify offer created in the local admin website",
+      "status": "SKIPPED",
+      "commands": []
+    }
+  ],
+  "status": "FAILED"
+}

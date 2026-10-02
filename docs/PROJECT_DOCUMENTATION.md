@@ -1,7 +1,8 @@
 # BKK Community Platform — Project Documentation
 
-Version: 1.0 development handoff  
-Updated: 14 August 2026  
+Version: 1.0 Android and website development handoff
+
+Updated: 1 October 2026
 Status: canonical PHP/MySQL release backend deployed; external credentials, authentic content and human/device evidence incomplete
 
 ## 1. Project purpose
@@ -18,7 +19,7 @@ The project should:
 - restore a valid secure session without exposing platform content to signed-out users;
 - never claim an RSVP or notification succeeded without provider confirmation; fail reset configuration closed, keep account-existence responses neutral and invalidate any code whose delivery fails;
 - remain usable with larger text, screen readers and reduced technical confidence;
-- give the group one reproducible Android, iOS, API, database and admin handoff;
+- give the group one reproducible Android, API, database and admin handoff;
 - protect personal information and privileged administration functions.
 
 Release success still requires all Must requirements to pass, no critical defects, at least 80% independent task completion during UAT and an average elderly-participant rating of at least 4/5.
@@ -41,7 +42,7 @@ Administrators use the same account system and every protected admin page rechec
 - Discount list, categories, eligibility and claim instructions.
 - Local-service list, categories, phone, address, hours and directions.
 - Contact submission with validation and rate limiting.
-- Offline readable cache in the Android app; iOS retains last fetched content in `UserDefaults`.
+- Offline readable cache in the Android app.
 
 ### Accounts
 
@@ -58,7 +59,7 @@ Administrators use the same account system and every protected admin page rechec
 - One attendance record per member/event enforced by a unique database constraint.
 - RSVP writes require a successful API response; mobile clients do not show offline success.
 - Android schedules a local 24-hour reminder only after a confirmed RSVP.
-- Device-token/preferences storage is implemented. Actual FCM/APNs provider delivery is not yet implemented in the canonical PHP release backend and remains a release gate.
+- Device-token/preferences storage is implemented. Actual FCM provider delivery is not yet implemented in the canonical PHP release backend and remains a release gate.
 
 ### Administration
 
@@ -73,15 +74,15 @@ Administrators use the same account system and every protected admin page rechec
 
 - Android supports API 26 and later.
 - Body content targets 18sp and primary controls target at least 48–56dp.
-- Material/SF Symbols replace unreliable emoji glyphs for interface meaning.
+- Material icons replace unreliable emoji glyphs for interface meaning.
 - Status includes text/icons and is not communicated by colour alone.
-- TalkBack, VoiceOver, switch control, 200% font size and contrast still require manual evidence.
+- TalkBack, switch control, 200% font size and contrast still require manual evidence.
 
 ### Security and privacy
 
 - Release traffic must use HTTPS.
 - Mobile bearer tokens expire after 30 days; only SHA-256 token hashes are stored and every request checks a revocable database session.
-- Android stores the bearer token with Android Keystore AES-GCM; iOS stores it in Keychain.
+- Android stores the bearer token with Android Keystore AES-GCM.
 - Passwords use PHP's supported `password_hash`/`password_verify` implementation.
 - Password reset stores only an HMAC, never the six-digit code.
 - The canonical API is same-origin/native-client only, rejects bodies over 32 KB, sends strict security headers and uses route-specific database-backed limits.
@@ -100,16 +101,16 @@ Administrators use the same account system and every protected admin page rechec
 ```mermaid
 flowchart LR
     A["Android Compose app"] -->|"HTTPS JSON /api/v1"| API["PHP 8.3 API behind Nginx"]
-    I["iOS SwiftUI app"] -->|"HTTPS JSON /api/v1"| API
     W["Server-rendered admin"] -->|"Same-origin session + CSRF"| API
     API --> DB["MySQL 8+"]
     API --> SMTP["SMTP provider"]
-    API -.-> FCM["FCM/APNs delivery - outstanding"]
+    API -.-> FCM["FCM delivery - outstanding"]
     A --> ROOM["Room public-content cache"]
-    I --> CACHE["iOS public-content cache"]
 ```
 
-Android uses Jetpack Compose, Navigation Compose, ViewModel/StateFlow, Retrofit/OkHttp, Room, DataStore, WorkManager and Firebase Messaging. iOS uses SwiftUI, URLSession, Keychain, UserNotifications and local caching. The canonical schema and numbered migrations are in `kxcy77/BKKCommunity-Web`; the bundled Prisma service is experimental reference code.
+Android uses Jetpack Compose, Navigation Compose, ViewModel/StateFlow, Retrofit/OkHttp, Room, DataStore, WorkManager and Firebase Messaging. The canonical schema and numbered migrations are in `services/web/database`; `reference/node-api-experimental` is development-reference code, not the deployed backend.
+
+The website, admin forms and Android JSON endpoints read the same MySQL records. Website changes appear on a fresh page load. Android refreshes at startup, after sign-in, on return to the foreground and through its manual Refresh action. It downloads the three content lists concurrently, then replaces the Room cache in a single transaction only when all requests succeed. A failed refresh preserves the previous cache and its last-successful-update time. This is refresh-based synchronisation, not continuous streaming or guaranteed immediate updates while a screen stays open.
 
 ## 7. Data model
 
@@ -141,7 +142,7 @@ All responses use either `{ "data": ... }` or `{ "error": { "code": "...", "mess
 - `/api/v1/devices`: token registration.
 - `/admin`: same-origin protected website content management; it is not a public JSON route.
 
-See [the canonical API documentation](https://github.com/kxcy77/BKKCommunity-Web/blob/main/docs/API.md) for request-level details. `api/README.md` documents only the experimental Node implementation.
+See [the canonical API documentation](../services/web/docs/API.md) for request-level details. `reference/node-api-experimental/README.md` documents only the experimental Node implementation.
 
 ## 9. Configuration and deployment
 
@@ -149,12 +150,12 @@ No live secret belongs in source control. Database/schema readiness is checked b
 
 - a managed MySQL database and separate `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` and `DB_PASSWORD` values;
 - a separate 32+ character `RESET_CODE_SECRET`;
-- SMTP host, user, password and verified From address;
-- authorised Firebase/APNs configuration when provider delivery is implemented;
-- HTTPS API hostname configured in Android/iOS release settings;
-- Android signing material and Apple team/provisioning profiles outside Git.
+- a verified From address and either a server-side Resend API key or SMTP host, user, password and encryption settings;
+- authorised Firebase configuration when provider delivery is implemented;
+- HTTPS API hostname configured in Android release settings;
+- Android signing material outside Git.
 
-Railway hosts the canonical PHP API and MySQL. Health/readiness, mobile authentication and RSVP were witnessed; production remains incomplete until a fresh empty-database rehearsal, authenticated live admin CRUD and real password-reset email delivery have been witnessed.
+Railway hosts the canonical PHP API and MySQL. Current read-only production checks and controlled local verification are recorded separately in [the 1 October verification report](verification/2026-10-01/REPORT.md). Local authentication, RSVP, admin read-back and reset-code logic do not prove that current production email, notifications or privileged writes work.
 
 ## 10. Testing strategy
 
@@ -163,7 +164,7 @@ Railway hosts the canonical PHP API and MySQL. Health/readiness, mobile authenti
 - Integration: fresh MySQL migration, auth lifecycle, duplicate RSVP, admin CRUD and account deletion.
 - UI: navigation, scrolling, empty/loading/error/offline/populated states and deep links.
 - Security: dependency audit, secret scan, rate limits, access control, session revocation and log review.
-- Accessibility: TalkBack, VoiceOver, keyboard/switch control, 200% text, contrast and 48dp targets.
+- Accessibility: TalkBack, keyboard/switch control, 200% text, contrast and 48dp targets.
 - UAT: at least six elderly BKK participants using realistic devices and approved data.
 
 ## 11. Known limitations and honest release status
@@ -171,12 +172,11 @@ Railway hosts the canonical PHP API and MySQL. Health/readiness, mobile authenti
 The current package is a hardened development handoff, not a signed production release. These cannot be invented in code and remain outstanding:
 
 - authentic approved BKK logo, images, events, discounts, services and contact details;
-- fresh empty-MySQL migration rehearsal and authenticated live admin CRUD evidence;
+- authenticated current-production admin CRUD evidence and a production-like backup/restore rehearsal;
 - live password-reset email delivery through a verified sender;
-- real Firebase projects and Android/iOS device delivery evidence;
-- iOS remote notification registration/delivery (local reminders are implemented);
-- physical Android and iPhone tests;
-- TalkBack, VoiceOver and 200% text evidence;
+- real Firebase projects and Android device delivery evidence;
+- physical Android tests;
+- TalkBack, full-screen 200% text and accessibility audit evidence;
 - six-person elderly-user UAT and client sign-off;
 - retention policy, privacy notice and POPIA/legal review.
 

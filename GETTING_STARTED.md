@@ -11,28 +11,19 @@ This is a source-code backup. Downloading or unzipping it does not start every p
 ## Android app
 
 1. Install Android Studio and the Android SDK.
-2. Install a JDK compatible with the project (JDK 17 or newer).
+2. Use a compatible Gradle runtime (tested from JDK 21, with the project's Java 25 daemon criteria). Android bytecode targets JVM 17; that is separate from the Gradle runtime.
 3. In Android Studio choose **Open**, then select `apps/android` — not the repository root.
 4. Allow Gradle to download its dependencies.
 5. Select an emulator or Android phone and press **Run**.
 
 The missing `local.properties` file is normal. Android Studio creates it for each person's own Android SDK location. `google-services.json` is optional in this project; without a real Firebase project the app still builds and uses its normal screens/API, but live FCM push notifications are unavailable.
 
-## iOS app
-
-1. Use a Mac with Xcode installed.
-2. Open `apps/ios/BKKCommunity.xcodeproj` in Xcode.
-3. Select an iPhone simulator or a connected iPhone, then press **Run**.
-4. If Xcode asks to resolve packages or select a development team, allow it and select the group member's own Apple account.
-
-The app can run in the simulator. Sharing a native build with other iPhone owners requires Apple TestFlight/Developer Program distribution; use the website for no-cost iPhone testing.
-
 ## Website and canonical API
 
 1. Install PHP 8.3+, Composer and MySQL 8.
 2. Open `services/web` in Visual Studio Code.
 3. Run `composer install` once to restore the excluded PHP dependencies.
-4. For a design/demo review, run:
+4. Configure your own local MySQL database and excluded `.env` file using `services/web/README.md`, then run:
 
    ```bash
    php -S 127.0.0.1:8080 -t public public/router.php
@@ -40,21 +31,20 @@ The app can run in the simulator. Sharing a native build with other iPhone owner
 
 5. Open `http://127.0.0.1:8080`.
 
-Without an `.env` database configuration, the website intentionally opens in labelled demo mode. That is not a crash. Persistent accounts, live admin data, RSVP writes and password-reset delivery require MySQL plus the environment variables described in `services/web/README.md`.
+Persistent accounts, shared admin data, RSVP writes and password-reset delivery require MySQL plus the environment variables described in `services/web/README.md`. Without database configuration the server returns 503. For a temporary design preview only, use the VS Code task, which explicitly enables local demo mode; changes made in demo mode are not shared with other users or the Android app.
 
 ## The easiest testing route
 
 | Person | Recommended way to test |
 |---|---|
 | Android user | Android Studio emulator/phone, or the shared debug APK |
-| iPhone user without TestFlight | Open `https://bkkcommunity-platform-2-production.up.railway.app` in Safari and use **Add to Home Screen** |
 | Person reviewing the website | Run `services/web` locally, or open the deployed website |
 
 ## If something does not start
 
 Check these first:
 
-1. Is the correct folder open (`apps/android`, `apps/ios/BKKCommunity.xcodeproj`, or `services/web`)?
+1. Is the correct folder open (`apps/android` or `services/web`)?
 2. Has the required tool downloaded its dependencies?
 3. Is the device/emulator connected and selected?
 4. Is the internet available for the hosted API?

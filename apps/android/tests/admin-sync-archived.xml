@@ -1,0 +1,6 @@
+<journey name="Archived offer removed on Android resume">
+  <actions>
+    <action type="resume">Leave and return to the Android app</action>
+    <action type="assert" target="Verification updated offer" absent="true" screenshot="android-archived-offer.png">Verify archived offer is absent</action>
+  </actions>
+</journey>

@@ -1,0 +1,12 @@
+<journey name="Local admin offer reaches Android">
+  <actions>
+    <action type="assert" target="Welcome back" screenshot="android-login.png">Verify signed-out login gate</action>
+    <action type="input" target="Email address" env="BKK_TEST_EMAIL">Enter local test email</action>
+    <action type="input" target="Password" env="BKK_TEST_PASSWORD">Enter redacted local test password</action>
+    <action type="tap" target="Sign In">Tap Sign In</action>
+    <action type="assert" target="YOUR COMMUNITY TODAY" screenshot="android-home.png">Verify authenticated home</action>
+    <action type="tap" target="Discounts" last="true">Open Discounts tab</action>
+    <action type="swipe">Scroll the discount list to the local verification offer</action>
+    <action type="assert" target="Verification original offer" screenshot="android-original-offer.png">Verify offer created in the local admin website</action>
+  </actions>
+</journey>

@@ -1,0 +1,7 @@
+<journey name="Admin edit refreshes Android on resume">
+  <actions>
+    <action type="resume">Leave and return to the Android app</action>
+    <action type="assert" target="Verification updated offer" screenshot="android-updated-offer.png">Verify updated offer without pressing Refresh</action>
+    <action type="assert" target="Verification original offer" absent="true">Verify obsolete title is absent</action>
+  </actions>
+</journey>

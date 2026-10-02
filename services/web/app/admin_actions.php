@@ -62,6 +62,7 @@ function admin_discount_input(): array
     return [
         'store_name' => trim((string) ($_POST['store_name'] ?? '')),
         'category' => trim((string) ($_POST['category'] ?? '')),
+        'title' => trim((string) ($_POST['title'] ?? $_POST['deal'] ?? '')),
         'deal' => trim((string) ($_POST['deal'] ?? '')),
         'eligibility' => trim((string) ($_POST['eligibility'] ?? '')),
         'claim_instructions' => trim((string) ($_POST['claim_instructions'] ?? '')),
@@ -76,6 +77,7 @@ function admin_discount_input_valid(array $discount): bool
 {
     return admin_text_length($discount['store_name'], 2, 160)
         && in_array($discount['category'], ['Pharmacy', 'Grocery', 'Restaurant', 'Transport'], true)
+        && admin_text_length($discount['title'], 3, 190)
         && admin_text_length($discount['deal'], 5, 5000)
         && admin_text_length($discount['eligibility'], 3, 255)
         && admin_text_length($discount['claim_instructions'], 5, 2000)

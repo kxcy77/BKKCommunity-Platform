@@ -472,7 +472,7 @@ function admin_all_discounts(): array
 {
     $db = database();
     if (!$db) {
-        return array_map(static fn (array $discount): array => $discount + ['valid_from' => '', 'valid_until' => '', 'is_active' => 1, 'version' => 'demo-1'], $_SESSION['demo_discounts'] ?? demo_discounts());
+        return array_map(static fn (array $discount): array => $discount + ['title' => mb_substr((string) ($discount['deal'] ?? ''), 0, 190), 'valid_from' => '', 'valid_until' => '', 'is_active' => 1, 'version' => 'demo-1'], $_SESSION['demo_discounts'] ?? demo_discounts());
     }
 
     return $db->query('SELECT d.id, d.store_name, d.title, d.details AS deal, d.eligibility,
@@ -520,7 +520,7 @@ function admin_create_discount(array $discount): int
     }
 
     $categoryId = admin_discount_category_id($db, $discount['category']);
-    $title = mb_substr($discount['deal'], 0, 190);
+    $title = $discount['title'];
     $statement = $db->prepare('INSERT INTO discounts (category_id, store_name, title, details, eligibility, claim_instructions, valid_from, valid_until, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)');
     $statement->execute([$categoryId, $discount['store_name'], $title, $discount['deal'], $discount['eligibility'], $discount['claim_instructions'], $discount['valid_from'] ?: null, $discount['valid_until'] ?: null]);
     $discountId = (int) $db->lastInsertId();
@@ -554,7 +554,7 @@ function admin_update_discount(int $discountId, array $discount): bool
 
     $categoryId = admin_discount_category_id($db, $discount['category']);
     $statement = $db->prepare('UPDATE discounts SET category_id = ?, store_name = ?, title = ?, details = ?, eligibility = ?, claim_instructions = ?, valid_from = ?, valid_until = ?, row_version = row_version + 1 WHERE id = ? AND row_version = ?');
-    $statement->execute([$categoryId, $discount['store_name'], mb_substr($discount['deal'], 0, 190), $discount['deal'], $discount['eligibility'], $discount['claim_instructions'], $discount['valid_from'] ?: null, $discount['valid_until'] ?: null, $discountId, $discount['version']]);
+    $statement->execute([$categoryId, $discount['store_name'], $discount['title'], $discount['deal'], $discount['eligibility'], $discount['claim_instructions'], $discount['valid_from'] ?: null, $discount['valid_until'] ?: null, $discountId, $discount['version']]);
     if ($statement->rowCount() !== 1) {
         return false;
     }

@@ -8,11 +8,11 @@ This test must be completed with at least six BKK participants aged 60 or older.
 - At least 80% of all tasks are completed without help.
 - The average ease-of-use rating is at least 4 out of 5.
 - No participant is misled into attending, travelling to, sharing or saving a demonstration event.
-- Text remains readable at 200% scaling and every task can be completed with TalkBack or VoiceOver.
+- Text remains readable at 200% scaling and every task can be completed with TalkBack.
 
 ## Test setup
 
-- Use a physical Android device and a physical iPhone where possible.
+- Use a physical Android device where possible.
 - Test the website with a mouse or trackpad and with keyboard only.
 - Use test accounts and clearly labelled test content. Do not use a participant's real password.
 - Ask the participant to think aloud. Do not point to a control or tell them which button to press.
@@ -34,7 +34,7 @@ This test must be completed with at least six BKK participants aged 60 or older.
 ## Accessibility checks
 
 - Repeat tasks 1, 3, 6 and 8 at 200% text scaling.
-- Repeat tasks 1, 3 and 8 with TalkBack on Android or VoiceOver on iOS.
+- Repeat tasks 1, 3 and 8 with TalkBack on Android.
 - On the website, repeat tasks 1, 3 and 8 using Tab, Shift+Tab, Enter and arrow keys only.
 - Confirm that focus is visible, labels are read correctly, controls are at least 48px/dp/pt high and status is never communicated by colour alone.
 

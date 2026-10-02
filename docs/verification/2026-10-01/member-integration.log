@@ -1,0 +1,10 @@
+PASS registration persisted
+PASS email-bound 6-digit password reset code consumed
+PASS login and protected profile
+PASS RSVP persisted
+PASS duplicate RSVP prevented and cancellation reversible
+PASS notification preferences persisted
+PASS profile update persisted
+PASS contact message persisted
+PASS account deletion and relational cleanup
+PASS persistent member journey complete

@@ -1,15 +1,18 @@
 # BKK Community Platform
 
-This is the clean, source-only backup repository for the BKK Community group project. It combines the Android app, iOS app, canonical website/API, shared documentation and development-reference code in one place.
+This is the clean, source-only backup repository for the BKK Community group project. It combines the Android app, canonical website/API, shared documentation and development-reference code in one place.
 
 **New to the project? Start with [START_HERE.md](START_HERE.md).**
+
+The assessed scope is Android plus the website, administrator pages and shared PHP/MySQL API. Older reports in `docs/submission` and dated audit reports describe earlier work and are historical evidence, not the current platform scope.
+
+Read [the latest verification report and screenshot evidence](docs/verification/2026-10-01/REPORT.md) for the checks performed, corrections made and outstanding production/device release gates.
 
 ## Start here
 
 | Area | Location | Purpose |
 |---|---|---|
 | Android app | `apps/android/` | Kotlin and Jetpack Compose member app; open this folder in Android Studio |
-| iOS app | `apps/ios/` | SwiftUI member app; open `BKKCommunity.xcodeproj` in Xcode |
 | Canonical website and API | `services/web/` | PHP/MySQL website, administration dashboard and deployed `/api/v1` service |
 | Documentation | `docs/` | Platform explainer, viva guide, test evidence and release gates |
 | Database reference | `database-reference/` | Shared schema reference from the mobile handover |
@@ -17,7 +20,7 @@ This is the clean, source-only backup repository for the BKK Community group pro
 
 ## What is intentionally excluded
 
-This repository does **not** contain generated build output, `node_modules`, Composer vendor packages, SDK paths, `.env` files, API keys, signing keys, Firebase configuration or APK/IPA files. Those files make a backup large, unsafe or machine-specific. Install dependencies/build locally after downloading the ZIP.
+This repository does **not** contain generated build output, `node_modules`, Composer vendor packages, SDK paths, `.env` files, API keys, signing keys, Firebase configuration or APK files. Those files make a backup large, unsafe or machine-specific. Install dependencies/build locally after downloading the ZIP.
 
 ## Source of truth
 

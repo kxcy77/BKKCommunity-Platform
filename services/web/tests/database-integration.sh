@@ -17,7 +17,7 @@ mysql_test() {
 }
 
 csrf_from() {
-  sed -n 's/.*name="csrf_token" value="\([^"]*\)".*/\1/p' | head -1
+  sed -n 's/.*name="csrf_token" value="\([^"]*\)".*/\1/p' | sed -n '1p'
 }
 
 cleanup() {
@@ -68,14 +68,14 @@ curl -fsS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null \
   --data-urlencode 'password=NewStrongPass26' \
   "${base_url}/actions.php"
 profile_html="$(curl -fsS -b "$cookie_jar" "${base_url}/profile.php")"
-printf '%s' "$profile_html" | grep -q "$test_name"
+printf '%s' "$profile_html" | grep -F "$test_name" >/dev/null
 echo 'PASS login and protected profile'
 
 category_id="$(mysql_test 'SELECT id FROM event_categories ORDER BY id LIMIT 1;')"
 mysql_test "INSERT INTO events(category_id,title,description,start_at,end_at,location,directions,status) VALUES (${category_id},'${test_event_title}','RSVP integration event',DATE_ADD(UTC_TIMESTAMP(),INTERVAL 48 HOUR),DATE_ADD(UTC_TIMESTAMP(),INTERVAL 49 HOUR),'BKK Hall','Main entrance','published');" >/dev/null
 event_id="$(mysql_test "SELECT id FROM events WHERE title='${test_event_title}';")"
 events_html="$(curl -fsS -b "$cookie_jar" "${base_url}/events.php")"
-printf '%s' "$events_html" | grep -q "$test_event_title"
+printf '%s' "$events_html" | grep -F "$test_event_title" >/dev/null
 csrf="$(printf '%s' "$events_html" | csrf_from)"
 [[ -n "$event_id" ]]
 curl -fsS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null \
