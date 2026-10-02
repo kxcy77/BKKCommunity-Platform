@@ -4,6 +4,7 @@ set -euo pipefail
 project_dir="$(cd "$(dirname "$0")/.." && pwd)"
 test_port="${BKK_TEST_PORT:-8091}"
 base_url="http://127.0.0.1:${test_port}"
+php "${project_dir}/tests/static-assets.php"
 server_log="$(mktemp /tmp/bkk-web-server.XXXXXX)"
 cookie_jar="$(mktemp /tmp/bkk-web-cookie.XXXXXX)"
 
@@ -39,6 +40,7 @@ for route in index.php events.php discounts.php info.php contact.php login.php r
 done
 
 manifest_file="$(mktemp /tmp/bkk-manifest.XXXXXX)"
+php "${project_dir}/tests/static-assets.php" "$base_url"
 curl -fsS "${base_url}/manifest.webmanifest" >"${manifest_file}"
 php -r '$manifest=json_decode(file_get_contents($argv[1]), true, 512, JSON_THROW_ON_ERROR); if (($manifest["display"] ?? null) !== "standalone" || count($manifest["icons"] ?? []) < 2) exit(1);' "${manifest_file}"
 grep -q 'rel="manifest"' <(curl -fsS "${base_url}/index.php") || { echo 'FAIL web app manifest link'; exit 1; }

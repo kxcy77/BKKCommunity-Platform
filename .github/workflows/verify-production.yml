@@ -17,6 +17,13 @@ jobs:
       github.event.workflow_run.head_branch == 'main'
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
       - name: Wait for Railway to deploy the tested commit
         env:
           EXPECTED_COMMIT: ${{ github.event.workflow_run.head_sha }}
@@ -33,6 +40,7 @@ jobs:
                 | jq -e --arg commit "$EXPECTED_COMMIT" \
                     '.data.status == "ready" and .data.commit == $commit'
               echo "Production is ready on commit $EXPECTED_COMMIT"
+              php services/web/tests/static-assets.php "$PRODUCTION_BASE_URL"
               exit 0
             fi
             echo "Attempt $attempt: waiting for Railway commit $EXPECTED_COMMIT"
