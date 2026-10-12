@@ -21,5 +21,11 @@ class ValidationRulesTest {
         assertTrue(ValidationRules.isContactValid("Thandi", "member@example.com", "Please tell me about Friday's event."))
         assertFalse(ValidationRules.isContactValid("Thandi", "member@example.com", "Hello"))
     }
+
+    @Test fun passwordMatchesServerLetterAndNumberRule() {
+        assertFalse(ValidationRules.isPassword("abcdefgh"))
+        assertFalse(ValidationRules.isPassword("12345678"))
+        assertTrue(ValidationRules.isPassword("abcdefgh1"))
+    }
 }
 

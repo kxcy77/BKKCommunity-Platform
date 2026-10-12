@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bkk-public-shell-v2';
+const CACHE_NAME = 'bkk-public-shell-v3';
 const STATIC_ASSETS = [
   '/offline.html',
   '/manifest.webmanifest',
@@ -50,6 +50,13 @@ self.addEventListener('fetch', (event) => {
   }
 
   if (STATIC_ASSETS.includes(url.pathname)) {
-    event.respondWith(caches.match(request).then((cached) => cached || fetch(request)));
+    // Prefer current assets: a cache-first CSS response hid deployed calendar fixes.
+    event.respondWith(fetch(request).then((response) => {
+      if (response.ok) {
+        const copy = response.clone();
+        event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.put(request, copy)));
+      }
+      return response;
+    }).catch(() => caches.match(request)));
   }
 });

@@ -130,6 +130,8 @@ class BkkRepository(
     suspend fun beginLogout(): String? {
         val token = sessionStore.token()
         sessionStore.clear()
+        events.clearAttendance()
+        featureStore.clearPersonalData()
         return token
     }
 
@@ -166,6 +168,8 @@ class BkkRepository(
     suspend fun deleteAccount(): Result<Unit> = runCatching {
         api.deleteAccount()
         sessionStore.clear()
+        events.clearAttendance()
+        featureStore.clearPersonalData()
     }
 
     fun errorMessage(error: Throwable): String = messageFor(error)

@@ -6,6 +6,7 @@ test_port="${BKK_TEST_PORT:-8091}"
 base_url="http://127.0.0.1:${test_port}"
 php "${project_dir}/tests/static-assets.php"
 php "${project_dir}/tests/calendar.php"
+php "${project_dir}/tests/push.php"
 server_log="$(mktemp /tmp/bkk-web-server.XXXXXX)"
 cookie_jar="$(mktemp /tmp/bkk-web-cookie.XXXXXX)"
 

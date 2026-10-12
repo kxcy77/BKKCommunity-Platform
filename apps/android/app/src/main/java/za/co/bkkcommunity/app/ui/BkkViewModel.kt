@@ -140,8 +140,10 @@ class BkkViewModel(
         }
         runAction(onSuccess = ::loadAttendanceHistory) {
             repository.setAttendance(event.id, attending).getOrThrow()
-            if (attending) reminders.schedule(event) else reminders.cancel(event.id)
-            if (attending) "Attendance confirmed. A reminder has been scheduled." else "Attendance cancelled."
+            val member = _state.value.member
+            val enabled = member?.notificationsEnabled == true && member.eventRemindersEnabled
+            if (attending && enabled) reminders.schedule(event) else reminders.cancel(event.id)
+            if (attending) "Attendance confirmed. You can manage reminders in Account." else "Attendance cancelled."
         }
     }
 
@@ -156,11 +158,16 @@ class BkkViewModel(
 
     fun updatePreferences(notifications: Boolean, eventReminders: Boolean, discountAlerts: Boolean) = runAction {
         repository.updatePreferences(notifications, eventReminders, discountAlerts).getOrThrow()
+        if (!notifications) clearPersonalNotifications()
+        else if (!eventReminders) cancelReminders()
+        else _state.value.events.filter { it.isAttending }.forEach(reminders::schedule)
         "Notification preferences updated."
     }
 
     fun logout(onComplete: () -> Unit) {
         viewModelScope.launch {
+            backgroundRefresh?.cancel()
+            clearPersonalNotifications()
             val token = repository.beginLogout()
             // Navigate as soon as the local session is gone. The server
             // revocation below must not make sign-out depend on connectivity.
@@ -172,11 +179,24 @@ class BkkViewModel(
 
     fun deleteAccount(onComplete: () -> Unit) = runAction(onComplete) {
         repository.deleteAccount().getOrThrow()
+        clearPersonalNotifications()
         "Your account has been deleted."
     }
 
     fun registerDevice(token: String) {
-        viewModelScope.launch { repository.registerDevice(token) }
+        reminders.registerDevice(token)
+    }
+
+    private fun cancelReminders() {
+        // Cancel unique work from older APKs too; these jobs did not carry a tag.
+        _state.value.events.forEach { reminders.cancel(it.id) }
+        _state.value.attendanceHistory.forEach { reminders.cancel(it.id) }
+        reminders.cancelReminders()
+    }
+
+    private fun clearPersonalNotifications() {
+        cancelReminders()
+        reminders.cancelAllPersonalNotifications()
     }
 
     fun loadEventDetail(id: Long) {

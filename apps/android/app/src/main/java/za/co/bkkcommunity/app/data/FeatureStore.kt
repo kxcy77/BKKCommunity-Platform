@@ -76,6 +76,15 @@ class FeatureStore(private val context: Context) {
         context.featureDataStore.edit { it.remove(Keys.NOTICES) }
     }
 
+    suspend fun clearPersonalData() {
+        context.featureDataStore.edit {
+            it.remove(Keys.NOTICES)
+            it.remove(Keys.SAVED_EVENTS)
+            it.remove(Keys.SAVED_DISCOUNTS)
+            it.remove(Keys.SAVED_SERVICES)
+        }
+    }
+
     suspend fun removeNotice(id: String) {
         context.featureDataStore.edit { preferences ->
             preferences[Keys.NOTICES] = encodeNotices(

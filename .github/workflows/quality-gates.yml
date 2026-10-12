@@ -94,6 +94,8 @@ jobs:
         run: bash tests/database-integration.sh
       - name: Verify API authentication and security boundaries
         run: bash tests/api-integration.sh
+      - name: Verify notification cancellation and preferences
+        run: php tests/push-database.php
 
   android:
     name: Android unit, lint and debug build

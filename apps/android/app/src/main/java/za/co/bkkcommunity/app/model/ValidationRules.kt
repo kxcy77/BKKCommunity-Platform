@@ -5,7 +5,8 @@ object ValidationRules {
         Regex("^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9-]+(?:\\.[A-Za-z0-9-]+)+$")
     )
 
-    fun isPassword(value: String): Boolean = value.length in 8..128
+    fun isPassword(value: String): Boolean = value.length in 8..128 &&
+        value.any { it in 'a'..'z' || it in 'A'..'Z' } && value.any { it in '0'..'9' }
 
     fun isRegistrationValid(name: String, email: String, password: String, confirmation: String, privacyAccepted: Boolean): Boolean =
         name.trim().length in 2..120 && isEmail(email) && isPassword(password) && password == confirmation && privacyAccepted
