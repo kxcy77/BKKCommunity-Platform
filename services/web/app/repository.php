@@ -345,6 +345,16 @@ function admin_get_event(int $eventId): ?array
     return null;
 }
 
+function admin_event_category_names(): array
+{
+    $defaults = ['Community', 'Wellness', 'Social', 'Health', 'Support'];
+    $db = database();
+    if (!$db) return $defaults;
+
+    $existing = $db->query('SELECT name FROM event_categories ORDER BY name')->fetchAll(PDO::FETCH_COLUMN);
+    return array_values(array_unique(array_merge($defaults, $existing)));
+}
+
 function admin_event_category_id(PDO $db, string $name, string $tone): int
 {
     $colour = match ($tone) {

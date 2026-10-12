@@ -15,6 +15,7 @@ if ($editId && !$editing) {
     redirect_to('admin/events.php');
 }
 $form = $editing ?? ['title' => '', 'date' => '', 'time' => '', 'end_time' => '', 'location' => '', 'category' => 'Community', 'tone' => 'blue', 'description' => '', 'directions' => ''];
+$categoryNames = admin_event_category_names();
 require dirname(__DIR__) . '/partials/header.php';
 ?>
 <div class="admin-shell">
@@ -32,7 +33,7 @@ require dirname(__DIR__) . '/partials/header.php';
             <div class="form-grid">
                 <div class="field field-full"><label for="title">Event title</label><input id="title" name="title" value="<?= h($form['title']) ?>" required minlength="3" maxlength="160"></div>
                 <div class="field"><label for="date">Date</label><input id="date" name="date" type="date" value="<?= h($form['date']) ?>" required></div>
-                <div class="field"><label for="category">Category</label><select id="category" name="category"><?php foreach (['Community', 'Wellness', 'Social', 'Health', 'Support'] as $category): ?><option <?= $form['category'] === $category ? 'selected' : '' ?>><?= h($category) ?></option><?php endforeach; ?></select></div>
+                <div class="field"><label for="category">Category</label><select id="category" name="category"><?php foreach ($categoryNames as $category): ?><option <?= $form['category'] === $category ? 'selected' : '' ?>><?= h($category) ?></option><?php endforeach; ?></select></div>
                 <div class="field"><label for="time">Start time</label><input id="time" name="time" type="time" value="<?= h($form['time']) ?>" required></div>
                 <div class="field"><label for="end_time">End time</label><input id="end_time" name="end_time" type="time" value="<?= h($form['end_time']) ?>" required></div>
                 <div class="field field-full"><label for="location">Location</label><input id="location" name="location" value="<?= h($form['location']) ?>" required minlength="3" maxlength="190"></div>
