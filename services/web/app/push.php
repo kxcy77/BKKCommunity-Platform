@@ -102,10 +102,12 @@ function push_enqueue(PDO $db, string $alertsSince): void
     // A required cutover timestamp prevents a first run from broadcasting all seed offers.
     $discounts = $db->prepare("SELECT d.id, d.title, d.store_name, v.id AS device_id, v.user_id
         FROM discounts d CROSS JOIN devices v JOIN users u ON u.id = v.user_id
+        JOIN auth_sessions s ON s.id = v.session_id AND s.user_id = v.user_id
         WHERE d.is_active = 1 AND d.is_demo = 0 AND d.created_at >= ? AND d.created_at >= v.created_at
         AND (d.valid_from IS NULL OR d.valid_from <= DATE(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+02:00')))
         AND (d.valid_until IS NULL OR d.valid_until >= DATE(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+02:00')))
         AND v.notifications_enabled = 1 AND u.deleted_at IS NULL
+        AND s.revoked_at IS NULL AND s.expires_at > UTC_TIMESTAMP()
         AND u.notifications_enabled = 1 AND u.discount_alerts_enabled = 1
         AND NOT EXISTS (SELECT 1 FROM notification_log n WHERE n.dedupe_key =
             CONCAT('discount:', d.id, ':device:', v.id, ':user:', v.user_id))
@@ -123,9 +125,11 @@ function push_enqueue(PDO $db, string $alertsSince): void
         c.name AS category, v.id AS device_id, v.user_id FROM attendance a
         JOIN events e ON e.id = a.event_id JOIN event_categories c ON c.id = e.category_id
         JOIN users u ON u.id = a.user_id JOIN devices v ON v.user_id = u.id
+        JOIN auth_sessions s ON s.id = v.session_id AND s.user_id = v.user_id
         WHERE a.status = 'attending' AND e.status = 'published'
         AND e.start_at > UTC_TIMESTAMP() AND e.start_at <= DATE_ADD(UTC_TIMESTAMP(), INTERVAL 24 HOUR)
         AND v.notifications_enabled = 1 AND u.deleted_at IS NULL
+        AND s.revoked_at IS NULL AND s.expires_at > UTC_TIMESTAMP()
         AND u.notifications_enabled = 1 AND u.event_reminders_enabled = 1
         AND NOT EXISTS (SELECT 1 FROM notification_log n WHERE n.dedupe_key =
             CONCAT('event:', e.id, ':start:', e.start_at, ':device:', v.id, ':user:', v.user_id))
@@ -142,10 +146,10 @@ function push_enqueue(PDO $db, string $alertsSince): void
 function push_job_target(PDO $db, array $job): ?string
 {
     $target = $db->prepare("SELECT v.fcm_token FROM devices v JOIN users u ON u.id = v.user_id
+        JOIN auth_sessions s ON s.id = v.session_id AND s.user_id = v.user_id
         WHERE v.id = ? AND v.user_id = ? AND v.notifications_enabled = 1
         AND u.deleted_at IS NULL AND u.notifications_enabled = 1
-        AND EXISTS (SELECT 1 FROM auth_sessions s WHERE s.user_id = u.id
-            AND s.revoked_at IS NULL AND s.expires_at > UTC_TIMESTAMP())
+        AND s.revoked_at IS NULL AND s.expires_at > UTC_TIMESTAMP()
         AND ((? = 'event_reminder' AND u.event_reminders_enabled = 1)
             OR (? = 'discount_alert' AND u.discount_alerts_enabled = 1))");
     $target->execute([$job['device_id'], $job['user_id'], $job['type'], $job['type']]);

@@ -15,9 +15,10 @@ try {
     $user = (int) $db->lastInsertId();
     $db->exec("INSERT INTO users(full_name,email,password_hash) VALUES ('Other Fixture','other-push-fixture@example.test','unused')");
     $other = (int) $db->lastInsertId();
-    $db->prepare("INSERT INTO devices(user_id,fcm_token,created_at) VALUES (?,'push-fixture-token',DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 DAY))")->execute([$user]);
-    $device = (int) $db->lastInsertId();
     $db->prepare("INSERT INTO auth_sessions(user_id,token_hash,expires_at) VALUES (?, ?, DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 DAY))")->execute([$user, hash('sha256', 'push-fixture-session')]);
+    $session = (int) $db->lastInsertId();
+    $db->prepare("INSERT INTO devices(user_id,session_id,fcm_token,created_at) VALUES (?,?,'push-fixture-token',DATE_SUB(UTC_TIMESTAMP(),INTERVAL 1 DAY))")->execute([$user,$session]);
+    $device = (int) $db->lastInsertId();
     $category = (int) $db->query('SELECT id FROM event_categories ORDER BY id LIMIT 1')->fetchColumn();
     $db->prepare("INSERT INTO events(category_id,title,description,start_at,end_at,location) VALUES (?,'Push fixture','Fixture',DATE_ADD(UTC_TIMESTAMP(),INTERVAL 23 HOUR),DATE_ADD(UTC_TIMESTAMP(),INTERVAL 24 HOUR),'Fixture hall')")->execute([$category]);
     $event = (int) $db->lastInsertId();
@@ -28,6 +29,13 @@ try {
     $check(count($jobs) === 1, 'Repeated scans queue one reminder');
     $job=$jobs[0];
     $check(push_job_target($db,$job) === 'push-fixture-token', 'Active RSVP and session eligible');
+    $db->prepare("INSERT INTO auth_sessions(user_id,token_hash,expires_at) VALUES (?, ?, DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 DAY))")->execute([$user, hash('sha256', 'other-active-session')]);
+    $db->prepare('UPDATE auth_sessions SET revoked_at=UTC_TIMESTAMP() WHERE id=?')->execute([$session]);
+    $check(push_job_target($db,$job) === null, 'Signing out this phone blocks push even while another session remains active');
+    $db->prepare('UPDATE auth_sessions SET revoked_at=NULL WHERE id=?')->execute([$session]);
+    $db->prepare('UPDATE devices SET session_id=NULL WHERE id=?')->execute([$device]);
+    $check(push_job_target($db,$job) === null, 'Pre-migration token cannot receive push before re-registration');
+    $db->prepare('UPDATE devices SET session_id=? WHERE id=?')->execute([$session,$device]);
     $db->prepare("UPDATE attendance SET status='cancelled' WHERE user_id=?")->execute([$user]);
     $check(push_job_target($db,$job) === null, 'Cancelled RSVP blocks delivery');
     $db->prepare("UPDATE attendance SET status='attending' WHERE user_id=?")->execute([$user]);

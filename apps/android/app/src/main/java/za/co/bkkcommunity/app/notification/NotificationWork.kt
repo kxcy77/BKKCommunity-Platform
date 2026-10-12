@@ -41,8 +41,7 @@ class PushWorker(context: Context, params: WorkerParameters) : CoroutineWorker(c
     override suspend fun doWork(): Result {
         val container = (applicationContext as BkkApplication).container
         val member = container.sessionStore.member.first() ?: return Result.success()
-        val recipient = inputData.getString("recipient_user_id")?.toLongOrNull()
-        if (recipient != null && recipient != member.id) return Result.success()
+        if (!NotificationRules.recipientAllows(inputData.getString("recipient_user_id"), member.id)) return Result.success()
         val type = inputData.getString("type")
         if (!NotificationRules.preferenceAllows(member.notificationsEnabled,
                 member.eventRemindersEnabled, member.discountAlertsEnabled, type)) return Result.success()

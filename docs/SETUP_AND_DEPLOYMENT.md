@@ -92,6 +92,16 @@ Do not put secrets in `config.js`; browser files are public. The API URL is not 
 9. Disable/remove any initializer or demo-seed setting after approved content is loaded.
 10. Attach logs/screenshots without credentials or personal information to the test evidence pack.
 
+## Android cloud notifications: safe activation
+
+1. In the Firebase project owned by the BKK organisation, register both Android package names: `za.co.bkkcommunity.app` for release and `za.co.bkkcommunity.app.debug` for the debug test build. Place the downloaded `google-services.json` only in `apps/android/app/` on authorised build machines. It is ignored by Git.
+2. Build and install the matching APK on an Android phone with Google Play services. Sign in and allow notifications when the app asks. Confirm the token is registered through the authenticated API; do not copy the token into documentation or chat.
+3. Put the Firebase service-account JSON in Railway's private `FCM_SERVICE_ACCOUNT_JSON` variable. Do not use a browser-visible key, commit the JSON, or put it in the APK. Keep `FCM_ENABLED=false` while testing configuration and approved content.
+4. After BKK has approved genuine content and test recipients, set `FCM_ALERTS_SINCE` to the UTC activation time (`YYYY-MM-DD HH:MM:SS`). Only then enable `FCM_ENABLED=true`; startup will reject missing or invalid configuration. This does not retroactively broadcast old demonstration offers.
+5. On the phone, verify a new approved discount, an event reminder, permission denial, cancellation, sign-out, and notification tap destination. A successful FCM API response only proves provider acceptance, not arrival on the phone. Keep production alerts off if any of these fail.
+
+Migration `010_bind_push_devices_to_sessions.sql` makes older token records ineligible until their app registers again. This prevents a signed-out phone receiving pushes merely because the same member has another active session. It also means a previously installed app must be opened while signed in before cloud notifications resume after deployment.
+
 ## Secret generation
 
 Generate independent secrets locally; do not paste them into chat or commit them:
