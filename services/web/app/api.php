@@ -530,10 +530,11 @@ function api_register_device(): never
     if ($token === '' || strlen($token) > 512 || !is_bool($enabled)) {
         api_error(422, 'A valid FCM token and notification preference are required.', 'validation_error');
     }
-    api_database()->prepare("INSERT INTO devices (user_id, fcm_token, platform, notifications_enabled, last_seen_at)
-        VALUES (?, ?, 'android', ?, UTC_TIMESTAMP())
-        ON DUPLICATE KEY UPDATE user_id = VALUES(user_id), notifications_enabled = VALUES(notifications_enabled), last_seen_at = UTC_TIMESTAMP()")
-        ->execute([$user['id'], $token, (int) $enabled]);
+    api_database()->prepare("INSERT INTO devices (user_id, session_id, fcm_token, platform, notifications_enabled, last_seen_at)
+        VALUES (?, ?, ?, 'android', ?, UTC_TIMESTAMP())
+        ON DUPLICATE KEY UPDATE user_id = VALUES(user_id), session_id = VALUES(session_id),
+            notifications_enabled = VALUES(notifications_enabled), last_seen_at = UTC_TIMESTAMP()")
+        ->execute([$user['id'], $user['session_id'], $token, (int) $enabled]);
     api_respond(['registered' => true]);
 }
 

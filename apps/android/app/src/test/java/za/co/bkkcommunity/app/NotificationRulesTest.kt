@@ -29,4 +29,10 @@ class NotificationRulesTest {
         assertFalse(NotificationRules.preferenceAllows(true, true, false, "discount"))
         assertTrue(NotificationRules.preferenceAllows(true, false, true, "discount"))
     }
+    @Test fun cloudMessageRequiresMatchingRecipient() {
+        assertTrue(NotificationRules.recipientAllows("42", 42))
+        assertFalse(NotificationRules.recipientAllows(null, 42))
+        assertFalse(NotificationRules.recipientAllows("not-an-id", 42))
+        assertFalse(NotificationRules.recipientAllows("43", 42))
+    }
 }

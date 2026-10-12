@@ -92,7 +92,8 @@ echo 'PASS notification preferences persisted'
 
 curl -fsS -H 'Content-Type: application/json' -H "Authorization: Bearer ${token}" -X PUT -d "{\"fcm_token\":\"${fcm_token}\",\"notifications_enabled\":true}" "${base_url}/devices/fcm-token" >/dev/null
 [[ "$(mysql_test "SELECT COUNT(*) FROM devices WHERE fcm_token='${fcm_token}';")" == '1' ]]
-echo 'PASS FCM device token persisted uniquely'
+[[ "$(mysql_test "SELECT COUNT(*) FROM devices d JOIN auth_sessions s ON s.id=d.session_id AND s.user_id=d.user_id WHERE d.fcm_token='${fcm_token}' AND s.revoked_at IS NULL;")" == '1' ]]
+echo 'PASS FCM device token persisted uniquely and bound to the current session'
 
 discounts="$(curl -fsS "${base_url}/discounts")"
 printf '%s' "$discounts" | php -r '$json=json_decode(stream_get_contents(STDIN),true); $rows=$json["data"]??[]; if (!array_filter($rows, static fn(array $row): bool => ($row["is_demo"]??null) === true)) exit(1);'
@@ -104,7 +105,8 @@ echo 'PASS discount details and local-service contracts returned valid data'
 curl -fsS -H "Authorization: Bearer ${token}" -X DELETE "${base_url}/auth/session" >/dev/null
 status="$(curl -sS -o /tmp/bkk-api-expired.json -w '%{http_code}' -H "Authorization: Bearer ${token}" "${base_url}/me")"
 [[ "$status" == '401' ]]
-echo 'PASS logout revoked the bearer token'
+[[ "$(mysql_test "SELECT COUNT(*) FROM devices d JOIN auth_sessions s ON s.id=d.session_id WHERE d.fcm_token='${fcm_token}' AND s.revoked_at IS NULL;")" == '0' ]]
+echo 'PASS logout revoked the bearer token and its device session'
 
 login="$(curl -fsS -H 'Content-Type: application/json' -d "{\"email\":\"${test_email}\",\"password\":\"NewStrongPass27\"}" "${base_url}/auth/login")"
 token="$(printf '%s' "$login" | json_value '$json["data"]["token"] ?? null')"

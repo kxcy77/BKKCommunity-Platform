@@ -20,4 +20,7 @@ object NotificationRules {
             "discount" -> discounts
             else -> true
         }
+
+    fun recipientAllows(recipientUserId: String?, signedInUserId: Long): Boolean =
+        recipientUserId?.toLongOrNull() == signedInUserId
 }
