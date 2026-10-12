@@ -14,7 +14,7 @@ data class CommunityEvent(
     val isDemo: Boolean = false
 ) {
     val isDemonstration: Boolean
-        get() = isDemo ||
+        get() = isDemo || id < 0 ||
             category.equals("Demonstration", ignoreCase = true) ||
             title.contains("not a real event", ignoreCase = true) ||
             description.contains("test content only", ignoreCase = true) ||

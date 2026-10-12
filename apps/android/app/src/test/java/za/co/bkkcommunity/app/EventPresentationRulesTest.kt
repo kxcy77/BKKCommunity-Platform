@@ -41,6 +41,7 @@ class EventPresentationRulesTest {
         )
 
         assertTrue(event.isDemonstration)
+        assertTrue(event(-1, "2026-08-15T08:00:00Z").isDemonstration)
         assertFalse(event(43, "2026-08-15T08:00:00Z").isDemonstration)
     }
 

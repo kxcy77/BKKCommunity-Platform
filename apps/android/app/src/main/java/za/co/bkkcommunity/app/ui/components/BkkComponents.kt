@@ -252,7 +252,7 @@ fun EventCard(
                         Text(event.category, Modifier.padding(horizontal = 10.dp, vertical = 5.dp), color = colour, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
                     }
                 }
-                if (onToggleSaved != null) {
+                if (onToggleSaved != null && (!event.isDemonstration || isSaved)) {
                     IconButton(onClick = onToggleSaved, modifier = Modifier.size(48.dp)) {
                         Icon(
                             if (isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,

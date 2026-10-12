@@ -217,13 +217,13 @@ fun HomeScreen(
                 }
                 Spacer(Modifier.height(14.dp))
                 Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                    ActionTile("Local services", "Phone numbers and places", Icons.Default.LocationCity, BkkTeal, BkkTealSurface,
+                    ActionTile("Local services", "Find local support", Icons.Default.LocationCity, BkkTeal, BkkTealSurface,
                         { onNavigate(Routes.INFO) }, Modifier.weight(1f))
                     ActionTile("Contact BKK", "Ask for help", Icons.Default.ContactMail, BkkRed, BkkRedSurface,
                         { onNavigate(Routes.CONTACT) }, Modifier.weight(1f))
                 }
             }
-            if (state.events.any { it.id < 0 }) item { DemoContentNotice(Modifier.padding(20.dp)) }
+            if (state.events.any { it.isDemonstration }) item { DemoContentNotice(Modifier.padding(20.dp)) }
             item { DataFreshnessNotice(state.lastUpdated, state.events.any { it.id < 0 }, state.dataWarning) }
             item { SectionTitle("Today's Schedule", Modifier.padding(horizontal = 20.dp, vertical = 18.dp)) }
             if (state.loading && state.events.isEmpty()) item { LoadingPane() }
@@ -286,7 +286,7 @@ fun EventsScreen(
                     CategoryFilterRow(categories, category) { category = it }
                 }
             }
-            if (state.events.any { it.id < 0 }) item { DemoContentNotice() }
+            if (state.events.any { it.isDemonstration }) item { DemoContentNotice() }
             if (state.loading && filtered.isEmpty()) item { LoadingPane() }
             else if (filtered.isEmpty()) item { EmptyPane("No matching events", "Choose another category or check again later.") }
             else items(filtered, key = { it.id }) { event ->
@@ -373,7 +373,6 @@ fun EventDetailScreen(
             TextButton(onClick = onReport, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
                 Text("Report incorrect information")
             }
-            if (event.id < 0 && !event.isDemonstration) DemoContentNotice()
         }
     }
 }
