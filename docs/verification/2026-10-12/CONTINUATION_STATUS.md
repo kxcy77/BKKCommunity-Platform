@@ -7,13 +7,14 @@
 - The PHP service now has an FCM HTTP v1 sender, a notification queue worker, bounded retries, provider message IDs, invalid-token handling, and fresh eligibility checks before sending. It leaves cloud delivery disabled by default. The worker preflights its configuration when enabled, so an incomplete Firebase setup fails startup rather than appearing healthy.
 - Website public assets use a network-first service-worker policy so an old CSS cache cannot mask a deployed calendar change. Authenticated pages and API responses remain outside that cache.
 - Android registration and password reset now explain the server's minimum password rule: at least eight characters with a letter and a number.
+- During the local admin walkthrough, an event in the existing `Exercise` category opened with `Community` selected. The admin editor and server validation now load existing database categories, so editing that record preserves `Exercise`. A local browser readback and the MySQL admin integration suite passed.
 
 ## Checks actually completed
 
 - Android: `testDebugUnitTest`, `lintDebug`, and `assembleDebug` passed with JDK 21. Eleven JVM unit tests passed. Lint emitted warnings but no errors. A fresh debug APK was built; it is not a signed release.
 - PHP: nine mocked transport assertions passed. Eleven transactional MySQL assertions passed, including a queue of 501 eligible offers; fixtures were rolled back. The full local web smoke suite and separate admin, member, and API integration suites passed against disposable local MySQL.
 - Email: a real reset message to `kingkg256@gmail.com` was marked Delivered in Resend, and the account owner confirmed it arrived. Completion of the code, new password, and subsequent sign-in has not yet been observed.
-- Production: the Railway `/api/v1/ready` endpoint reported a connected database on the previous deployed commit. The new notification code and cache change are not production evidence until their exact commit is deployed and checked.
+- Production: the Railway `/api/v1/ready` endpoint reported a connected database on the previous deployed commit earlier in the day. Later the same day, the public URL returned HTTP 404 `Application not found`; Railway reported the web service offline with no active deployment. A redeploy request was refused because the workspace trial had expired. The new notification code and cache change have therefore not been deployed or verified in production.
 
 ## Still required for a live release claim
 
@@ -22,6 +23,7 @@
 - Install the Firebase-configured APK on a physical Android device with Google Play services. Test token registration, permission denial, a genuine new discount, an attending event within 24 hours, a cancelled RSVP, a rescheduled event, sign-out, and tap destinations. A provider HTTP 200 means FCM accepted a message; only on-device receipt proves delivery.
 - No Android emulator system image or attached phone was available for this run. API 26, current Android, TalkBack, font scaling, and physical notification checks remain open.
 - Actual shop offers, events, and service details must be approved by BKK before replacing demonstration content. The deployed API still reported no events and three sample discounts during this investigation.
+- Railway service must have an active plan or a supported alternative host before the website or Android API can function publicly again. The local demonstration on this Mac is separate from production and is explicitly labelled as fixture data.
 
 ## Configuration and release notes
 
