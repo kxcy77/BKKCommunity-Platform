@@ -5,6 +5,7 @@ project_dir="$(cd "$(dirname "$0")/.." && pwd)"
 test_port="${BKK_TEST_PORT:-8091}"
 base_url="http://127.0.0.1:${test_port}"
 php "${project_dir}/tests/static-assets.php"
+php "${project_dir}/tests/calendar.php"
 server_log="$(mktemp /tmp/bkk-web-server.XXXXXX)"
 cookie_jar="$(mktemp /tmp/bkk-web-cookie.XXXXXX)"
 
@@ -38,6 +39,14 @@ for route in index.php events.php discounts.php info.php contact.php login.php r
   [[ "$code" == "200" ]] || { echo "FAIL ${route}: HTTP ${code}"; exit 1; }
   echo "PASS ${route}: HTTP ${code}"
 done
+
+calendar_html="$(curl -fsS "${base_url}/events.php?month=2024-02&category=Health")"
+printf '%s' "$calendar_html" | grep -q 'id="calendar-heading">February 2024' || { echo 'FAIL calendar requested month'; exit 1; }
+printf '%s' "$calendar_html" | grep -q 'month=2024-03&amp;category=Health' || { echo 'FAIL calendar navigation preserves category'; exit 1; }
+printf '%s' "$calendar_html" | grep -q 'Scrollable February 2024 event calendar' || { echo 'FAIL calendar accessible month label'; exit 1; }
+calendar_array_code="$(curl -sS -o /dev/null -w '%{http_code}' "${base_url}/events.php?month%5B%5D=2024-02&category%5B%5D=Health")"
+[[ "$calendar_array_code" == "200" ]] || { echo 'FAIL calendar rejects malformed query safely'; exit 1; }
+echo 'PASS rendered calendar month, navigation, accessible label and malformed query handling'
 
 manifest_file="$(mktemp /tmp/bkk-manifest.XXXXXX)"
 php "${project_dir}/tests/static-assets.php" "$base_url"
