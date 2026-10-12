@@ -170,7 +170,7 @@ fun HomeScreen(
                     }
                 }
             }
-            state.discounts.firstOrNull()?.let { discount ->
+            state.discounts.firstOrNull { !it.isDemonstration }?.let { discount ->
                 item {
                     Card(
                         colors = CardDefaults.cardColors(containerColor = BkkGoldSurface),
@@ -217,13 +217,13 @@ fun HomeScreen(
                 }
                 Spacer(Modifier.height(14.dp))
                 Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                    ActionTile("Local services", "Phone numbers and places", Icons.Default.LocationCity, BkkTeal, BkkTealSurface,
+                    ActionTile("Local services", "Find local support", Icons.Default.LocationCity, BkkTeal, BkkTealSurface,
                         { onNavigate(Routes.INFO) }, Modifier.weight(1f))
                     ActionTile("Contact BKK", "Ask for help", Icons.Default.ContactMail, BkkRed, BkkRedSurface,
                         { onNavigate(Routes.CONTACT) }, Modifier.weight(1f))
                 }
             }
-            if (state.events.any { it.id < 0 }) item { DemoContentNotice(Modifier.padding(20.dp)) }
+            if (state.events.any { it.isDemonstration }) item { DemoContentNotice(Modifier.padding(20.dp)) }
             item { DataFreshnessNotice(state.lastUpdated, state.events.any { it.id < 0 }, state.dataWarning) }
             item { SectionTitle("Today's Schedule", Modifier.padding(horizontal = 20.dp, vertical = 18.dp)) }
             if (state.loading && state.events.isEmpty()) item { LoadingPane() }
@@ -286,7 +286,7 @@ fun EventsScreen(
                     CategoryFilterRow(categories, category) { category = it }
                 }
             }
-            if (state.events.any { it.id < 0 }) item { DemoContentNotice() }
+            if (state.events.any { it.isDemonstration }) item { DemoContentNotice() }
             if (state.loading && filtered.isEmpty()) item { LoadingPane() }
             else if (filtered.isEmpty()) item { EmptyPane("No matching events", "Choose another category or check again later.") }
             else items(filtered, key = { it.id }) { event ->
@@ -373,7 +373,6 @@ fun EventDetailScreen(
             TextButton(onClick = onReport, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
                 Text("Report incorrect information")
             }
-            if (event.id < 0 && !event.isDemonstration) DemoContentNotice()
         }
     }
 }
@@ -392,12 +391,12 @@ fun DiscountsScreen(
     Column(Modifier.fillMaxSize().padding(bottom = padding.calculateBottomPadding())) {
         BkkTopBar("Senior Discounts", onProfile = onProfile)
         LazyColumn(contentPadding = PaddingValues(horizontal = 20.dp, vertical = 18.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            item { ScreenIntro("Save more every day", "Trusted savings for pensioners and community members aged 60+.") }
+            item { ScreenIntro("Savings in one place", "Check each offer's status and terms before visiting a provider.") }
             item {
                 Text("Browse by category", fontWeight = FontWeight.Bold, color = BkkNavy)
                 CategoryFilterRow(categories, category, Modifier.padding(top = 8.dp)) { category = it }
             }
-            if (state.discounts.any { it.id < 0 }) item { DemoContentNotice() }
+            if (state.discounts.any { it.isDemonstration }) item { DemoContentNotice() }
             if (state.loading && filtered.isEmpty()) item { LoadingPane() }
             else if (filtered.isEmpty()) item { EmptyPane("No matching discounts", "Choose another category or check again later.") }
             else items(filtered, key = { it.id }) { discount ->
@@ -438,25 +437,31 @@ fun DiscountDetailScreen(
             }
             Text(discount.storeName, style = MaterialTheme.typography.headlineLarge, color = BkkNavy)
             Text(discount.title, style = MaterialTheme.typography.titleLarge)
+            if (discount.isDemonstration) DemoContentNotice()
             Text(discount.details)
             HorizontalDivider()
             SectionTitle("Who qualifies?")
             Text(discount.eligibility)
-            SectionTitle("How to claim")
-            Text(discount.claimInstructions)
-            discount.validUntil?.let { Text("Valid until ${formatLongDate(it)}", color = BkkMuted) }
-            OutlinedButton(onClick = onToggleSaved, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
-                Icon(Icons.Default.Bookmark, contentDescription = null)
-                Text(if (isSaved) "Remove from saved" else "Save discount", Modifier.padding(start = 8.dp))
+            if (!discount.isDemonstration) {
+                SectionTitle("How to claim")
+                Text(discount.claimInstructions)
             }
-            OutlinedButton(onClick = { shareDiscount(context, discount) }, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
-                Icon(Icons.Default.Share, contentDescription = null)
-                Text("Share discount", Modifier.padding(start = 8.dp))
+            discount.validUntil?.let { Text("Valid until ${formatLongDate(it)}", color = BkkMuted) }
+            if (!discount.isDemonstration || isSaved) {
+                OutlinedButton(onClick = onToggleSaved, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
+                    Icon(Icons.Default.Bookmark, contentDescription = null)
+                    Text(if (isSaved) "Remove from saved" else "Save discount", Modifier.padding(start = 8.dp))
+                }
+            }
+            if (!discount.isDemonstration) {
+                OutlinedButton(onClick = { shareDiscount(context, discount) }, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
+                    Icon(Icons.Default.Share, contentDescription = null)
+                    Text("Share discount", Modifier.padding(start = 8.dp))
+                }
             }
             TextButton(onClick = onReport, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
                 Text("Report expired or incorrect information")
             }
-            if (discount.id < 0) DemoContentNotice()
         }
     }
 }
@@ -480,7 +485,7 @@ fun InfoScreen(
                 Text("Browse by service", fontWeight = FontWeight.Bold, color = BkkNavy)
                 CategoryFilterRow(types, type, Modifier.padding(top = 8.dp)) { type = it }
             }
-            if (state.services.any { it.id < 0 }) item { DemoContentNotice() }
+            if (state.services.any { it.isDemonstration }) item { DemoContentNotice() }
             if (filtered.isEmpty()) item { EmptyPane("No services found", "Choose another category or check again later.") }
             else items(filtered, key = { it.id }) { service ->
                 ServiceCard(

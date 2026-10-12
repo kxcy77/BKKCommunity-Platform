@@ -65,6 +65,14 @@ nav_count="$(printf '%s' "$home_html" | php -r '$html=stream_get_contents(STDIN)
 printf '%s' "$home_html" | grep -q 'What would you like to do today?' || { echo 'FAIL simplified home task prompt'; exit 1; }
 echo 'PASS primary navigation is limited to five choices and Home has a single task prompt'
 
+curl -fsS "${base_url}/discounts.php" | php -r '$html=stream_get_contents(STDIN); if (!str_contains($html, "Demonstration only") || str_contains($html, "How to claim</dt>")) exit(1);' \
+  || { echo 'FAIL demo discounts are not clearly separated from claimable offers'; exit 1; }
+curl -fsS "${base_url}/info.php" | php -r '$html=stream_get_contents(STDIN); if (!str_contains($html, "Demonstration only") || str_contains($html, "Call this service")) exit(1);' \
+  || { echo 'FAIL demo services expose unverified call actions'; exit 1; }
+curl -fsS "${base_url}/contact.php" | php -r '$html=stream_get_contents(STDIN); if (str_contains($html, "072 888 5030") || str_contains($html, "andrew.spaumer@gmail.com")) exit(1);' \
+  || { echo 'FAIL public contact page exposes unverified details'; exit 1; }
+echo 'PASS sample offers, services and public contact details are safely labelled'
+
 (cd "$project_dir" && php -r 'require "app/repository.php"; $demo=["category"=>"Demonstration","title"=>"BKK App Demonstration Event - Not a Real Event","description"=>"TEST CONTENT ONLY","location"=>"Demonstration only - do not travel"]; if (!is_demonstration_event($demo)) exit(1); if (is_demonstration_event(["category"=>"Social","title"=>"Community lunch","description"=>"Meet neighbours","location"=>"BKK Hall"])) exit(1);') \
   || { echo 'FAIL demonstration event safety rule'; exit 1; }
 echo 'PASS demonstration events are identified independently of their database ID'

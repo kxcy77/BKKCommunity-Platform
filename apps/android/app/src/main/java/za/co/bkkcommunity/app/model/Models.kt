@@ -14,7 +14,7 @@ data class CommunityEvent(
     val isDemo: Boolean = false
 ) {
     val isDemonstration: Boolean
-        get() = isDemo ||
+        get() = isDemo || id < 0 ||
             category.equals("Demonstration", ignoreCase = true) ||
             title.contains("not a real event", ignoreCase = true) ||
             description.contains("test content only", ignoreCase = true) ||
@@ -30,8 +30,15 @@ data class Discount(
     val claimInstructions: String,
     val category: String,
     val validFrom: String?,
-    val validUntil: String?
-)
+    val validUntil: String?,
+    val isDemo: Boolean = false
+) {
+    val isDemonstration: Boolean
+        get() = isDemo || id < 0 ||
+            (storeName == "Clicks" && title == "10% off selected prescriptions" && details == "Selected prescription items qualify for a pensioner discount.") ||
+            (storeName == "Checkers" && title == "Tuesday senior savings" && details == "Save 5% on qualifying grocery purchases every Tuesday.") ||
+            (storeName == "Wimpy" && title == "Senior breakfast special" && details == "A reduced-price breakfast before 10:00 on weekdays.")
+}
 
 data class LocalService(
     val id: Long,
@@ -40,8 +47,15 @@ data class LocalService(
     val address: String,
     val phone: String,
     val directions: String?,
-    val openingHours: String?
-)
+    val openingHours: String?,
+    val isDemo: Boolean = false
+) {
+    val isDemonstration: Boolean
+        get() = isDemo || id < 0 ||
+            (name == "BKK Community Clinic" && address == "12 Main Road, BKK" && phone == "011 555 0101") ||
+            (name == "Community Pharmacy" && address == "18 Main Road, BKK" && phone == "011 555 0102") ||
+            (name == "BKK Community Support Desk" && address == "BKK Community Hall, Main Road" && phone == "072 888 5030")
+}
 
 data class Member(
     val id: Long,

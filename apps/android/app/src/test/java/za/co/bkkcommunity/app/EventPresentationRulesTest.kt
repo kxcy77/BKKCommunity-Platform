@@ -6,6 +6,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import za.co.bkkcommunity.app.model.CommunityEvent
+import za.co.bkkcommunity.app.model.Discount
+import za.co.bkkcommunity.app.model.LocalService
 import za.co.bkkcommunity.app.ui.screens.eventMatchesPeriod
 import za.co.bkkcommunity.app.ui.screens.greetingForHour
 
@@ -39,7 +41,22 @@ class EventPresentationRulesTest {
         )
 
         assertTrue(event.isDemonstration)
+        assertTrue(event(-1, "2026-08-15T08:00:00Z").isDemonstration)
         assertFalse(event(43, "2026-08-15T08:00:00Z").isDemonstration)
+    }
+
+    @Test fun demoDiscountAndServiceCannotLookLikeVerifiedLiveContent() {
+        val discount = Discount(42, "Clicks", "10% off selected prescriptions",
+            "Selected prescription items qualify for a pensioner discount.", "Aged 60+", "Ask in store",
+            "Pharmacy", null, null)
+        val service = LocalService(43, "clinic", "BKK Community Clinic", "12 Main Road, BKK",
+            "011 555 0101", null, null)
+        assertTrue(discount.isDemonstration)
+        assertTrue(service.isDemonstration)
+        assertFalse(discount.copy(details = "Approved terms supplied by the business").isDemonstration)
+        assertFalse(service.copy(address = "Verified BKK clinic address").isDemonstration)
+        assertTrue(discount.copy(storeName = "New business", isDemo = true).isDemonstration)
+        assertTrue(service.copy(name = "New service", isDemo = true).isDemonstration)
     }
 
     private fun event(id: Long, start: String) = CommunityEvent(

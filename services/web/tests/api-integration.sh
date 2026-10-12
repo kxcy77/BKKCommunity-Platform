@@ -95,9 +95,10 @@ curl -fsS -H 'Content-Type: application/json' -H "Authorization: Bearer ${token}
 echo 'PASS FCM device token persisted uniquely'
 
 discounts="$(curl -fsS "${base_url}/discounts")"
+printf '%s' "$discounts" | php -r '$json=json_decode(stream_get_contents(STDIN),true); $rows=$json["data"]??[]; if (!array_filter($rows, static fn(array $row): bool => ($row["is_demo"]??null) === true)) exit(1);'
 discount_id="$(printf '%s' "$discounts" | json_value '$json["data"][0]["id"] ?? null')"
 curl -fsS "${base_url}/discounts/${discount_id}" | php -r '$json=json_decode(stream_get_contents(STDIN), true); if (!isset($json["data"]["claim_instructions"])) exit(1);'
-curl -fsS "${base_url}/local-services" | php -r '$json=json_decode(stream_get_contents(STDIN), true); if (!is_array($json["data"] ?? null)) exit(1);'
+curl -fsS "${base_url}/local-services" | php -r '$json=json_decode(stream_get_contents(STDIN), true); $rows=$json["data"]??null; if (!is_array($rows) || !array_filter($rows, static fn(array $row): bool => ($row["is_demo"]??null) === true)) exit(1);'
 echo 'PASS discount details and local-service contracts returned valid data'
 
 curl -fsS -H "Authorization: Bearer ${token}" -X DELETE "${base_url}/auth/session" >/dev/null

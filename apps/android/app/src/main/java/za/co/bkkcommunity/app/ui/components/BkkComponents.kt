@@ -153,7 +153,7 @@ fun DemoContentNotice(modifier: Modifier = Modifier) {
                 Icon(Icons.Default.CloudOff, contentDescription = null, tint = Color(0xFF6A4000), modifier = Modifier.padding(10.dp))
             }
             Text(
-                "Demo information — connect the BKK server for live updates.",
+                "Demonstration only — these details are not verified. Do not claim an offer, call, or travel based on them.",
                 Modifier.padding(start = 12.dp), color = Color(0xFF5E3900), style = MaterialTheme.typography.bodyMedium
             )
         }
@@ -252,7 +252,7 @@ fun EventCard(
                         Text(event.category, Modifier.padding(horizontal = 10.dp, vertical = 5.dp), color = colour, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
                     }
                 }
-                if (onToggleSaved != null) {
+                if (onToggleSaved != null && (!event.isDemonstration || isSaved)) {
                     IconButton(onClick = onToggleSaved, modifier = Modifier.size(48.dp)) {
                         Icon(
                             if (isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
@@ -313,7 +313,7 @@ fun DiscountCard(
                     Icon(Icons.Default.LocalOffer, null, tint = categoryColour(discount.category), modifier = Modifier.padding(10.dp).size(24.dp))
                 }
                 Text(discount.storeName, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f).padding(start = 12.dp))
-                if (onToggleSaved != null) {
+                if (onToggleSaved != null && (!discount.isDemonstration || isSaved)) {
                     IconButton(onClick = onToggleSaved, modifier = Modifier.size(48.dp)) {
                         Icon(
                             if (isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
@@ -327,6 +327,9 @@ fun DiscountCard(
                 }
             }
             Text(discount.title, style = MaterialTheme.typography.titleMedium)
+            if (discount.isDemonstration) {
+                Text("Demonstration only — not a valid offer", color = Color(0xFF5E3900), fontWeight = FontWeight.Bold)
+            }
             Text(discount.details, color = BkkMuted, maxLines = 3, overflow = TextOverflow.Ellipsis)
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
                 Text("View details", color = BkkBlue, fontWeight = FontWeight.Bold)
@@ -358,7 +361,7 @@ fun ServiceCard(
                     Text(service.type.replaceFirstChar { it.uppercase() }, color = BkkTeal, fontWeight = FontWeight.Bold)
                     Text(service.name, style = MaterialTheme.typography.titleLarge)
                 }
-                if (onToggleSaved != null) {
+                if (onToggleSaved != null && (!service.isDemonstration || isSaved)) {
                     IconButton(onClick = onToggleSaved, modifier = Modifier.size(48.dp)) {
                         Icon(
                             if (isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
@@ -367,6 +370,10 @@ fun ServiceCard(
                         )
                     }
                 }
+            }
+            if (service.isDemonstration) {
+                Text("Demonstration only — address and phone are not verified. Do not call or travel.",
+                    color = Color(0xFF5E3900), fontWeight = FontWeight.Bold)
             }
             Row(verticalAlignment = Alignment.Top) {
                 Icon(Icons.Default.LocationOn, null, Modifier.size(22.dp), tint = BkkNavy)
@@ -378,24 +385,26 @@ fun ServiceCard(
                     Text(it, Modifier.padding(start = 8.dp))
                 }
             }
-            OutlinedButton(onClick = onCall, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
-                Text("Call ${service.phone}")
-            }
-            val context = androidx.compose.ui.platform.LocalContext.current
-            OutlinedButton(
-                onClick = {
-                    val rawDigits = service.phone.filter { it.isDigit() }
-                    val safePhone = if (rawDigits.startsWith("0")) "27" + rawDigits.drop(1) else rawDigits
-                    val text = android.net.Uri.encode("Hello ${service.name}, I am inquiring via BKK Community app.")
-                    runCatching { context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://wa.me/$safePhone?text=$text"))) }
-                },
-                modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)
-            ) {
-                Text("Chat on WhatsApp")
-            }
-            if (onDirections != null) {
-                OutlinedButton(onClick = onDirections, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
-                    Text("Open directions")
+            if (!service.isDemonstration) {
+                OutlinedButton(onClick = onCall, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
+                    Text("Call ${service.phone}")
+                }
+                val context = androidx.compose.ui.platform.LocalContext.current
+                OutlinedButton(
+                    onClick = {
+                        val rawDigits = service.phone.filter { it.isDigit() }
+                        val safePhone = if (rawDigits.startsWith("0")) "27" + rawDigits.drop(1) else rawDigits
+                        val text = android.net.Uri.encode("Hello ${service.name}, I am inquiring via BKK Community app.")
+                        runCatching { context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://wa.me/$safePhone?text=$text"))) }
+                    },
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)
+                ) {
+                    Text("Chat on WhatsApp")
+                }
+                if (onDirections != null) {
+                    OutlinedButton(onClick = onDirections, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
+                        Text("Open directions")
+                    }
                 }
             }
         }

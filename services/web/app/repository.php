@@ -118,15 +118,16 @@ function all_discounts(): array
 {
     $db = database();
     if (!$db) {
-        return array_values(array_filter(
+        $discounts = array_values(array_filter(
             $_SESSION['demo_discounts'] ?? demo_discounts(),
             static fn (array $discount): bool => (bool) ($discount['is_active'] ?? true)
         ));
+        return array_map(static fn (array $discount): array => $discount + ['is_demo' => true], $discounts);
     }
 
     $rows = $db->query("SELECT d.id, d.store_name, c.name AS category,
         CONCAT(d.title, ': ', d.details) AS deal,
-        d.eligibility, d.claim_instructions
+        d.eligibility, d.claim_instructions, d.is_demo
         FROM discounts d
         INNER JOIN discount_categories c ON c.id = d.category_id
         WHERE d.is_active = 1
@@ -143,13 +144,14 @@ function all_services(): array
 {
     $db = database();
     if (!$db) {
-        return array_values(array_filter(
+        $services = array_values(array_filter(
             $_SESSION['demo_services'] ?? demo_services(),
             static fn (array $service): bool => (bool) ($service['is_active'] ?? true)
         ));
+        return array_map(static fn (array $service): array => $service + ['is_demo' => true], $services);
     }
 
-    $rows = $db->query("SELECT id, type, name, phone, address,
+    $rows = $db->query("SELECT id, type, name, phone, address, is_demo,
         COALESCE(opening_hours, 'Contact the service for opening times') AS hours,
         COALESCE(directions, 'Contact the service for directions and support information.') AS description
         FROM local_services WHERE is_active = 1 ORDER BY type, name")->fetchAll();
@@ -482,11 +484,11 @@ function admin_all_discounts(): array
 {
     $db = database();
     if (!$db) {
-        return array_map(static fn (array $discount): array => $discount + ['title' => mb_substr((string) ($discount['deal'] ?? ''), 0, 190), 'valid_from' => '', 'valid_until' => '', 'is_active' => 1, 'version' => 'demo-1'], $_SESSION['demo_discounts'] ?? demo_discounts());
+        return array_map(static fn (array $discount): array => $discount + ['title' => mb_substr((string) ($discount['deal'] ?? ''), 0, 190), 'valid_from' => '', 'valid_until' => '', 'is_active' => 1, 'is_demo' => 1, 'version' => 'demo-1'], $_SESSION['demo_discounts'] ?? demo_discounts());
     }
 
     return $db->query('SELECT d.id, d.store_name, d.title, d.details AS deal, d.eligibility,
-        d.claim_instructions, d.valid_from, d.valid_until, d.is_active, c.name AS category,
+        d.claim_instructions, d.valid_from, d.valid_until, d.is_active, d.is_demo, c.name AS category,
         d.row_version AS version
         FROM discounts d INNER JOIN discount_categories c ON c.id = d.category_id
         ORDER BY d.is_active DESC, d.updated_at DESC, d.store_name')->fetchAll();
@@ -691,12 +693,13 @@ function admin_all_services(): array
                 'directions' => $service['description'] ?? '',
                 'opening_hours' => $service['hours'] ?? '',
                 'is_active' => 1,
+                'is_demo' => 1,
                 'version' => 'demo-1',
             ];
         }, $_SESSION['demo_services'] ?? demo_services());
     }
 
-    return $db->query("SELECT id, type, name, address, phone, directions, opening_hours, is_active,
+    return $db->query("SELECT id, type, name, address, phone, directions, opening_hours, is_active, is_demo,
         row_version AS version
         FROM local_services ORDER BY is_active DESC, type, name")->fetchAll();
 }
