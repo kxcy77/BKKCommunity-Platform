@@ -57,7 +57,9 @@ try {
     $queued = (int) $db->query("SELECT COUNT(*) FROM notification_log WHERE type='discount_alert' AND user_id=$user")->fetchColumn();
     $check($queued === 500, 'First batch queues at most 500 eligible offers');
     push_enqueue($db, $cutover);
-    $queued = (int) $db->query("SELECT COUNT(*) FROM notification_log WHERE type='discount_alert' AND user_id=$user")->fetchColumn();
-    $check($queued === 501, 'Second batch reaches the offer beyond the first 500');
+    $fixtureQueued = (int) $db->query("SELECT COUNT(*) FROM notification_log n
+        JOIN discounts d ON d.id=n.discount_id WHERE n.type='discount_alert' AND n.user_id=$user
+        AND d.title LIKE 'Fixture offer %'")->fetchColumn();
+    $check($fixtureQueued === 501, 'Second batch reaches every fixture offer beyond the first 500');
 } finally { if ($db->inTransaction()) $db->rollBack(); }
 echo "$checks database assertions passed; fixtures rolled back.\n";
