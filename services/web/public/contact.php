@@ -14,7 +14,7 @@ require __DIR__ . '/partials/header.php';
     <div class="shell form-layout">
         <form class="form-card" action="<?= h(app_url('actions.php')) ?>" method="post" novalidate>
             <input type="hidden" name="csrf_token" value="<?= h(csrf_token()) ?>"><input type="hidden" name="action" value="contact">
-            <h2>Send us a message</h2><p class="form-intro">Required fields are marked “required”. We aim to respond within two working days.</p>
+            <h2>Send us a message</h2><p class="form-intro">Required fields are marked “required”. Your message is saved for BKK staff to review; a response time is not yet guaranteed.</p>
             <div class="form-grid">
                 <div class="field"><label for="name">Full name <span aria-hidden="true">*</span></label><input id="name" name="name" autocomplete="name" required minlength="2" value="<?= h($user['full_name'] ?? '') ?>"></div>
                 <div class="field"><label for="email">Email address <span aria-hidden="true">*</span></label><input id="email" name="email" type="email" autocomplete="email" required value="<?= h($user['email'] ?? '') ?>"></div>
@@ -25,8 +25,7 @@ require __DIR__ . '/partials/header.php';
             <button class="button" type="submit"><?= icon_svg('mail') ?> Send message</button>
         </form>
         <aside class="side-panel">
-            <p class="eyebrow eyebrow-light">Direct contact</p><h2>Prefer to speak to someone?</h2><p>Use the details below during ordinary community-office hours.</p>
-            <ul class="benefit-list"><li><?= icon_svg('phone') ?><span><strong>Phone</strong><br><a class="footer-link" href="tel:+27728885030">072 888 5030</a></span></li><li><?= icon_svg('mail') ?><span><strong>Email</strong><br><a class="footer-link" href="mailto:andrew.spaumer@gmail.com">andrew.spaumer@gmail.com</a></span></li><li><?= icon_svg('pin') ?><span><strong>Location</strong><br>BKK Community Hall</span></li></ul>
+            <p class="eyebrow eyebrow-light">Contact information</p><h2>Verified details are coming</h2><p>BKK staff have not yet confirmed a public phone number, email address, office location or response time. Please use the message form for now. Do not use contact details shown in demonstration records.</p>
         </aside>
     </div>
 </section>

@@ -52,7 +52,7 @@ fun EventEntity.toDomain() = CommunityEvent(
 )
 
 fun DiscountEntity.toDomain() = Discount(
-    id, storeName, title, details, eligibility, claimInstructions, category, validFrom, validUntil
+    id, storeName, title, details, eligibility, claimInstructions, category, validFrom, validUntil, isDemo
 )
 
-fun LocalServiceEntity.toDomain() = LocalService(id, type, name, address, phone, directions, openingHours)
+fun LocalServiceEntity.toDomain() = LocalService(id, type, name, address, phone, directions, openingHours, isDemo)

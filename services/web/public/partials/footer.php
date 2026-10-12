@@ -20,9 +20,8 @@
         <section>
             <h2>Get in touch</h2>
             <ul class="contact-list">
-                <li><?= icon_svg('phone') ?><a href="tel:+27728885030">072 888 5030</a></li>
-                <li><?= icon_svg('mail') ?><a href="mailto:andrew.spaumer@gmail.com">andrew.spaumer@gmail.com</a></li>
-                <li><?= icon_svg('pin') ?><span>BKK Community Hall</span></li>
+                <li><?= icon_svg('mail') ?><a href="<?= h(app_url('contact.php')) ?>">Send a message to BKK</a></li>
+                <li><?= icon_svg('info') ?><span>Direct contact details will appear after BKK verifies them.</span></li>
             </ul>
         </section>
     </div>

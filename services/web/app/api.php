@@ -225,6 +225,7 @@ function api_discount(array $row): array
         'category' => (string) $row['category'],
         'valid_from' => $row['valid_from'] === null ? null : (string) $row['valid_from'],
         'valid_until' => $row['valid_until'] === null ? null : (string) $row['valid_until'],
+        'is_demo' => (bool) $row['is_demo'],
     ];
 }
 
@@ -411,7 +412,7 @@ function api_discounts(?int $discountId = null): never
 {
     api_current_user(false);
     $category = trim((string) ($_GET['category'] ?? ''));
-    $sql = "SELECT d.id, d.store_name, d.title, d.details, d.eligibility, d.claim_instructions,
+    $sql = "SELECT d.id, d.store_name, d.title, d.details, d.eligibility, d.claim_instructions, d.is_demo,
         DATE_FORMAT(d.valid_from, '%Y-%m-%d') AS valid_from,
         DATE_FORMAT(d.valid_until, '%Y-%m-%d') AS valid_until, c.name AS category
         FROM discounts d INNER JOIN discount_categories c ON c.id = d.category_id
@@ -442,7 +443,7 @@ function api_local_services(): never
 {
     api_current_user(false);
     $type = trim((string) ($_GET['type'] ?? ''));
-    $sql = 'SELECT id, type, name, address, phone, directions, opening_hours FROM local_services WHERE is_active = 1';
+    $sql = 'SELECT id, type, name, address, phone, directions, opening_hours, is_demo FROM local_services WHERE is_active = 1';
     $params = [];
     if ($type !== '') {
         $sql .= ' AND type = ?';
@@ -456,6 +457,7 @@ function api_local_services(): never
         'address' => (string) $row['address'], 'phone' => (string) $row['phone'],
         'directions' => $row['directions'] === null ? null : (string) $row['directions'],
         'opening_hours' => $row['opening_hours'] === null ? null : (string) $row['opening_hours'],
+        'is_demo' => (bool) $row['is_demo'],
     ], $statement->fetchAll());
     api_respond($rows);
 }

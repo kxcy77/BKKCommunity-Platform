@@ -36,10 +36,12 @@ data class DiscountDto(
     @Json(name = "claim_instructions") val claimInstructions: String,
     val category: String,
     @Json(name = "valid_from") val validFrom: String?,
-    @Json(name = "valid_until") val validUntil: String?
+    @Json(name = "valid_until") val validUntil: String?,
+    @Json(name = "is_demo") val isDemo: Boolean? = null
 ) {
     fun toEntity() = DiscountEntity(
-        id, storeName, title, details, eligibility, claimInstructions, category, validFrom, validUntil
+        id, storeName, title, details, eligibility, claimInstructions, category, validFrom, validUntil,
+        isDemo ?: (id < 0)
     )
 }
 
@@ -50,9 +52,10 @@ data class LocalServiceDto(
     val address: String,
     val phone: String,
     val directions: String?,
-    @Json(name = "opening_hours") val openingHours: String?
+    @Json(name = "opening_hours") val openingHours: String?,
+    @Json(name = "is_demo") val isDemo: Boolean? = null
 ) {
-    fun toEntity() = LocalServiceEntity(id, type, name, address, phone, directions, openingHours)
+    fun toEntity() = LocalServiceEntity(id, type, name, address, phone, directions, openingHours, isDemo ?: (id < 0))
 }
 
 data class MemberDto(

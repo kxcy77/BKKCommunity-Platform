@@ -102,7 +102,7 @@ function push_enqueue(PDO $db, string $alertsSince): void
     // A required cutover timestamp prevents a first run from broadcasting all seed offers.
     $discounts = $db->prepare("SELECT d.id, d.title, d.store_name, v.id AS device_id, v.user_id
         FROM discounts d CROSS JOIN devices v JOIN users u ON u.id = v.user_id
-        WHERE d.is_active = 1 AND d.created_at >= ? AND d.created_at >= v.created_at
+        WHERE d.is_active = 1 AND d.is_demo = 0 AND d.created_at >= ? AND d.created_at >= v.created_at
         AND (d.valid_from IS NULL OR d.valid_from <= DATE(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+02:00')))
         AND (d.valid_until IS NULL OR d.valid_until >= DATE(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+02:00')))
         AND v.notifications_enabled = 1 AND u.deleted_at IS NULL
@@ -161,7 +161,7 @@ function push_job_target(PDO $db, array $job): ?string
         if (!$row || is_demonstration_event($row)
             || !str_contains($job['dedupe_key'], ':start:' . $row['start_at'] . ':')) return null;
     } else {
-        $discount = $db->prepare("SELECT id FROM discounts WHERE id = ? AND is_active = 1
+        $discount = $db->prepare("SELECT id FROM discounts WHERE id = ? AND is_active = 1 AND is_demo = 0
             AND (valid_from IS NULL OR valid_from <= DATE(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+02:00')))
             AND (valid_until IS NULL OR valid_until >= DATE(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+02:00')))");
         $discount->execute([$job['discount_id']]);

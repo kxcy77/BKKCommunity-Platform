@@ -49,11 +49,16 @@ try {
 
     // A busy scan must advance past records already queued by an earlier scan.
     $discountCategory = (int) $db->query('SELECT id FROM discount_categories ORDER BY id LIMIT 1')->fetchColumn();
+    $db->prepare("INSERT INTO discounts(category_id,store_name,title,details,eligibility,claim_instructions,is_demo)
+        VALUES (?,'Demo fixture shop','Demo fixture offer','Not real','Fixture members','Do not claim',1)")->execute([$discountCategory]);
+    $demoDiscount = (int) $db->lastInsertId();
     $offer = $db->prepare("INSERT INTO discounts(category_id,store_name,title,details,eligibility,claim_instructions)
         VALUES (?,'Fixture shop',?,'Fixture details','Fixture members','Ask in store')");
     for ($i = 0; $i < 501; ++$i) $offer->execute([$discountCategory, 'Fixture offer ' . $i]);
     $cutover = (string) $db->query("SELECT DATE_FORMAT(DATE_SUB(UTC_TIMESTAMP(), INTERVAL 1 MINUTE), '%Y-%m-%d %H:%i:%s')")->fetchColumn();
     push_enqueue($db, $cutover);
+    $demoQueued = (int) $db->query("SELECT COUNT(*) FROM notification_log WHERE type='discount_alert' AND discount_id=$demoDiscount")->fetchColumn();
+    $check($demoQueued === 0, 'Demonstration discount never queues a phone alert');
     $queued = (int) $db->query("SELECT COUNT(*) FROM notification_log WHERE type='discount_alert' AND user_id=$user")->fetchColumn();
     $check($queued === 500, 'First batch queues at most 500 eligible offers');
     push_enqueue($db, $cutover);
@@ -61,5 +66,10 @@ try {
         JOIN discounts d ON d.id=n.discount_id WHERE n.type='discount_alert' AND n.user_id=$user
         AND d.title LIKE 'Fixture offer %'")->fetchColumn();
     $check($fixtureQueued === 501, 'Second batch reaches every fixture offer beyond the first 500');
+    $queuedOffer = $db->query("SELECT n.* FROM notification_log n JOIN discounts d ON d.id=n.discount_id
+        WHERE n.type='discount_alert' AND d.title='Fixture offer 0' LIMIT 1")->fetch();
+    $check(is_array($queuedOffer), 'A verified fixture offer was queued');
+    $db->prepare('UPDATE discounts SET is_demo=1 WHERE id=?')->execute([$queuedOffer['discount_id']]);
+    $check(push_job_target($db, $queuedOffer) === null, 'A queued offer marked demo is blocked at delivery');
 } finally { if ($db->inTransaction()) $db->rollBack(); }
 echo "$checks database assertions passed; fixtures rolled back.\n";
