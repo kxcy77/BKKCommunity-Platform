@@ -83,12 +83,15 @@ curl -fsS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null \
   --data-urlencode "csrf_token=${csrf}" --data-urlencode 'action=admin_create_event' \
   --data-urlencode "title=${event_title}" --data-urlencode 'date=2099-08-10' \
   --data-urlencode 'time=10:00' --data-urlencode 'end_time=11:30' --data-urlencode 'location=Integration Hall' \
-  --data-urlencode 'category=Community' --data-urlencode 'tone=teal' \
+  --data-urlencode 'category=Exercise' --data-urlencode 'tone=teal' \
   --data-urlencode 'description=Integration event created by the automated administrator test.' \
   --data-urlencode 'directions=Use the accessible main entrance.' "${base_url}/actions.php"
 event_id="$(mysql_test "SELECT id FROM events WHERE title='${event_title}' LIMIT 1;")"
 [[ -n "$event_id" ]]
+assert_api_field events "$event_id" category Exercise
 event_edit_html="$(curl -fsS -b "$cookie_jar" "${base_url}/admin/events.php?edit=${event_id}")"
+printf '%s' "$event_edit_html" | contains_text '<option selected>Exercise</option>'
+echo 'PASS existing event category remains selected in the edit form'
 event_version="$(printf '%s' "$event_edit_html" | sed -n 's/.*name="version" value="\([^"]*\)".*/\1/p' | head -1)"
 curl -fsS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null \
   --data-urlencode "csrf_token=${csrf}" --data-urlencode 'action=admin_update_event' --data-urlencode "id=${event_id}" --data-urlencode "version=${event_version}" \

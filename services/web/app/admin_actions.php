@@ -53,7 +53,7 @@ function admin_event_input_valid(array $event, bool $mustBeFuture): bool
         && admin_text_length($event['location'], 3, 190)
         && admin_text_length($event['description'], 10, 5000)
         && mb_strlen($event['directions']) <= 2000
-        && in_array($event['category'], ['Community', 'Wellness', 'Social', 'Health', 'Support'], true)
+        && in_array($event['category'], admin_event_category_names(), true)
         && in_array($event['tone'], ['blue', 'green', 'teal', 'red', 'gold'], true);
 }
 
