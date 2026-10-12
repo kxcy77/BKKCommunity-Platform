@@ -7,8 +7,8 @@ RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --opt
 FROM php:8.3-fpm
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends default-mysql-client gnupg libonig-dev nginx \
-    && docker-php-ext-install pdo_mysql mbstring \
+    && apt-get install -y --no-install-recommends default-mysql-client gnupg libcurl4-openssl-dev libonig-dev nginx \
+    && docker-php-ext-install pdo_mysql mbstring curl \
     && rm -rf /var/lib/apt/lists/*
 
 COPY app /var/www/app
@@ -24,4 +24,4 @@ RUN chmod +x /var/www/bin/*.sh \
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "set -eu; /var/www/bin/migrate.sh; php-fpm -D; exec nginx -g 'daemon off;'"]
+CMD ["sh", "/var/www/bin/start.sh"]

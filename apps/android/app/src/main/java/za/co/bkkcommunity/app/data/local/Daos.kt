@@ -23,6 +23,9 @@ interface EventDao {
     @Query("UPDATE events SET isAttending = :attending WHERE id = :id")
     suspend fun setAttendance(id: Long, attending: Boolean)
 
+    @Query("UPDATE events SET isAttending = 0")
+    suspend fun clearAttendance()
+
     @Query("DELETE FROM events")
     suspend fun clear()
 }

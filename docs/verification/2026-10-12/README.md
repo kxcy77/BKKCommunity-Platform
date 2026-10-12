@@ -1,5 +1,7 @@
 # Calendar fix and delivery configuration checks — 12 October 2026
 
+This file records the earlier calendar and email investigation. The later code changes and current limits are recorded in [CONTINUATION_STATUS.md](CONTINUATION_STATUS.md); the historical blocker statements below describe the state at the time they were measured.
+
 ## Implemented calendar change
 
 The website no longer hard-codes August 2026. It defaults to the current month in Africa/Johannesburg and provides Previous month, Current month and Next month links. Weekday alignment and month length come from the selected month, including February in leap years. Event markers match the entire date (year, month and day), and honour the category filter. Event days link to their detailed cards. The detailed list still includes all upcoming events in the selected category, as the page explains.

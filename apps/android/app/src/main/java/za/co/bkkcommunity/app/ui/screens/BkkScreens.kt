@@ -984,7 +984,7 @@ fun RegisterScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), modifier = Modifier.fillMaxWidth())
         OutlinedTextField(phone, { phone = it }, label = { Text("Phone number (optional)") }, singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone), modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(password, { password = it }, label = { Text("Password — at least 8 characters") }, singleLine = true,
+        OutlinedTextField(password, { password = it }, label = { Text("Password — 8+ characters, letter and number") }, singleLine = true,
             visualTransformation = PasswordVisualTransformation(), modifier = Modifier.fillMaxWidth())
         OutlinedTextField(confirm, { confirm = it }, label = { Text("Confirm password") }, singleLine = true,
             visualTransformation = PasswordVisualTransformation(), isError = confirm.isNotEmpty() && confirm != password, modifier = Modifier.fillMaxWidth())
@@ -1032,7 +1032,7 @@ fun ResetPasswordScreen(
             singleLine = true, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(code, { value -> code = value.filter(Char::isDigit).take(6) }, label = { Text("6-Digit Reset Code (e.g. 123456)") },
             singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(password, { password = it }, label = { Text("New password — at least 8 characters") },
+        OutlinedTextField(password, { password = it }, label = { Text("New password — 8+ characters, letter and number") },
             singleLine = true, visualTransformation = PasswordVisualTransformation(), modifier = Modifier.fillMaxWidth())
         OutlinedTextField(confirmation, { confirmation = it }, label = { Text("Confirm new password") },
             singleLine = true, visualTransformation = PasswordVisualTransformation(),
