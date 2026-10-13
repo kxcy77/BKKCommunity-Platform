@@ -21,16 +21,18 @@ function push_http(string $url, array $headers, string $body): array
 
 function push_credentials(): array
 {
+    $expectedProject = trim((string) getenv('FCM_PROJECT_ID'));
     $raw = trim((string) getenv('FCM_SERVICE_ACCOUNT_JSON'));
     $file = trim((string) getenv('GOOGLE_APPLICATION_CREDENTIALS'));
     if ($raw === '' && $file !== '') $raw = (string) @file_get_contents($file);
     $credentials = json_decode($raw, true);
-    if (!is_array($credentials) || ($credentials['type'] ?? '') !== 'service_account'
+    if ($expectedProject === '' || !is_array($credentials) || ($credentials['type'] ?? '') !== 'service_account'
         || !preg_match('/^[a-z][a-z0-9-]{4,61}[a-z0-9]$/', (string) ($credentials['project_id'] ?? ''))
+        || !hash_equals($expectedProject, (string) $credentials['project_id'])
         || !filter_var($credentials['client_email'] ?? '', FILTER_VALIDATE_EMAIL)
         || empty($credentials['private_key'])
         || openssl_pkey_get_private((string) $credentials['private_key']) === false) {
-        throw new RuntimeException('FCM service-account configuration is incomplete.');
+        throw new RuntimeException('FCM service-account configuration is incomplete or belongs to a different project.');
     }
     return $credentials;
 }

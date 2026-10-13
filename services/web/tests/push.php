@@ -9,7 +9,7 @@ function check_push(bool $condition, string $label): void {
 }
 $key = openssl_pkey_new(['private_key_bits' => 2048, 'private_key_type' => OPENSSL_KEYTYPE_RSA]);
 openssl_pkey_export($key, $pem);
-$credentials = ['project_id' => 'bkk-test-project', 'client_email' => 'worker@bkk-test-project.iam.gserviceaccount.com','private_key' => $pem];
+$credentials = ['type' => 'service_account', 'project_id' => 'bkk-test-project', 'client_email' => 'worker@bkk-test-project.iam.gserviceaccount.com','private_key' => $pem];
 $jwt = push_jwt($credentials, 1000);
 $parts = explode('.', $jwt);
 $decode = static fn(string $s): string => base64_decode(strtr($s, '-_', '+/'));
@@ -31,7 +31,16 @@ check_push(push_send($credentials, $job, 'fixture-token', $unregistered)['unregi
 $invalid = static fn(): array => ['status' => 400, 'body' => ['error' => ['details' => [['errorCode' => 'INVALID_ARGUMENT']]]]];
 check_push(!push_send($credentials, $job, 'fixture-token', $invalid)['unregistered'], 'Malformed message does not disable a valid device');
 putenv('FCM_SERVICE_ACCOUNT_JSON='); putenv('GOOGLE_APPLICATION_CREDENTIALS=');
+putenv('FCM_PROJECT_ID=bkk-test-project');
 $rejected = false;
 try { push_credentials(); } catch (RuntimeException) { $rejected = true; }
 check_push($rejected, 'Missing credentials fail closed');
+$serviceAccount = json_encode($credentials, JSON_THROW_ON_ERROR);
+putenv('FCM_SERVICE_ACCOUNT_JSON=' . $serviceAccount);
+putenv('FCM_PROJECT_ID=another-project');
+$rejected = false;
+try { push_credentials(); } catch (RuntimeException) { $rejected = true; }
+check_push($rejected, 'A service account for the wrong Firebase project fails closed');
+putenv('FCM_PROJECT_ID=bkk-test-project');
+check_push(push_credentials()['project_id'] === 'bkk-test-project', 'Matching Firebase project is accepted');
 echo "$checks transport assertions passed; no real notification sent.\n";
