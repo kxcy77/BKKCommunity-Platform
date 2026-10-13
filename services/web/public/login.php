@@ -43,12 +43,6 @@ require __DIR__ . '/partials/header.php';
                 <li><?= icon_svg('check') ?><span>See your upcoming event list.</span></li>
                 <li><?= icon_svg('check') ?><span>Control reminder preferences.</span></li>
             </ul>
-            <?php if (is_demo_mode()): ?>
-                <div class="demo-credentials">
-                    <strong>Local demonstration mode</strong>
-                    <p>Development accounts are configured privately through environment variables.</p>
-                </div>
-            <?php endif; ?>
         </aside>
     </div>
 </section>

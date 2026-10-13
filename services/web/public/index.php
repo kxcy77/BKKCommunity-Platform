@@ -82,9 +82,6 @@ require __DIR__ . '/partials/header.php';
                         </div>
                     </div>
                     <div class="event-action">
-                        <?php if (!empty($event['is_demo'])): ?>
-                            <div class="demo-event-action" role="note"><strong>Demonstration only</strong><span>Attendance is unavailable for this test event.</span></div>
-                        <?php else: ?>
                         <form action="<?= h(app_url('actions.php')) ?>" method="post">
                             <input type="hidden" name="csrf_token" value="<?= h(csrf_token()) ?>">
                             <input type="hidden" name="action" value="toggle_rsvp">
@@ -92,7 +89,6 @@ require __DIR__ . '/partials/header.php';
                             <input type="hidden" name="return_to" value="index.php">
                             <button class="button <?= $attending ? 'rsvp-active' : '' ?>" type="submit"><?= $attending ? icon_svg('check') . ' Attending' : 'I will attend' ?></button>
                         </form>
-                        <?php endif; ?>
                     </div>
                 </article>
             <?php endforeach; ?>

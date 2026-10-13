@@ -195,7 +195,7 @@ function register_user(array $input): array
     }
 
     if (isset($_SESSION['demo_registered_users'][$email]) || isset(demo_accounts()[$email])) {
-        return [false, 'An account with that email address already exists in this demo session.'];
+        return [false, 'An account with that email address already exists.'];
     }
     $_SESSION['demo_registered_users'][$email] = [
         'full_name' => $input['full_name'],
@@ -205,7 +205,7 @@ function register_user(array $input): array
         'auth_version' => 1,
         'password_hash' => password_hash($input['password'], PASSWORD_DEFAULT),
     ];
-    return [true, 'Your demo account was created for this browser session. You can now log in.'];
+    return [true, 'Your account was created. You can now log in.'];
 }
 
 function logout_user(): void

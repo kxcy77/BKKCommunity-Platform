@@ -1,7 +1,6 @@
 package za.co.bkkcommunity.app.ui
 
 import android.Manifest
-import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -26,7 +25,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -39,7 +37,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.messaging.FirebaseMessaging
-import androidx.core.net.toUri
 import za.co.bkkcommunity.app.AppContainer
 import za.co.bkkcommunity.app.ui.screens.ContactScreen
 import za.co.bkkcommunity.app.ui.screens.DiscountDetailScreen
@@ -96,7 +93,6 @@ private val mainDestinations = listOf(
 
 @Composable
 fun BkkApp(container: AppContainer, deepLink: Uri?) {
-    val context = LocalContext.current
     val navController = rememberNavController()
     val viewModel: BkkViewModel = viewModel(factory = BkkViewModelFactory(container))
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -213,7 +209,6 @@ fun BkkApp(container: AppContainer, deepLink: Uri?) {
                     onOpenInbox = { navController.navigate(Routes.NOTIFICATIONS) },
                     onOpenSchedule = { navController.navigate(Routes.MY_SCHEDULE) },
                     onOpenSaved = { navController.navigate(Routes.SAVED) },
-                    onCallBkk = { context.startActivity(Intent(Intent.ACTION_DIAL, "tel:0728885030".toUri())) },
                     onRefreshAttendance = viewModel::loadAttendanceHistory,
                     onUpdateProfile = viewModel::updateProfile, onUpdatePreferences = viewModel::updatePreferences,
                     onLogout = { viewModel.logout(::requireLogin) },

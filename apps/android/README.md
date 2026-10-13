@@ -8,4 +8,4 @@ Open this folder directly in Android Studio. See `OPEN_IN_ANDROID_STUDIO.md` and
 ./gradlew testDebugUnitTest lintDebug assembleDebug
 ```
 
-Do not distribute a build until it points to the verified HTTPS API and has fresh build, device and accessibility evidence. Negative-ID records are demonstration content and cannot be RSVP'd to.
+Do not distribute a build until it points to the verified HTTPS API and has fresh build, device and accessibility evidence. Content-status metadata is retained for administrator review, while published event records use the normal RSVP, reminder and attendance-history flow.

@@ -27,7 +27,6 @@ import java.util.concurrent.TimeUnit
 
 class ReminderScheduler(private val context: Context) {
     fun schedule(event: CommunityEvent) {
-        if (event.isDemonstration) return
         val delay = NotificationRules.reminderDelay(event.startAt) ?: return
         val input = Data.Builder()
             .putLong(ReminderWorker.EVENT_ID, event.id)
@@ -79,7 +78,7 @@ class ReminderWorker(context: Context, parameters: WorkerParameters) : Worker(co
             if (!member.notificationsEnabled || !member.eventRemindersEnabled) return@runBlocking false
             val event = container.repository.eventStream.first().firstOrNull { it.id == eventId }
                 ?: return@runBlocking false
-            event.isAttending && !event.isDemonstration &&
+            event.isAttending &&
                 event.startAt == inputData.getString(EVENT_START) &&
                 runCatching { Instant.parse(event.startAt).isAfter(Instant.now()) }.getOrDefault(false)
         }

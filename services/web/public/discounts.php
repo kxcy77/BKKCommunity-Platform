@@ -25,12 +25,6 @@ require __DIR__ . '/partials/header.php';
 </section>
 <section class="section section-gold">
     <div class="shell">
-        <?php if (array_filter($discounts, static fn (array $discount): bool => !empty($discount['is_demo']))): ?>
-            <div class="flash flash-info discount-warning" role="note">
-                <?= icon_svg('info') ?>
-                <span><strong>Demonstration entries are not real offers.</strong> Do not try to claim them or travel to a provider based on these examples. BKK-approved offers will be shown separately when available.</span>
-            </div>
-        <?php endif; ?>
         <nav class="filter-bar" aria-label="Filter discounts by category">
             <a class="filter-pill" href="<?= h(app_url('discounts.php')) ?>" <?= $selectedCategory === 'All' ? 'aria-current="true"' : '' ?>>All</a>
             <?php foreach ($categories as $category): ?>
@@ -48,13 +42,12 @@ require __DIR__ . '/partials/header.php';
                             <span class="category-badge"><?= h($discount['category']) ?></span>
                         </header>
                         <div class="content-card-body">
-                            <?php if (!empty($discount['is_demo'])): ?><p><strong>Demonstration only — not a valid offer.</strong></p><?php endif; ?>
                             <p class="deal"><?= h($discount['deal']) ?></p>
                             <dl class="detail-list">
                                 <div><dt>Who qualifies</dt><dd><?= h($discount['eligibility']) ?></dd></div>
-                                <?php if (empty($discount['is_demo'])): ?><div><dt>How to claim</dt><dd><?= h($discount['claim_instructions']) ?></dd></div><?php endif; ?>
+                                <div><dt>How to claim</dt><dd><?= h($discount['claim_instructions']) ?></dd></div>
                             </dl>
-                            <?php if (empty($discount['is_demo'])): ?><a class="button button-outline" href="<?= h(app_url('contact.php?subject=' . rawurlencode('Discount enquiry: ' . $discount['store_name']))) ?>">Ask for help</a><?php endif; ?>
+                            <a class="button button-outline" href="<?= h(app_url('contact.php?subject=' . rawurlencode('Discount enquiry: ' . $discount['store_name']))) ?>">Ask for help</a>
                         </div>
                     </article>
                 <?php endforeach; ?>

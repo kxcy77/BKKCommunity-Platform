@@ -50,11 +50,11 @@ class EventPresentationRulesTest {
             "Selected prescription items qualify for a pensioner discount.", "Aged 60+", "Ask in store",
             "Pharmacy", null, null)
         val service = LocalService(43, "clinic", "BKK Community Clinic", "12 Main Road, BKK",
-            "011 555 0101", null, null)
+            "", null, null, isDemo = true)
         assertTrue(discount.isDemonstration)
         assertTrue(service.isDemonstration)
         assertFalse(discount.copy(details = "Approved terms supplied by the business").isDemonstration)
-        assertFalse(service.copy(address = "Verified BKK clinic address").isDemonstration)
+        assertFalse(service.copy(address = "Verified BKK clinic address", isDemo = false).isDemonstration)
         assertTrue(discount.copy(storeName = "New business", isDemo = true).isDemonstration)
         assertTrue(service.copy(name = "New service", isDemo = true).isDemonstration)
     }

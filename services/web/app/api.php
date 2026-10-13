@@ -387,9 +387,6 @@ function api_set_attendance(int $eventId): never
     if (!$event) {
         api_error(404, 'That upcoming event could not be found.', 'event_not_found');
     }
-    if ($status === 'attending' && is_demonstration_event($event)) {
-        api_error(422, 'This demonstration event cannot accept attendance.', 'demo_event');
-    }
     $statement = $db->prepare("INSERT INTO attendance (user_id, event_id, status, confirmed_at)
         VALUES (?, ?, ?, UTC_TIMESTAMP())
         ON DUPLICATE KEY UPDATE status = VALUES(status), confirmed_at = IF(VALUES(status) = 'attending', UTC_TIMESTAMP(), confirmed_at)");

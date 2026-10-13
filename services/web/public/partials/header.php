@@ -63,12 +63,6 @@ $accountLabel = $user ? (is_admin() ? 'Admin' : 'My account') : 'My account';
     </div>
 </header>
 
-<?php if (is_demo_mode()): ?>
-    <div class="demo-notice" role="status">
-        <div class="shell"><?= icon_svg('info') ?><strong>Demonstration mode:</strong> sample content and browser-session data are being used until MySQL is configured.</div>
-    </div>
-<?php endif; ?>
-
 <?php $flashes = pull_flashes(); ?>
 <?php if ($flashes): ?>
     <div class="flash-region shell" aria-live="polite">

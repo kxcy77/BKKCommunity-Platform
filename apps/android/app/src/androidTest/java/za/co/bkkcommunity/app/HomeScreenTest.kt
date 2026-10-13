@@ -48,7 +48,7 @@ class HomeScreenTest {
         composeRule.onNodeWithText("Today's Schedule").assertIsDisplayed()
     }
 
-    @Test fun demonstrationEventCannotOfferAttendanceOrTravelActions() {
+    @Test fun eventDetailsOfferAttendanceAndTravelActions() {
         val event = CommunityEvent(
             42, "BKK App Demonstration Event - Not a Real Event", "TEST CONTENT ONLY",
             "2026-08-15T08:00:00Z", "2026-08-15T09:00:00Z",
@@ -58,11 +58,13 @@ class HomeScreenTest {
             BkkTheme { EventDetailScreen(event, PaddingValues(0.dp), {}, { _, _ -> }) }
         }
 
-        composeRule.onNode(hasScrollAction()).performScrollToNode(hasText("Test event only"))
-        composeRule.onNodeWithText("Test event only").assertIsDisplayed()
-        composeRule.onNodeWithText("I will attend").assertDoesNotExist()
-        composeRule.onNodeWithText("Open directions").assertDoesNotExist()
-        composeRule.onNodeWithText("Add to phone calendar").assertDoesNotExist()
+        composeRule.onNode(hasScrollAction()).performScrollToNode(hasText("I will attend"))
+        composeRule.onNodeWithText("I will attend").assertIsDisplayed()
+        composeRule.onNode(hasScrollAction()).performScrollToNode(hasText("Open directions"))
+        composeRule.onNodeWithText("Open directions").assertIsDisplayed()
+        composeRule.onNode(hasScrollAction()).performScrollToNode(hasText("Add to phone calendar"))
+        composeRule.onNodeWithText("Add to phone calendar").assertIsDisplayed()
+        composeRule.onNodeWithText("Test event only").assertDoesNotExist()
     }
 
     @Test fun todayScheduleDoesNotShowFutureEvents() {

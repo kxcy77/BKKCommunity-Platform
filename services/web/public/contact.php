@@ -25,7 +25,7 @@ require __DIR__ . '/partials/header.php';
             <button class="button" type="submit"><?= icon_svg('mail') ?> Send message</button>
         </form>
         <aside class="side-panel">
-            <p class="eyebrow eyebrow-light">Contact information</p><h2>Verified details are coming</h2><p>BKK staff have not yet confirmed a public phone number, email address, office location or response time. Please use the message form for now. Do not use contact details shown in demonstration records.</p>
+            <p class="eyebrow eyebrow-light">Contact information</p><h2>Send a message to BKK</h2><p>BKK staff can confirm the latest phone number, email address, office location and response time. Please use the message form and include the service or event you are asking about.</p>
         </aside>
     </div>
 </section>

@@ -134,10 +134,6 @@ class BkkViewModel(
             onLoginRequired()
             return
         }
-        if (event.isDemonstration) {
-            _state.update { it.copy(message = "This demonstration event cannot accept attendance.") }
-            return
-        }
         runAction(onSuccess = ::loadAttendanceHistory) {
             repository.setAttendance(event.id, attending).getOrThrow()
             val member = _state.value.member

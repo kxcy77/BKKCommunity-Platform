@@ -29,12 +29,12 @@ function demo_discounts(): array
 function demo_services(): array
 {
     return [
-        ['id' => 1, 'name' => 'BKK Community Hall', 'category' => 'Community', 'phone' => '072 888 5030', 'address' => 'BKK Community Hall', 'hours' => 'Monday–Friday, 08:00–16:00', 'description' => 'Community events, referrals and general member support.', 'tone' => 'blue'],
+        ['id' => 1, 'name' => 'BKK Community Hall', 'category' => 'Community', 'phone' => '', 'address' => 'BKK Community Hall', 'hours' => 'Monday–Friday, 08:00–16:00', 'description' => 'Community events, referrals and general member support.', 'tone' => 'blue'],
         ['id' => 2, 'name' => 'Community Health Support Desk', 'category' => 'Health', 'phone' => '0800 029 999', 'address' => 'Confirm the nearest participating clinic', 'hours' => 'Weekdays, 08:00–16:00', 'description' => 'General health-service guidance and referral information.', 'tone' => 'red'],
         ['id' => 3, 'name' => 'SASSA Information Line', 'category' => 'Government', 'phone' => '0800 60 10 11', 'address' => 'Telephone information service', 'hours' => 'Weekdays during office hours', 'description' => 'General social-grant enquiries and official process guidance.', 'tone' => 'gold'],
         ['id' => 4, 'name' => 'Emergency Services', 'category' => 'Emergency', 'phone' => '112', 'address' => 'National mobile emergency number', 'hours' => '24 hours', 'description' => 'Call from a mobile phone when urgent police, fire or medical help is required.', 'tone' => 'red'],
-        ['id' => 5, 'name' => 'Digital Help Desk', 'category' => 'Support', 'phone' => '072 888 5030', 'address' => 'BKK Community Library', 'hours' => 'Selected Saturdays, 10:00–12:00', 'description' => 'Patient help with smartphones, messages and online forms.', 'tone' => 'teal'],
-        ['id' => 6, 'name' => 'Community Transport Desk', 'category' => 'Transport', 'phone' => '072 888 5030', 'address' => 'BKK Community Hall', 'hours' => 'Book at least one day ahead', 'description' => 'Information about volunteer lifts and nearby public transport.', 'tone' => 'green'],
+        ['id' => 5, 'name' => 'Digital Help Desk', 'category' => 'Support', 'phone' => '', 'address' => 'BKK Community Library', 'hours' => 'Selected Saturdays, 10:00–12:00', 'description' => 'Patient help with smartphones, messages and online forms.', 'tone' => 'teal'],
+        ['id' => 6, 'name' => 'Community Transport Desk', 'category' => 'Transport', 'phone' => '', 'address' => 'BKK Community Hall', 'hours' => 'Book at least one day ahead', 'description' => 'Information about volunteer lifts and nearby public transport.', 'tone' => 'green'],
     ];
 }
 

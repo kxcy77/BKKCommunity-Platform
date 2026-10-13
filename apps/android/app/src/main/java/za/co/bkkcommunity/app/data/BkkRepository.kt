@@ -202,11 +202,11 @@ class BkkRepository(
         }
         if (services.count() == 0) {
             services.replaceAll(listOf(
-                LocalServiceEntity(-1, "clinic", "BKK Community Clinic", "12 Main Road, BKK", "011 555 0101",
+                LocalServiceEntity(-1, "clinic", "BKK Community Clinic", "12 Main Road, BKK", "",
                     "Opposite the community hall.", "Mon–Fri 08:00–16:00", true),
-                LocalServiceEntity(-2, "pharmacy", "Community Pharmacy", "18 Main Road, BKK", "011 555 0102",
+                LocalServiceEntity(-2, "pharmacy", "Community Pharmacy", "18 Main Road, BKK", "",
                     "Next to the grocery store.", "Mon–Sat 08:00–18:00", true),
-                LocalServiceEntity(-3, "support", "BKK Community Support Desk", "BKK Community Hall", "072 888 5030",
+                LocalServiceEntity(-3, "support", "BKK Community Support Desk", "BKK Community Hall", "",
                     "Reception desk inside the main entrance.", "Weekdays 09:00–15:00", true)
             ))
         }

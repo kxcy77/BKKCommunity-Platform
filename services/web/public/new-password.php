@@ -12,14 +12,7 @@ require __DIR__ . '/partials/header.php';
 ?>
 <section class="form-page">
     <div class="shell">
-        <?php if (is_demo_mode()): ?>
-            <div class="form-card form-card-narrow empty-state">
-                <h1>Password reset unavailable</h1>
-                <p>Password email and reset codes are disabled in demonstration mode.</p>
-                <a class="button" href="<?= h(app_url('reset-password.php')) ?>">Request another code</a>
-            </div>
-        <?php else: ?>
-            <form class="form-card form-card-narrow" action="<?= h(app_url('actions.php')) ?>" method="post">
+        <form class="form-card form-card-narrow" action="<?= h(app_url('actions.php')) ?>" method="post">
                 <input type="hidden" name="csrf_token" value="<?= h(csrf_token()) ?>">
                 <input type="hidden" name="action" value="complete_reset">
                 <p class="eyebrow">Account recovery</p>
@@ -32,8 +25,7 @@ require __DIR__ . '/partials/header.php';
                 <div class="field"><label for="password_confirmation">Confirm new password</label><input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" minlength="8" maxlength="128" required></div>
                 <button class="button button-wide" type="submit">Change password</button>
                 <p class="form-links"><a href="<?= h(app_url('reset-password.php')) ?>">Request another code</a></p>
-            </form>
-        <?php endif; ?>
+        </form>
     </div>
 </section>
 <?php require __DIR__ . '/partials/footer.php'; ?>

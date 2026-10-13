@@ -51,10 +51,7 @@ data class LocalService(
     val isDemo: Boolean = false
 ) {
     val isDemonstration: Boolean
-        get() = isDemo || id < 0 ||
-            (name == "BKK Community Clinic" && address == "12 Main Road, BKK" && phone == "011 555 0101") ||
-            (name == "Community Pharmacy" && address == "18 Main Road, BKK" && phone == "011 555 0102") ||
-            (name == "BKK Community Support Desk" && address == "BKK Community Hall, Main Road" && phone == "072 888 5030")
+        get() = isDemo || id < 0
 }
 
 data class Member(

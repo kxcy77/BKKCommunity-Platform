@@ -4,13 +4,13 @@ Implemented:
 
 - Documented five-tab Compose navigation and scrollable home/actions/schedule.
 - Public events, discounts and services with search, filters, details and atomic Room refresh.
-- Clear demo-data/freshness state; demonstration records reject RSVP.
+- The public Events and Local Information screens use the same interaction flow for every published record: members can RSVP, cancel attendance, save events, set reminders and open directions; a call action appears when BKK has supplied a verified phone number, otherwise the member can ask BKK for the contact details. The internal content-status flag remains available to administrators for replacement and verification.
 - Online-only authentication, contact, profile, preferences, attendance history, deletion and RSVP.
 - Forgot-password success navigates to email-bound six-digit code entry.
 - Android Keystore AES-GCM bearer-token storage and server 401 session clearing.
 - One RSVP state per event, local 24-hour WorkManager reminder after confirmed RSVP and cancellation cleanup.
 - FCM token registration, notification inbox and event/discount deep links when Firebase is configured.
-- Saved information, directions, sharing, telephone and calendar actions.
+- Saved information, directions, sharing, verified telephone and calendar actions.
 - API base URLs provided by Gradle properties; release placeholder is deliberately non-operational.
 
 Not verified or not supplied:

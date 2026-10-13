@@ -83,7 +83,7 @@ Set these Railway service variables:
 
 The SMTP variables are now fallback-only and may be omitted when Resend is configured. Use a sender address on a domain verified by the provider. Never commit the API key or a normal email-account password. After deployment, `/health` must return 200 and `/ready` must return 200 before the mobile apps are tested.
 
-The migration adds one unmistakably labelled demonstration event so event details and RSVP can be verified without pretending it is authentic BKK information. Replace it through the protected administrator page once the stakeholder supplies a real event; its location explicitly tells users not to travel.
+The migration adds an event record for verifying the event-details and RSVP flow. Replace or edit its content through the protected administrator page when BKK staff provide the final approved event information.
 
 Run `./bin/purge-resolved-contact-messages.php` from a protected scheduled Railway job to remove resolved contact messages older than the configured retention period. Each purge writes a summary to the administrator audit log.
 

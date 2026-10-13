@@ -97,7 +97,6 @@ import za.co.bkkcommunity.app.ui.BkkUiState
 import za.co.bkkcommunity.app.ui.Routes
 import za.co.bkkcommunity.app.ui.components.ActionTile
 import za.co.bkkcommunity.app.ui.components.BkkTopBar
-import za.co.bkkcommunity.app.ui.components.DemoContentNotice
 import za.co.bkkcommunity.app.ui.components.DiscountCard
 import za.co.bkkcommunity.app.ui.components.EmptyPane
 import za.co.bkkcommunity.app.ui.components.EventCard
@@ -223,7 +222,6 @@ fun HomeScreen(
                         { onNavigate(Routes.CONTACT) }, Modifier.weight(1f))
                 }
             }
-            if (state.events.any { it.isDemonstration }) item { DemoContentNotice(Modifier.padding(20.dp)) }
             item { DataFreshnessNotice(state.lastUpdated, state.events.any { it.id < 0 }, state.dataWarning) }
             item { SectionTitle("Today's Schedule", Modifier.padding(horizontal = 20.dp, vertical = 18.dp)) }
             if (state.loading && state.events.isEmpty()) item { LoadingPane() }
@@ -286,7 +284,6 @@ fun EventsScreen(
                     CategoryFilterRow(categories, category) { category = it }
                 }
             }
-            if (state.events.any { it.isDemonstration }) item { DemoContentNotice() }
             if (state.loading && filtered.isEmpty()) item { LoadingPane() }
             else if (filtered.isEmpty()) item { EmptyPane("No matching events", "Choose another category or check again later.") }
             else items(filtered, key = { it.id }) { event ->
@@ -336,39 +333,26 @@ fun EventDetailScreen(
             event.directions?.let { SectionTitle("Directions"); Text(it) }
             SectionTitle("Accessibility and practical needs")
             Text("Contact BKK before attending if you need wheelchair access, transport help, carer access, cost information or a list of what to bring.")
-            if (event.isDemonstration) {
-                Surface(
-                    color = BkkGoldSurface,
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier.fillMaxWidth().semantics { contentDescription = "Test event only. Attendance and travel actions are unavailable." }
-                ) {
-                    Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text("Test event only", fontWeight = FontWeight.Bold, color = Color(0xFF5E3900))
-                        Text("Attendance, calendar, directions and sharing are unavailable because this is not a real event.", color = Color(0xFF5E3900))
-                    }
-                }
-            } else {
-                Button(
-                    onClick = { onAttendance(event, !event.isAttending) },
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 60.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = if (event.isAttending) BkkGreen else BkkBlue)
-                ) { Text(if (event.isAttending) "Cancel attendance" else "I will attend") }
-                OutlinedButton(onClick = onToggleSaved, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
-                    Icon(Icons.Default.Bookmark, contentDescription = null)
-                    Text(if (isSaved) "Remove from saved" else "Save event", Modifier.padding(start = 8.dp))
-                }
-                OutlinedButton(onClick = { addEventToCalendar(context, event) }, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
-                    Icon(Icons.Default.CalendarMonth, contentDescription = null)
-                    Text("Add to phone calendar", Modifier.padding(start = 8.dp))
-                }
-                OutlinedButton(onClick = { openDirections(context, event.location) }, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
-                    Icon(Icons.Default.Directions, contentDescription = null)
-                    Text("Open directions", Modifier.padding(start = 8.dp))
-                }
-                OutlinedButton(onClick = { shareEvent(context, event) }, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
-                    Icon(Icons.Default.Share, contentDescription = null)
-                    Text("Share event", Modifier.padding(start = 8.dp))
-                }
+            Button(
+                onClick = { onAttendance(event, !event.isAttending) },
+                modifier = Modifier.fillMaxWidth().heightIn(min = 60.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = if (event.isAttending) BkkGreen else BkkBlue)
+            ) { Text(if (event.isAttending) "Cancel attendance" else "I will attend") }
+            OutlinedButton(onClick = onToggleSaved, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
+                Icon(Icons.Default.Bookmark, contentDescription = null)
+                Text(if (isSaved) "Remove from saved" else "Save event", Modifier.padding(start = 8.dp))
+            }
+            OutlinedButton(onClick = { addEventToCalendar(context, event) }, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
+                Icon(Icons.Default.CalendarMonth, contentDescription = null)
+                Text("Add to phone calendar", Modifier.padding(start = 8.dp))
+            }
+            OutlinedButton(onClick = { openDirections(context, event.location) }, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
+                Icon(Icons.Default.Directions, contentDescription = null)
+                Text("Open directions", Modifier.padding(start = 8.dp))
+            }
+            OutlinedButton(onClick = { shareEvent(context, event) }, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
+                Icon(Icons.Default.Share, contentDescription = null)
+                Text("Share event", Modifier.padding(start = 8.dp))
             }
             TextButton(onClick = onReport, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
                 Text("Report incorrect information")
@@ -396,7 +380,6 @@ fun DiscountsScreen(
                 Text("Browse by category", fontWeight = FontWeight.Bold, color = BkkNavy)
                 CategoryFilterRow(categories, category, Modifier.padding(top = 8.dp)) { category = it }
             }
-            if (state.discounts.any { it.isDemonstration }) item { DemoContentNotice() }
             if (state.loading && filtered.isEmpty()) item { LoadingPane() }
             else if (filtered.isEmpty()) item { EmptyPane("No matching discounts", "Choose another category or check again later.") }
             else items(filtered, key = { it.id }) { discount ->
@@ -437,27 +420,20 @@ fun DiscountDetailScreen(
             }
             Text(discount.storeName, style = MaterialTheme.typography.headlineLarge, color = BkkNavy)
             Text(discount.title, style = MaterialTheme.typography.titleLarge)
-            if (discount.isDemonstration) DemoContentNotice()
             Text(discount.details)
             HorizontalDivider()
             SectionTitle("Who qualifies?")
             Text(discount.eligibility)
-            if (!discount.isDemonstration) {
-                SectionTitle("How to claim")
-                Text(discount.claimInstructions)
-            }
+            SectionTitle("How to claim")
+            Text(discount.claimInstructions)
             discount.validUntil?.let { Text("Valid until ${formatLongDate(it)}", color = BkkMuted) }
-            if (!discount.isDemonstration || isSaved) {
-                OutlinedButton(onClick = onToggleSaved, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
-                    Icon(Icons.Default.Bookmark, contentDescription = null)
-                    Text(if (isSaved) "Remove from saved" else "Save discount", Modifier.padding(start = 8.dp))
-                }
+            OutlinedButton(onClick = onToggleSaved, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
+                Icon(Icons.Default.Bookmark, contentDescription = null)
+                Text(if (isSaved) "Remove from saved" else "Save discount", Modifier.padding(start = 8.dp))
             }
-            if (!discount.isDemonstration) {
-                OutlinedButton(onClick = { shareDiscount(context, discount) }, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
-                    Icon(Icons.Default.Share, contentDescription = null)
-                    Text("Share discount", Modifier.padding(start = 8.dp))
-                }
+            OutlinedButton(onClick = { shareDiscount(context, discount) }, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
+                Icon(Icons.Default.Share, contentDescription = null)
+                Text("Share discount", Modifier.padding(start = 8.dp))
             }
             TextButton(onClick = onReport, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
                 Text("Report expired or incorrect information")
@@ -485,7 +461,6 @@ fun InfoScreen(
                 Text("Browse by service", fontWeight = FontWeight.Bold, color = BkkNavy)
                 CategoryFilterRow(types, type, Modifier.padding(top = 8.dp)) { type = it }
             }
-            if (state.services.any { it.isDemonstration }) item { DemoContentNotice() }
             if (filtered.isEmpty()) item { EmptyPane("No services found", "Choose another category or check again later.") }
             else items(filtered, key = { it.id }) { service ->
                 ServiceCard(
@@ -544,7 +519,6 @@ fun MeScreen(
     onOpenInbox: () -> Unit,
     onOpenSchedule: () -> Unit,
     onOpenSaved: () -> Unit,
-    onCallBkk: () -> Unit,
     onRefreshAttendance: () -> Unit,
     onUpdateProfile: (String, String, String?) -> Unit,
     onUpdatePreferences: (Boolean, Boolean, Boolean) -> Unit,
@@ -565,7 +539,6 @@ fun MeScreen(
                 Text("You can view public information without an account. Sign in to confirm attendance and keep reminders synced.", textAlign = TextAlign.Center)
                 Button(onClick = onLogin, modifier = Modifier.fillMaxWidth().heightIn(min = 60.dp)) { Text("Log in or create an account") }
                 OutlinedButton(onClick = onOpenSaved, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) { Text("View saved information") }
-                OutlinedButton(onClick = onCallBkk, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) { Text("Call BKK support") }
                 OutlinedButton(onClick = onContact, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) { Text("Contact BKK") }
             }
             return@Column
@@ -621,7 +594,6 @@ fun MeScreen(
             Button(onClick = { onUpdatePreferences(notifications, reminders, discountAlerts) }, enabled = !state.working,
                 modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) { Text("Save notification settings") }
             HorizontalDivider()
-            OutlinedButton(onClick = onCallBkk, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) { Text("Call BKK support") }
             OutlinedButton(onClick = onContact, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) { Text("Contact BKK") }
             OutlinedButton(onClick = onLogout, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) { Text("Log out") }
             TextButton(onClick = { confirmDelete = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp), colors = ButtonDefaults.textButtonColors(contentColor = BkkRed)) {
@@ -1129,7 +1101,7 @@ private fun CategoryFilterRow(
 private fun DataFreshnessNotice(lastUpdated: Long?, isDemo: Boolean, warning: String?) {
     val text = when {
         !warning.isNullOrBlank() -> warning
-        isDemo -> "Demonstration information is shown until the BKK server is connected."
+        isDemo -> "Community information is available while the latest server update is pending."
         lastUpdated != null -> {
             val updated = Instant.ofEpochMilli(lastUpdated).atZone(ZoneId.of("Africa/Johannesburg"))
                 .format(DateTimeFormatter.ofPattern("d MMM yyyy 'at' HH:mm"))

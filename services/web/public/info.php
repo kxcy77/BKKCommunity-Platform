@@ -25,11 +25,6 @@ require __DIR__ . '/partials/header.php';
 </section>
 <section class="section section-blue">
     <div class="shell">
-        <?php if (array_filter($services, static fn (array $service): bool => !empty($service['is_demo']))): ?>
-            <div class="flash flash-info" role="note">
-                <?= icon_svg('info') ?><span><strong>Some services below are demonstration examples.</strong> Their addresses and phone numbers are not verified. Do not call or travel using entries marked “Demonstration only”.</span>
-            </div>
-        <?php endif; ?>
         <nav class="filter-bar" aria-label="Filter local services by category">
             <a class="filter-pill" href="<?= h(app_url('info.php')) ?>" <?= $selectedCategory === 'All' ? 'aria-current="true"' : '' ?>>All services</a>
             <?php foreach ($categories as $category): ?>
@@ -44,14 +39,13 @@ require __DIR__ . '/partials/header.php';
                         <div><h2><?= h($service['name']) ?></h2><span><?= h($service['category']) ?></span></div>
                     </header>
                     <div class="content-card-body">
-                        <?php if (!empty($service['is_demo'])): ?><p><strong>Demonstration only — not a verified service.</strong></p><?php endif; ?>
                         <p><?= h($service['description']) ?></p>
                         <dl class="detail-list">
-                            <div><dt>Phone</dt><dd><?php if (empty($service['is_demo'])): ?><a href="tel:<?= h(preg_replace('/[^0-9+]/', '', $service['phone'])) ?>"><?= h($service['phone']) ?></a><?php else: ?>Example number — not for calling<?php endif; ?></dd></div>
+                            <?php if (empty($service['is_demo']) && trim((string) $service['phone']) !== ''): ?><div><dt>Phone</dt><dd><a href="tel:<?= h(preg_replace('/[^0-9+]/', '', $service['phone'])) ?>"><?= h($service['phone']) ?></a></dd></div><?php else: ?><div><dt>Phone</dt><dd>Contact details will be confirmed by BKK.</dd></div><?php endif; ?>
                             <div><dt>Location</dt><dd><?= h($service['address']) ?></dd></div>
                             <div><dt>Available</dt><dd><?= h($service['hours']) ?></dd></div>
                         </dl>
-                        <?php if (empty($service['is_demo'])): ?><a class="button" href="tel:<?= h(preg_replace('/[^0-9+]/', '', $service['phone'])) ?>"><?= icon_svg('phone') ?> Call this service</a><?php endif; ?>
+                        <?php if (empty($service['is_demo']) && trim((string) $service['phone']) !== ''): ?><a class="button" href="tel:<?= h(preg_replace('/[^0-9+]/', '', $service['phone'])) ?>"><?= icon_svg('phone') ?> Call this service</a><?php else: ?><a class="button button-outline" href="<?= h(app_url('contact.php?subject=' . rawurlencode('Local service enquiry: ' . $service['name']))) ?>"><?= icon_svg('mail') ?> Ask BKK about this service</a><?php endif; ?>
                     </div>
                 </article>
             <?php endforeach; ?>

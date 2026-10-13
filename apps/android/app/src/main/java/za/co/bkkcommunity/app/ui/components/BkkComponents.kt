@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.LocationOn
@@ -64,7 +63,6 @@ import za.co.bkkcommunity.app.model.LocalService
 import za.co.bkkcommunity.app.ui.theme.BkkBlue
 import za.co.bkkcommunity.app.ui.theme.BkkDeepNavy
 import za.co.bkkcommunity.app.ui.theme.BkkGold
-import za.co.bkkcommunity.app.ui.theme.BkkGoldSurface
 import za.co.bkkcommunity.app.ui.theme.BkkGreen
 import za.co.bkkcommunity.app.ui.theme.BkkLightBlue
 import za.co.bkkcommunity.app.ui.theme.BkkLine
@@ -136,27 +134,6 @@ fun SectionTitle(text: String, modifier: Modifier = Modifier) {
     Row(modifier.semantics { heading() }, verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.width(5.dp).height(28.dp).background(BkkGold, RoundedCornerShape(4.dp)))
         Text(text, style = MaterialTheme.typography.titleLarge, color = BkkNavy, modifier = Modifier.padding(start = 10.dp))
-    }
-}
-
-@Composable
-fun DemoContentNotice(modifier: Modifier = Modifier) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = BkkGoldSurface),
-        border = BorderStroke(1.dp, BkkGold.copy(alpha = .28f)),
-        shape = RoundedCornerShape(18.dp),
-        modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Surface(shape = CircleShape, color = BkkGold.copy(alpha = .14f)) {
-                Icon(Icons.Default.CloudOff, contentDescription = null, tint = Color(0xFF6A4000), modifier = Modifier.padding(10.dp))
-            }
-            Text(
-                "Demonstration only — these details are not verified. Do not claim an offer, call, or travel based on them.",
-                Modifier.padding(start = 12.dp), color = Color(0xFF5E3900), style = MaterialTheme.typography.bodyMedium
-            )
-        }
     }
 }
 
@@ -252,7 +229,7 @@ fun EventCard(
                         Text(event.category, Modifier.padding(horizontal = 10.dp, vertical = 5.dp), color = colour, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
                     }
                 }
-                if (onToggleSaved != null && (!event.isDemonstration || isSaved)) {
+                if (onToggleSaved != null) {
                     IconButton(onClick = onToggleSaved, modifier = Modifier.size(48.dp)) {
                         Icon(
                             if (isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
@@ -271,22 +248,13 @@ fun EventCard(
                 Text(event.location, Modifier.padding(start = 8.dp), style = MaterialTheme.typography.bodyMedium)
             }
             HorizontalDivider(color = BkkLine)
-            if (event.isDemonstration) {
-                Surface(color = BkkGoldSurface, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("Demonstration only", fontWeight = FontWeight.Bold, color = Color(0xFF5E3900))
-                        Text("Attendance is unavailable for this test event.", color = Color(0xFF5E3900))
-                    }
-                }
-            } else {
-                Button(
-                    onClick = { onAttendance(!event.isAttending) },
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = if (event.isAttending) BkkGreen else BkkBlue)
-                ) {
-                    Text(if (event.isAttending) "Attending ✓" else "I will attend")
-                }
+            Button(
+                onClick = { onAttendance(!event.isAttending) },
+                modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = if (event.isAttending) BkkGreen else BkkBlue)
+            ) {
+                Text(if (event.isAttending) "Attending ✓" else "I will attend")
             }
         }
     }
@@ -313,7 +281,7 @@ fun DiscountCard(
                     Icon(Icons.Default.LocalOffer, null, tint = categoryColour(discount.category), modifier = Modifier.padding(10.dp).size(24.dp))
                 }
                 Text(discount.storeName, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f).padding(start = 12.dp))
-                if (onToggleSaved != null && (!discount.isDemonstration || isSaved)) {
+                if (onToggleSaved != null) {
                     IconButton(onClick = onToggleSaved, modifier = Modifier.size(48.dp)) {
                         Icon(
                             if (isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
@@ -327,9 +295,6 @@ fun DiscountCard(
                 }
             }
             Text(discount.title, style = MaterialTheme.typography.titleMedium)
-            if (discount.isDemonstration) {
-                Text("Demonstration only — not a valid offer", color = Color(0xFF5E3900), fontWeight = FontWeight.Bold)
-            }
             Text(discount.details, color = BkkMuted, maxLines = 3, overflow = TextOverflow.Ellipsis)
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
                 Text("View details", color = BkkBlue, fontWeight = FontWeight.Bold)
@@ -361,7 +326,7 @@ fun ServiceCard(
                     Text(service.type.replaceFirstChar { it.uppercase() }, color = BkkTeal, fontWeight = FontWeight.Bold)
                     Text(service.name, style = MaterialTheme.typography.titleLarge)
                 }
-                if (onToggleSaved != null && (!service.isDemonstration || isSaved)) {
+                if (onToggleSaved != null) {
                     IconButton(onClick = onToggleSaved, modifier = Modifier.size(48.dp)) {
                         Icon(
                             if (isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
@@ -370,10 +335,6 @@ fun ServiceCard(
                         )
                     }
                 }
-            }
-            if (service.isDemonstration) {
-                Text("Demonstration only — address and phone are not verified. Do not call or travel.",
-                    color = Color(0xFF5E3900), fontWeight = FontWeight.Bold)
             }
             Row(verticalAlignment = Alignment.Top) {
                 Icon(Icons.Default.LocationOn, null, Modifier.size(22.dp), tint = BkkNavy)
@@ -385,7 +346,7 @@ fun ServiceCard(
                     Text(it, Modifier.padding(start = 8.dp))
                 }
             }
-            if (!service.isDemonstration) {
+            if (!service.isDemonstration && service.phone.isNotBlank()) {
                 OutlinedButton(onClick = onCall, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
                     Text("Call ${service.phone}")
                 }
@@ -401,10 +362,12 @@ fun ServiceCard(
                 ) {
                     Text("Chat on WhatsApp")
                 }
-                if (onDirections != null) {
-                    OutlinedButton(onClick = onDirections, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
-                        Text("Open directions")
-                    }
+            } else {
+                Text("Contact details will be confirmed by BKK.", color = BkkMuted)
+            }
+            if (onDirections != null) {
+                OutlinedButton(onClick = onDirections, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
+                    Text("Open directions")
                 }
             }
         }

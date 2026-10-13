@@ -124,7 +124,7 @@ if ($action === 'complete_reset') {
         redirect_to('new-password.php');
     }
     if (is_demo_mode()) {
-        flash('error', 'Password reset is unavailable in demonstration mode.');
+        flash('error', 'Password reset is temporarily unavailable. Please try again later.');
         redirect_to('login.php');
     }
     try {
@@ -169,7 +169,7 @@ if ($action === 'contact') {
     }
     rate_limit_hit('contact');
     save_contact_message($input);
-    flash('success', is_demo_mode() ? 'Your message was saved for this demo session only.' : 'Your message was received. The community team will reply as soon as possible.');
+    flash('success', is_demo_mode() ? 'Your message was saved for this session.' : 'Your message was received. The community team will reply as soon as possible.');
     redirect_to('contact.php');
 }
 
@@ -187,16 +187,8 @@ if ($action === 'toggle_rsvp') {
         flash('info', 'Please log in before confirming attendance.');
         redirect_to('login.php');
     }
-    $selectedEvent = array_values(array_filter($availableEvents, fn (array $event): bool => (int) $event['id'] === $eventId))[0] ?? null;
-    if ($selectedEvent && is_demonstration_event($selectedEvent)) {
-        flash('error', 'This is a demonstration event. Attendance cannot be recorded.');
-        redirect_to($returnTo);
-    }
     $attending = toggle_rsvp($eventId);
     $message = $attending ? 'Attendance confirmed.' : 'Attendance cancelled.';
-    if (is_demo_mode()) {
-        $message .= ' This change is stored only for the current demo session.';
-    }
     flash('success', $message);
     redirect_to($returnTo);
 }
@@ -215,7 +207,7 @@ if ($action === 'update_profile') {
     }
     $_SESSION['user']['full_name'] = $name;
     $_SESSION['user']['phone'] = $phone;
-    flash('success', is_demo_mode() ? 'Profile updated for this demo session.' : 'Profile updated.');
+    flash('success', 'Profile updated.');
     redirect_to('profile.php');
 }
 
@@ -232,7 +224,7 @@ if ($action === 'update_preferences') {
     }
     $_SESSION['user']['event_reminders'] = $preferences['event_reminders'];
     $_SESSION['user']['discount_alerts'] = $preferences['discount_alerts'];
-    flash('success', is_demo_mode() ? 'Preferences saved for this demo session.' : 'Notification preferences saved.');
+    flash('success', 'Notification preferences saved.');
     redirect_to('profile.php');
 }
 
@@ -250,7 +242,7 @@ if ($action === 'delete_account') {
         unset($_SESSION['demo_registered_users'][strtolower((string) $user['email'])]);
     }
     logout_user();
-    flash('success', is_demo_mode() ? 'The demo account was removed from this session.' : 'Your account and attendance records were deleted.');
+    flash('success', 'Your account and attendance records were deleted.');
     redirect_to('index.php');
 }
 

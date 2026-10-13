@@ -52,7 +52,7 @@ class PushWorker(context: Context, params: WorkerParameters) : CoroutineWorker(c
         if (type == "event") {
             val history = container.repository.attendanceHistory().getOrNull()
                 ?: return if (runAttemptCount < 4) Result.retry() else Result.failure()
-            if (history.none { it.id == id && it.isAttending && !it.isDemonstration }) return Result.success()
+            if (history.none { it.id == id && it.isAttending }) return Result.success()
             container.reminderScheduler.cancel(requireNotNull(id))
         }
         if (container.sessionStore.token() == null) return Result.success()
