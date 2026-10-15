@@ -53,7 +53,7 @@ class LiveContentSyncTest {
         check(get("admin/users.php").contains("Registered users"))
         runBlocking { repository.login(email, password).getOrThrow(); repository.refreshAll().getOrThrow() }
         compose.waitUntil(15_000) { compose.onAllNodesWithText("Events", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty() }
-        val marker = "Sync Verification ${System.currentTimeMillis()}"
+        val marker = args.getString("syncMarker") ?: "Sync Verification ${System.currentTimeMillis()}"
         val event = mapOf("title" to marker, "date" to "2099-10-20", "time" to "10:00", "end_time" to "11:00", "location" to "Verification only", "category" to "Exercise", "tone" to "blue", "description" to "Temporary automated verification record. Not a scheduled community activity.", "directions" to "Verification only")
         val discount = mapOf("store_name" to marker, "category" to "Grocery", "title" to marker, "deal" to "Temporary verification offer; not redeemable.", "eligibility" to "Verification only", "claim_instructions" to "Not redeemable; automated verification only.", "tone" to "gold", "valid_from" to "", "valid_until" to "")
         val service = mapOf("type" to "support", "name" to marker, "address" to "Verification only", "phone" to "0000000000", "directions" to "Verification only", "opening_hours" to "Verification only")
@@ -72,7 +72,10 @@ class LiveContentSyncTest {
         }
         try {
             post("admin/events.php", event + ("action" to "admin_create_event"))
-            post("admin/discounts.php", discount + ("action" to "admin_create_discount"))
+            // Production verification supplies a pre-labelled fixture excluded from push delivery.
+            if (args.getString("syncSeededDiscount") != "true") {
+                post("admin/discounts.php", discount + ("action" to "admin_create_discount"))
+            }
             post("admin/services.php", service + ("action" to "admin_create_service"))
             compose.onNodeWithText("Events", useUnmergedTree = true).performClick()
             compose.waitUntil(35_000) { runBlocking { repository.eventStream.first().any { it.title == marker } && repository.discountStream.first().any { it.storeName == marker } && repository.serviceStream.first().any { it.name == marker } } }
