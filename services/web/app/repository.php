@@ -600,6 +600,47 @@ function admin_set_discount_archived(int $discountId, bool $archived, string $re
     return true;
 }
 
+/** Read-only directory; only the explicit public profile columns are selected. */
+function admin_registered_users(int $page = 1, string $search = '', string $platform = ''): array
+{
+    require_admin();
+    $search = mb_substr(trim($search), 0, 100);
+    $platform = in_array($platform, ['website', 'android', 'unknown'], true) ? $platform : '';
+    $db = database();
+    if (!$db) {
+        $items = array_values(array_map(static fn (array $user): array => array_intersect_key($user,
+            array_flip(['full_name', 'email', 'phone', 'signup_platform', 'created_at'])),
+            array_merge(demo_accounts(), $_SESSION['demo_registered_users'] ?? [])));
+        $items = array_values(array_filter($items, static fn (array $user): bool =>
+            ($platform === '' || ($user['signup_platform'] ?? 'unknown') === $platform)
+            && ($search === '' || str_contains(mb_strtolower(implode(' ', [$user['full_name'], $user['email'], $user['phone'] ?? ''])), mb_strtolower($search)))));
+        usort($items, static fn (array $a, array $b): int => strcmp($b['created_at'] ?? '', $a['created_at'] ?? ''));
+        $total = count($items);
+        $pages = max(1, (int) ceil($total / 25));
+        $page = max(1, min($page, $pages));
+        return ['items' => array_slice($items, ($page - 1) * 25, 25), 'total' => $total, 'page' => $page, 'pages' => $pages];
+    }
+    $where = ' WHERE deleted_at IS NULL';
+    $parameters = [];
+    if ($platform !== '') {
+        $where .= ' AND signup_platform = ?';
+        $parameters[] = $platform;
+    }
+    if ($search !== '') {
+        $where .= " AND (full_name LIKE ? ESCAPE '!' OR email LIKE ? ESCAPE '!' OR phone LIKE ? ESCAPE '!')";
+        $term = '%' . strtr($search, ['!' => '!!', '%' => '!%', '_' => '!_']) . '%';
+        array_push($parameters, $term, $term, $term);
+    }
+    $count = $db->prepare('SELECT COUNT(*) FROM users' . $where);
+    $count->execute($parameters);
+    $total = (int) $count->fetchColumn();
+    $pages = max(1, (int) ceil($total / 25));
+    $page = max(1, min($page, $pages));
+    $statement = $db->prepare('SELECT id, full_name, email, phone, signup_platform, created_at FROM users' . $where . ' ORDER BY created_at DESC, id DESC LIMIT 25 OFFSET ' . (($page - 1) * 25));
+    $statement->execute($parameters);
+    return ['items' => $statement->fetchAll(), 'total' => $total, 'page' => $page, 'pages' => $pages];
+}
+
 function admin_contact_messages(int $page = 1, int $perPage = 25, string $search = '', string $status = ''): array
 {
     $page = max(1, $page);

@@ -3,6 +3,8 @@ package za.co.bkkcommunity.app.ui
 import android.Manifest
 import android.net.Uri
 import android.os.Build
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material.icons.Icons
@@ -29,6 +31,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.delay
+import za.co.bkkcommunity.app.data.ContentSection
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
@@ -163,21 +169,44 @@ fun BkkApp(container: AppContainer, deepLink: Uri?) {
             viewModel.refreshInBackground()
         }
     }
-    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        viewModel.refreshInBackground()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner, state.member?.id) {
+        if (state.member == null) return@LaunchedEffect
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            while (true) {
+                viewModel.refreshInBackground()
+                delay(30_000)
+            }
+        }
     }
 
     val backStack by navController.currentBackStackEntryAsState()
     val destination = backStack?.destination
+    val route = destination?.route
+    LaunchedEffect(route, state.member?.id, state.loading) {
+        if (route in setOf(Routes.HOME, Routes.EVENTS, Routes.EVENTS_TODAY, Routes.DISCOUNTS, Routes.INFO)) {
+            viewModel.refreshInBackground()
+        }
+    }
+    val sections = when (route) {
+        Routes.EVENTS, Routes.EVENTS_TODAY, Routes.EVENT_DETAIL, Routes.MY_SCHEDULE -> listOf(ContentSection.EVENTS)
+        Routes.DISCOUNTS, Routes.DISCOUNT_DETAIL -> listOf(ContentSection.DISCOUNTS)
+        Routes.INFO -> listOf(ContentSection.SERVICES)
+        Routes.HOME, Routes.SAVED -> ContentSection.entries
+        else -> emptyList()
+    }
     val showBottomBar = mainDestinations.any { item -> destination?.hierarchy?.any { it.route == item.route } == true } ||
         destination?.route == Routes.EVENTS_TODAY
 
     Scaffold(
         containerColor = BkkSurface,
+        topBar = {
+            if (state.member != null && sections.isNotEmpty()) ContentSyncBanner(state.contentSync, sections, state.working, viewModel::refresh)
+        },
         snackbarHost = { SnackbarHost(snackbarHost) },
         bottomBar = { if (showBottomBar) BkkBottomBar(navController) }
     ) { padding ->
-        NavHost(navController, startDestination = Routes.LOGIN) {
+        NavHost(navController, startDestination = Routes.LOGIN, modifier = Modifier.padding(top = padding.calculateTopPadding())) {
             composable(Routes.HOME) {
                 HomeScreen(state, padding, onNavigate = navController::navigate, onRefresh = viewModel::refresh,
                     onAttendance = { event, attending -> viewModel.setAttendance(event, attending) { navController.navigate(Routes.LOGIN) } },

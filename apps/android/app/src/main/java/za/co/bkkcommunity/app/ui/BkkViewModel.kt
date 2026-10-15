@@ -13,6 +13,8 @@ import kotlinx.coroutines.Job
 import za.co.bkkcommunity.app.AppContainer
 import za.co.bkkcommunity.app.data.BkkRepository
 import za.co.bkkcommunity.app.data.FeatureStore
+import za.co.bkkcommunity.app.data.ContentSection
+import za.co.bkkcommunity.app.data.ContentSyncStatus
 import za.co.bkkcommunity.app.model.CommunityNotice
 import za.co.bkkcommunity.app.model.CommunityEvent
 import za.co.bkkcommunity.app.model.Discount
@@ -33,6 +35,7 @@ data class BkkUiState(
     val savedItems: SavedItems = SavedItems(),
     val notices: List<CommunityNotice> = emptyList(),
     val lastUpdated: Long? = null,
+    val contentSync: Map<ContentSection, ContentSyncStatus> = emptyMap(),
     val eventDetails: Map<Long, CommunityEvent> = emptyMap(),
     val discountDetails: Map<Long, Discount> = emptyMap(),
     val detailLoading: Set<String> = emptySet(),
@@ -79,6 +82,17 @@ class BkkViewModel(
         }
         viewModelScope.launch {
             featureStore.lastUpdated.collect { updated -> _state.update { it.copy(lastUpdated = updated) } }
+        }
+        viewModelScope.launch {
+            repository.syncStatus.collect { statuses ->
+                _state.update { previous ->
+                    previous.copy(
+                        contentSync = statuses,
+                        eventDetails = if (statuses[ContentSection.EVENTS]?.lastUpdated != previous.contentSync[ContentSection.EVENTS]?.lastUpdated) emptyMap() else previous.eventDetails,
+                        discountDetails = if (statuses[ContentSection.DISCOUNTS]?.lastUpdated != previous.contentSync[ContentSection.DISCOUNTS]?.lastUpdated) emptyMap() else previous.discountDetails
+                    )
+                }
+            }
         }
     }
 
@@ -198,13 +212,14 @@ class BkkViewModel(
     fun loadEventDetail(id: Long) {
         if (id < 0 || _state.value.events.any { it.id == id } || _state.value.detailLoading.contains("event-$id")) return
         viewModelScope.launch {
+            val generation = repository.syncStatus.value[ContentSection.EVENTS]?.lastUpdated
             val key = "event-$id"
             _state.update { it.copy(detailLoading = it.detailLoading + key) }
             repository.eventDetail(id)
                 .onSuccess { event ->
                     _state.update { state ->
                         state.copy(
-                            eventDetails = state.eventDetails + (id to event),
+                            eventDetails = if (generation == repository.syncStatus.value[ContentSection.EVENTS]?.lastUpdated) state.eventDetails + (id to event) else state.eventDetails,
                             detailLoading = state.detailLoading - key
                         )
                     }
@@ -218,13 +233,14 @@ class BkkViewModel(
     fun loadDiscountDetail(id: Long) {
         if (id < 0 || _state.value.discounts.any { it.id == id } || _state.value.detailLoading.contains("discount-$id")) return
         viewModelScope.launch {
+            val generation = repository.syncStatus.value[ContentSection.DISCOUNTS]?.lastUpdated
             val key = "discount-$id"
             _state.update { it.copy(detailLoading = it.detailLoading + key) }
             repository.discountDetail(id)
                 .onSuccess { discount ->
                     _state.update { state ->
                         state.copy(
-                            discountDetails = state.discountDetails + (id to discount),
+                            discountDetails = if (generation == repository.syncStatus.value[ContentSection.DISCOUNTS]?.lastUpdated) state.discountDetails + (id to discount) else state.discountDetails,
                             detailLoading = state.detailLoading - key
                         )
                     }

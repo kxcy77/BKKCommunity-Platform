@@ -232,6 +232,10 @@ function api_discount(array $row): array
 function api_register(): never
 {
     $input = api_input();
+    $platform = $input['platform'] ?? 'unknown';
+    if (!is_string($platform) || !in_array($platform, ['website', 'android', 'unknown'], true)) {
+        api_error(422, 'Select a supported signup platform.', 'validation_error');
+    }
     $name = trim((string) ($input['full_name'] ?? ''));
     $email = strtolower(trim((string) ($input['email'] ?? '')));
     $phone = trim((string) ($input['phone'] ?? '')) ?: null;
@@ -250,8 +254,8 @@ function api_register(): never
     $db = api_database();
     $db->beginTransaction();
     try {
-        $statement = $db->prepare("INSERT INTO users (full_name, email, phone, password_hash, role) VALUES (?, ?, ?, ?, 'member')");
-        $statement->execute([$name, $email, $phone, password_hash($password, PASSWORD_DEFAULT)]);
+        $statement = $db->prepare("INSERT INTO users (full_name, email, phone, password_hash, role, signup_platform) VALUES (?, ?, ?, ?, 'member', ?)");
+        $statement->execute([$name, $email, $phone, password_hash($password, PASSWORD_DEFAULT), $platform]);
         $userId = (int) $db->lastInsertId();
         $token = api_issue_token($db, $userId);
         $db->commit();

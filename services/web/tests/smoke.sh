@@ -119,7 +119,7 @@ large_body_code="$(php -r 'echo str_repeat("x", 33000);' | curl -sS -o /tmp/bkk-
 php -r '$json=json_decode(file_get_contents("/tmp/bkk-large-body.json"), true); if (($json["error"]["code"] ?? null) !== "payload_too_large") exit(1);'
 echo 'PASS oversized API bodies are rejected'
 
-for route in profile.php admin/index.php admin/events.php admin/discounts.php admin/services.php admin/messages.php admin/audit.php; do
+for route in profile.php admin/index.php admin/users.php admin/events.php admin/discounts.php admin/services.php admin/messages.php admin/audit.php; do
   code="$(curl -sS -o /dev/null -w '%{http_code}' "${base_url}/${route}")"
   [[ "$code" == "302" ]] || { echo "FAIL guest protection ${route}: HTTP ${code}"; exit 1; }
   echo "PASS guest protection ${route}: HTTP ${code}"
@@ -164,7 +164,7 @@ admin_html="$(curl -fsS -b "$admin_cookie" "${base_url}/admin/index.php")"
 printf '%s' "$admin_html" | grep -q 'Dashboard overview' || { echo 'FAIL admin login'; exit 1; }
 echo 'PASS admin login and protected dashboard'
 
-for route in admin/events.php admin/discounts.php admin/services.php admin/messages.php admin/audit.php; do
+for route in admin/users.php admin/events.php admin/discounts.php admin/services.php admin/messages.php admin/audit.php; do
   code="$(curl -sS -b "$admin_cookie" -o /dev/null -w '%{http_code}' "${base_url}/${route}")"
   [[ "$code" == "200" ]] || { echo "FAIL authenticated ${route}: HTTP ${code}"; exit 1; }
   echo "PASS authenticated ${route}: HTTP ${code}"

@@ -3,6 +3,7 @@ CREATE TABLE users (
     full_name VARCHAR(120) NOT NULL,
     email VARCHAR(190) NOT NULL UNIQUE,
     phone VARCHAR(30) NULL,
+    signup_platform ENUM('website', 'android', 'unknown') NOT NULL DEFAULT 'unknown',
     password_hash VARCHAR(255) NOT NULL,
     role ENUM('member', 'admin') NOT NULL DEFAULT 'member',
     auth_version INT UNSIGNED NOT NULL DEFAULT 1,
@@ -11,7 +12,8 @@ CREATE TABLE users (
     discount_alerts_enabled BOOLEAN NOT NULL DEFAULT TRUE,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at DATETIME NULL
+    deleted_at DATETIME NULL,
+    INDEX idx_users_signup_created (signup_platform, created_at, id)
 );
 
 CREATE TABLE auth_sessions (

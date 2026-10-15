@@ -222,7 +222,6 @@ fun HomeScreen(
                         { onNavigate(Routes.CONTACT) }, Modifier.weight(1f))
                 }
             }
-            item { DataFreshnessNotice(state.lastUpdated, state.events.any { it.id < 0 }, state.dataWarning) }
             item { SectionTitle("Today's Schedule", Modifier.padding(horizontal = 20.dp, vertical = 18.dp)) }
             if (state.loading && state.events.isEmpty()) item { LoadingPane() }
             else if (todayEvents.isEmpty()) item { EmptyPane("No events today", "Open Events to see what is coming up next.") }

@@ -135,7 +135,10 @@ if (in_array($action, ['admin_create_event', 'admin_update_event'], true)) {
     } catch (Throwable $exception) {
         admin_failed_change($exception, 'admin/events.php' . ($eventId ? '?edit=' . (int) $eventId : ''));
     }
-    flash($saved ? 'success' : 'error', $saved ? ($updating ? 'The event was updated.' : 'The event was added.') : 'The event changed in another session or could not be found. Reload it before trying again.');
+    $visibility = ($event['date'] . ' ' . $event['end_time'] < date('Y-m-d H:i'))
+        ? ' Past events are hidden from upcoming events.'
+        : ' Published upcoming events appear on the website and in the Android app after its next refresh (normally within 30 seconds online). Draft or archived events remain hidden.';
+    flash($saved ? 'success' : 'error', $saved ? ($updating ? 'The event was updated.' : 'The event was added.') . $visibility : 'The event changed in another session or could not be found. Reload it before trying again.');
     redirect_to('admin/events.php');
 }
 
@@ -171,7 +174,8 @@ if (in_array($action, ['admin_create_discount', 'admin_update_discount'], true))
     } catch (Throwable $exception) {
         admin_failed_change($exception, 'admin/discounts.php' . ($discountId ? '?edit=' . (int) $discountId : ''));
     }
-    flash($saved ? 'success' : 'error', $saved ? ($updating ? 'The discount was updated.' : 'The discount was added.') : 'The discount changed in another session or could not be found. Reload it before trying again.');
+    $visibility = ' Active discounts appear on the website and in the Android app after its next refresh (normally within 30 seconds online). Archived offers and offers outside their validity dates remain hidden.';
+    flash($saved ? 'success' : 'error', $saved ? ($updating ? 'The discount was updated.' : 'The discount was added.') . $visibility : 'The discount changed in another session or could not be found. Reload it before trying again.');
     redirect_to('admin/discounts.php');
 }
 
@@ -207,7 +211,7 @@ if (in_array($action, ['admin_create_service', 'admin_update_service'], true)) {
     } catch (Throwable $exception) {
         admin_failed_change($exception, 'admin/services.php' . ($serviceId ? '?edit=' . (int) $serviceId : ''));
     }
-    flash($saved ? 'success' : 'error', $saved ? ($updating ? 'The local service was updated.' : 'The local service was added.') : 'The local service changed in another session or could not be found. Reload it before trying again.');
+    flash($saved ? 'success' : 'error', $saved ? ($updating ? 'The local service was updated.' : 'The local service was added.') . ' Active services appear on the website and in the Android app after its next refresh (normally within 30 seconds online). Archived services remain hidden.' : 'The local service changed in another session or could not be found. Reload it before trying again.');
     redirect_to('admin/services.php');
 }
 

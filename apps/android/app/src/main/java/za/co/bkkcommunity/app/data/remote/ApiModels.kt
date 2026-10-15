@@ -71,7 +71,7 @@ data class MemberDto(
 }
 
 data class AuthDto(val user: MemberDto, val token: String)
-data class RegisterRequest(@Json(name = "full_name") val fullName: String, val email: String, val phone: String?, val password: String)
+data class RegisterRequest(@Json(name = "full_name") val fullName: String, val email: String, val phone: String?, val password: String, val platform: String = "android")
 data class LoginRequest(val email: String, val password: String)
 data class ForgotPasswordRequest(val email: String)
 data class ResetPasswordRequest(val email: String, val token: String, val password: String)

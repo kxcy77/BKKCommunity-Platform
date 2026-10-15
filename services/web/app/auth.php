@@ -183,7 +183,7 @@ function register_user(array $input): array
             return [false, 'An account with that email address already exists.'];
         }
         try {
-            $statement = $db->prepare('INSERT INTO users (full_name, email, phone, password_hash, role) VALUES (?, ?, ?, ?, \'member\')');
+            $statement = $db->prepare('INSERT INTO users (full_name, email, phone, password_hash, role, signup_platform) VALUES (?, ?, ?, ?, \'member\', \'website\')');
             $statement->execute([$input['full_name'], $email, $input['phone'], password_hash($input['password'], PASSWORD_DEFAULT)]);
         } catch (PDOException $exception) {
             if ($exception->getCode() === '23000') {
@@ -198,6 +198,8 @@ function register_user(array $input): array
         return [false, 'An account with that email address already exists.'];
     }
     $_SESSION['demo_registered_users'][$email] = [
+        'signup_platform' => 'website',
+        'created_at' => gmdate('Y-m-d H:i:s'),
         'full_name' => $input['full_name'],
         'email' => $email,
         'phone' => $input['phone'],

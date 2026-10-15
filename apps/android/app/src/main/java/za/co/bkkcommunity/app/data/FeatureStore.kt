@@ -54,6 +54,14 @@ class FeatureStore(private val context: Context) {
         context.featureDataStore.edit { it[Keys.LAST_UPDATED] = at }
     }
 
+    val contentUpdated: Flow<Map<ContentSection, Long?>> = context.featureDataStore.data
+        .catch { error -> if (error is IOException) emit(androidx.datastore.preferences.core.emptyPreferences()) else throw error }
+        .map { preferences -> ContentSection.entries.associateWith { preferences[longPreferencesKey("updated_${it.name}")] } }
+
+    suspend fun recordContentRefresh(section: ContentSection, at: Long) {
+        context.featureDataStore.edit { it[longPreferencesKey("updated_${section.name}")] = at }
+    }
+
     suspend fun addNotice(notice: CommunityNotice) {
         context.featureDataStore.edit { preferences ->
             val notices = decodeNotices(preferences[Keys.NOTICES].orEmpty())

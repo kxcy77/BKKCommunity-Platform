@@ -5,6 +5,9 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import za.co.bkkcommunity.app.data.ContentSection
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -65,17 +68,32 @@ class ContentRefreshTest {
     }
 
     @Test
-    fun partialNetworkFailurePreservesWholeCacheAndRefreshTimestamp() = runBlocking {
+    fun partialNetworkFailureOnlyPreservesFailedSection() = runBlocking {
         repository.refreshAll().getOrThrow()
         val before = features.lastUpdated.first()
         api.eventRows = emptyList()
         api.serviceRows = emptyList()
         api.failDiscountRead = true
         assertTrue(repository.refreshAll().isFailure)
-        assertEquals("Original event", repository.eventStream.first().single().title)
+        assertTrue(repository.eventStream.first().isEmpty())
         assertEquals("Original offer", repository.discountStream.first().single().title)
-        assertEquals("Original clinic", repository.serviceStream.first().single().name)
+        assertTrue(repository.serviceStream.first().isEmpty())
         assertEquals(before, features.lastUpdated.first())
+        assertNotNull(repository.syncStatus.value[ContentSection.DISCOUNTS]?.warning)
+        assertNull(repository.syncStatus.value[ContentSection.EVENTS]?.warning)
+        api.failDiscountRead = false
+        repository.refreshAll().getOrThrow()
+        assertNull(repository.syncStatus.value[ContentSection.DISCOUNTS]?.warning)
+    }
+
+    @Test
+    fun concurrentRefreshesShareRequests() = runBlocking {
+        api.readDelay = 100
+        val first = async { repository.refreshAll() }
+        val second = async { repository.refreshAll() }
+        first.await().getOrThrow()
+        second.await().getOrThrow()
+        assertEquals(1, api.eventReads)
     }
 
     @Test
@@ -107,7 +125,13 @@ class ContentRefreshTest {
         var serviceRows = listOf(LocalServiceDto(993, "clinic", "Original clinic",
             "Original address", "0115550101", null, "09:00–17:00"))
         var failDiscountRead = false
-        override suspend fun events(category: String?) = ApiEnvelope(eventRows)
+        var readDelay = 0L
+        var eventReads = 0
+        override suspend fun events(category: String?): ApiEnvelope<List<EventDto>> {
+            eventReads++
+            delay(readDelay)
+            return ApiEnvelope(eventRows)
+        }
         override suspend fun discounts(category: String?): ApiEnvelope<List<DiscountDto>> {
             if (failDiscountRead) throw IOException("Controlled offline fixture")
             return ApiEnvelope(discountRows)

@@ -90,6 +90,8 @@ jobs:
           exit 1
       - name: Verify admin edits reach website and Android API
         run: bash tests/admin-database-integration.sh
+      - name: Verify registered users and signup origin
+        run: bash tests/registered-users-integration.sh
       - name: Verify member workflows
         run: bash tests/database-integration.sh
       - name: Verify API authentication and security boundaries

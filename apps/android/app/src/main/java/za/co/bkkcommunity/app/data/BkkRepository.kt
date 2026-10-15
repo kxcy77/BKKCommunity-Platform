@@ -6,6 +6,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.json.JSONObject
@@ -48,6 +51,10 @@ class BkkRepository(
     private val featureStore: FeatureStore
 ) {
     private val refreshMutex = Mutex()
+    private var refreshGeneration = 0L
+    private var lastRefreshResult: Result<Unit> = Result.success(Unit)
+    private val _syncStatus = MutableStateFlow<Map<ContentSection, ContentSyncStatus>>(emptyMap())
+    val syncStatus = _syncStatus.asStateFlow()
     val eventStream: Flow<List<CommunityEvent>> = events.observeAll().map { rows -> rows.map { it.toDomain() } }
     val discountStream: Flow<List<Discount>> = discounts.observeAll().map { rows -> rows.map { it.toDomain() } }
     val serviceStream: Flow<List<LocalService>> = services.observeAll().map { rows -> rows.map { it.toDomain() } }
@@ -56,46 +63,63 @@ class BkkRepository(
     suspend fun initialize(): String? {
         // A successful empty server response is real data, not permission to
         // resurrect demo records the next time the app starts offline.
-        if (featureStore.lastUpdated.first() == null) seedDemoIfEmpty()
+        val updated = featureStore.contentUpdated.first()
+        _syncStatus.update { previous -> ContentSection.entries.associateWith { previous[it] ?: ContentSyncStatus(updated[it]) } }
+        if (featureStore.lastUpdated.first() == null && updated.values.all { it == null }) seedDemoIfEmpty()
         return refreshAll().exceptionOrNull()?.let(::messageFor)
     }
 
-    suspend fun refreshAll(): Result<Unit> = try {
-        refreshMutex.withLock {
+    suspend fun refreshAll(): Result<Unit> {
+        val generation = refreshGeneration
+        return refreshMutex.withLock {
+            // Concurrent callers share the just-completed refresh instead of queuing duplicate requests.
+            if (generation != refreshGeneration) return@withLock lastRefreshResult
             coroutineScope {
-                val eventRequest = async { api.events().data.map { it.toEntity() } }
-                val discountRequest = async { api.discounts().data.map { it.toEntity() } }
-                val serviceRequest = async { api.localServices().data.map { it.toEntity() } }
-                val remoteEvents = eventRequest.await()
-                val remoteDiscounts = discountRequest.await()
-                val remoteServices = serviceRequest.await()
-                database.withTransaction {
-                    events.clear()
-                    discounts.clear()
-                    services.clear()
-                    events.replaceAll(remoteEvents)
-                    discounts.replaceAll(remoteDiscounts)
-                    services.replaceAll(remoteServices)
-                }
-                featureStore.recordSuccessfulRefresh()
+                val requests = listOf(
+                    async { refreshSection(ContentSection.EVENTS) {
+                        val rows = api.events().data.map { it.toEntity() }
+                        database.withTransaction { events.clear(); events.replaceAll(rows) }
+                    } },
+                    async { refreshSection(ContentSection.DISCOUNTS) {
+                        val rows = api.discounts().data.map { it.toEntity() }
+                        database.withTransaction { discounts.clear(); discounts.replaceAll(rows) }
+                    } },
+                    async { refreshSection(ContentSection.SERVICES) {
+                        val rows = api.localServices().data.map { it.toEntity() }
+                        database.withTransaction { services.clear(); services.replaceAll(rows) }
+                    } }
+                )
+                val errors = requests.mapNotNull { it.await().exceptionOrNull() }
+                if (errors.isEmpty()) featureStore.recordSuccessfulRefresh()
+                lastRefreshResult = errors.firstOrNull()?.let { Result.failure(it) } ?: Result.success(Unit)
+                refreshGeneration++
+                lastRefreshResult
             }
         }
+    }
+
+    private suspend fun refreshSection(section: ContentSection, action: suspend () -> Unit): Result<Unit> = try {
+        action()
+        val now = System.currentTimeMillis()
+        featureStore.recordContentRefresh(section, now)
+        _syncStatus.update { it + (section to ContentSyncStatus(now)) }
         Result.success(Unit)
     } catch (cancelled: CancellationException) {
         throw cancelled
     } catch (error: Exception) {
+        _syncStatus.update {
+            it + (section to (it[section] ?: ContentSyncStatus()).copy(warning = messageFor(error)))
+        }
         Result.failure(error)
     }
 
     suspend fun eventDetail(id: Long): Result<CommunityEvent> = runCatching {
         val remote = api.event(id).data.toEntity()
-        events.replaceAll(listOf(remote))
         remote.toDomain()
     }
 
     suspend fun discountDetail(id: Long): Result<Discount> = runCatching {
         val remote = api.discount(id).data.toEntity()
-        discounts.replaceAll(listOf(remote))
         remote.toDomain()
     }
 
