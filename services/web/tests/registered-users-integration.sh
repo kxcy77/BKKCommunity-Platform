@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+trap 'echo "FAIL registered-users integration at line $LINENO" >&2' ERR
 base_url="${BKK_BASE_URL:-http://127.0.0.1:8090}"
 database_name="${BKK_TEST_DB_NAME:?Use a disposable test database}"
 database_user="${BKK_TEST_DB_USER:-root}"
@@ -17,7 +18,8 @@ cleanup() {
   rm -f "$cookie_jar"
 }
 trap cleanup EXIT
-[[ "$(curl -sS -o /dev/null -w '%{http_code}' "$base_url/admin/users.php")" == 302 ]]
+guest_status="$(curl -sS -o /dev/null -w '%{http_code}' "$base_url/admin/users.php")"
+[[ "$guest_status" == 302 ]] || { echo "FAIL guest directory response: $guest_status"; exit 1; }
 html="$(curl -fsS -c "$cookie_jar" "$base_url/register.php")"
 csrf="$(printf '%s' "$html" | csrf_from)"
 curl -fsS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null \
@@ -25,7 +27,8 @@ curl -fsS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null \
   --data-urlencode 'full_name=Directory Test Member' --data-urlencode "email=$email" \
   --data-urlencode 'phone=' --data-urlencode 'password=DirectoryPass26' \
   --data-urlencode 'password_confirmation=DirectoryPass26' --data-urlencode 'privacy_consent=1' "$base_url/actions.php"
-[[ "$(mysql_test "SELECT signup_platform FROM users WHERE email='$email';")" == website ]]
+origin="$(mysql_test "SELECT signup_platform FROM users WHERE email='$email';")"
+[[ "$origin" == website ]] || { echo "FAIL website registration origin: '${origin}'"; exit 1; }
 login() {
   local html csrf
   html="$(curl -fsSL -b "$cookie_jar" -c "$cookie_jar" "$base_url/login.php")"
