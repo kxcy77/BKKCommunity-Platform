@@ -1,0 +1,78 @@
+PASS packaged /offline.html
+PASS packaged /manifest.webmanifest
+PASS packaged /assets/css/app.css
+PASS packaged /assets/js/app.js
+PASS packaged /assets/vendor/bootstrap/bootstrap.min.css
+PASS packaged /assets/vendor/bootstrap/bootstrap.bundle.min.js
+PASS packaged /assets/icons/bkk-180.png
+PASS packaged /assets/icons/bkk-192.png
+PASS packaged /assets/icons/bkk-512.png
+PASS pinned Bootstrap integrity, licence and source maps
+PASS 24 calendar regression checks
+PASS JWT has three parts
+PASS JWT signature verifies
+PASS OAuth is time limited and messaging scoped
+PASS Data-only message honours Android session guards
+PASS Message carries item and intended member IDs
+PASS Provider acceptance is validated
+PASS Unregistered token is recognised
+PASS Malformed message does not disable a valid device
+PASS Missing credentials fail closed
+PASS A service account for the wrong Firebase project fails closed
+PASS Matching Firebase project is accepted
+11 transport assertions passed; no real notification sent.
+PASS index.php: HTTP 200
+PASS events.php: HTTP 200
+PASS discounts.php: HTTP 200
+PASS info.php: HTTP 200
+PASS contact.php: HTTP 200
+PASS login.php: HTTP 200
+PASS register.php: HTTP 200
+PASS reset-password.php: HTTP 200
+PASS new-password.php: HTTP 200
+PASS offline.html: HTTP 200
+PASS manifest.webmanifest: HTTP 200
+PASS service-worker.js: HTTP 200
+PASS rendered calendar month, navigation, accessible label and malformed query handling
+PASS served /offline.html
+PASS served /manifest.webmanifest
+PASS served /assets/css/app.css
+PASS served /assets/js/app.js
+PASS served /assets/vendor/bootstrap/bootstrap.min.css
+PASS served /assets/vendor/bootstrap/bootstrap.bundle.min.js
+PASS served /assets/icons/bkk-180.png
+PASS served /assets/icons/bkk-192.png
+PASS served /assets/icons/bkk-512.png
+PASS pinned Bootstrap integrity, licence and source maps
+PASS installable web app metadata and private-route cache exclusions
+PASS primary navigation is limited to five choices and Home has a single task prompt
+PASS local information actions and public contact details are rendered
+PASS demonstration events are identified independently of their database ID
+PASS administrator idle and absolute session-expiry rules
+PASS health reports the running service
+PASS readiness fails closed without a database
+PASS production fails closed when database configuration is absent
+PASS unknown routes return 404
+PASS oversized API bodies are rejected
+PASS guest protection profile.php: HTTP 302
+PASS guest protection admin/index.php: HTTP 302
+PASS guest protection admin/users.php: HTTP 302
+PASS guest protection admin/events.php: HTTP 302
+PASS guest protection admin/discounts.php: HTTP 302
+PASS guest protection admin/services.php: HTTP 302
+PASS guest protection admin/messages.php: HTTP 302
+PASS guest protection admin/audit.php: HTTP 302
+PASS CSRF protection: HTTP 419
+PASS login page does not expose demonstration credentials
+PASS member login and protected profile
+PASS signed-in members cannot enter administrator pages
+PASS admin login and protected dashboard
+PASS authenticated admin/users.php: HTTP 200
+PASS authenticated admin/events.php: HTTP 200
+PASS authenticated admin/discounts.php: HTTP 200
+PASS authenticated admin/services.php: HTTP 200
+PASS authenticated admin/messages.php: HTTP 200
+PASS authenticated admin/audit.php: HTTP 200
+PASS administrator event create, edit, archive, restore, audit and delete blocking
+PASS administrator discount create, edit and archive workflow
+PASS administrator local-service create, edit and archive workflow

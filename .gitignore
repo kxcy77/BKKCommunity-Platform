@@ -34,5 +34,6 @@ coverage/
 .DS_Store
 *.log
 !docs/verification/2026-10-01/*.log
+!docs/verification/2026-10-15/*.log
 **/xcuserdata/
 *.xcuserstate
