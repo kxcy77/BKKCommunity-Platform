@@ -35,8 +35,9 @@ object ApiClient {
                     path.contains("/auth/register") ||
                     path.contains("/auth/forgot-password") ||
                     path.contains("/auth/reset-password")
-                if (response.code == 401 && !isAuthEntryPoint && sessionStore.token() != null) {
-                    runBlocking { sessionStore.clear() }
+                val rejectedToken = response.request.header("Authorization")?.removePrefix("Bearer ")
+                if (response.code == 401 && !isAuthEntryPoint && rejectedToken != null) {
+                    runBlocking { sessionStore.clearIfTokenMatches(rejectedToken) }
                 }
                 response
             }

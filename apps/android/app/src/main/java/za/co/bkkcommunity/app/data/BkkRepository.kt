@@ -51,7 +51,8 @@ class BkkRepository(
     private val featureStore: FeatureStore
 ) {
     private val refreshMutex = Mutex()
-    private var refreshGeneration = 0L
+    @Volatile private var refreshGeneration = 0L
+    private var lastRefreshToken: String? = null
     private var lastRefreshResult: Result<Unit> = Result.success(Unit)
     private val _syncStatus = MutableStateFlow<Map<ContentSection, ContentSyncStatus>>(emptyMap())
     val syncStatus = _syncStatus.asStateFlow()
@@ -71,9 +72,10 @@ class BkkRepository(
 
     suspend fun refreshAll(): Result<Unit> {
         val generation = refreshGeneration
+        val requestedToken = sessionStore.token()
         return refreshMutex.withLock {
             // Concurrent callers share the just-completed refresh instead of queuing duplicate requests.
-            if (generation != refreshGeneration) return@withLock lastRefreshResult
+            if (generation != refreshGeneration && requestedToken == lastRefreshToken) return@withLock lastRefreshResult
             coroutineScope {
                 val requests = listOf(
                     async { refreshSection(ContentSection.EVENTS) {
@@ -92,6 +94,7 @@ class BkkRepository(
                 val errors = requests.mapNotNull { it.await().exceptionOrNull() }
                 if (errors.isEmpty()) featureStore.recordSuccessfulRefresh()
                 lastRefreshResult = errors.firstOrNull()?.let { Result.failure(it) } ?: Result.success(Unit)
+                lastRefreshToken = requestedToken
                 refreshGeneration++
                 lastRefreshResult
             }

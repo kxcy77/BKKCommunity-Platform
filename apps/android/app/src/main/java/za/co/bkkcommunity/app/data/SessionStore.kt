@@ -8,12 +8,15 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import za.co.bkkcommunity.app.model.AuthSession
 import za.co.bkkcommunity.app.model.Member
 
 private val Context.sessionDataStore by preferencesDataStore(name = "session")
 
 class SessionStore(private val context: Context) {
+    private val sessionMutex = Mutex()
     private val secureTokens = SecureTokenStore(context.applicationContext)
     @Volatile private var tokenSnapshot: String? = secureTokens.read()
 
@@ -38,7 +41,7 @@ class SessionStore(private val context: Context) {
         saveMember(session.member, session.token)
     }
 
-    suspend fun saveMember(member: Member, token: String? = null) {
+    suspend fun saveMember(member: Member, token: String? = null) = sessionMutex.withLock {
         if (token != null) {
             secureTokens.write(token)
             tokenSnapshot = token
@@ -62,7 +65,13 @@ class SessionStore(private val context: Context) {
         }
     }
 
-    suspend fun clear() {
+    suspend fun clear() = sessionMutex.withLock { clearStoredSession() }
+
+    suspend fun clearIfTokenMatches(expectedToken: String) = sessionMutex.withLock {
+        if (tokenSnapshot == expectedToken) clearStoredSession()
+    }
+
+    private suspend fun clearStoredSession() {
         context.sessionDataStore.edit { it.clear() }
         secureTokens.clear()
         tokenSnapshot = null
