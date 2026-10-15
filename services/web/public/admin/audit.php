@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
-require_admin();
+require_permission('audit');
 $pageTitle = 'Administrator audit history';
 $bodyClass = 'admin-page';
 $activeNav = 'admin';

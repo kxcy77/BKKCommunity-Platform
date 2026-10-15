@@ -81,6 +81,7 @@ echo 'PASS demonstration events are identified independently of their database I
   || { echo 'FAIL administrator session expiry rules'; exit 1; }
 echo 'PASS administrator idle and absolute session-expiry rules'
 php "${project_dir}/tests/admin-poll-activity.php"
+php "${project_dir}/tests/staff-permissions.php"
 
 health_code="$(curl -sS -o /tmp/bkk-health.json -w '%{http_code}' "${base_url}/health")"
 [[ "$health_code" == "200" ]] || { echo "FAIL health: HTTP ${health_code}"; exit 1; }

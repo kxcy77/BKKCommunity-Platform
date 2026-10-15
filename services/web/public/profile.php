@@ -26,6 +26,7 @@ require __DIR__ . '/partials/header.php';
             <p><?= h($user['email']) ?></p>
             <?php if (!empty($user['phone'])): ?><p><?= h($user['phone']) ?></p><?php endif; ?>
             <span class="category-badge">Member account</span>
+            <?php if (!is_admin()): ?><p><a href="<?= h(app_url('staff-invitation.php')) ?>">Accept staff invitation</a></p><?php endif; ?>
         </aside>
         <div class="profile-content">
             <section class="panel">

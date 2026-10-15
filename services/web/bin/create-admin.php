@@ -56,8 +56,9 @@ if ($existing) {
         fwrite(STDOUT, "No changes made.\n");
         exit(0);
     }
-    $db->prepare("UPDATE users SET role = 'admin', deleted_at = NULL, auth_version = auth_version + 1 WHERE id = ?")
+    $db->prepare("UPDATE users SET role = 'admin', staff_level = 'owner', deleted_at = NULL, auth_version = auth_version + 1 WHERE id = ?")
         ->execute([$existing['id']]);
+    staff_revoke_sessions($db, (int) $existing['id']);
     admin_audit_log('grant_admin_cli', 'user', (int) $existing['id'], ['role' => $existing['role']], ['role' => 'admin'], 'Administrator role granted through the protected CLI command.');
     fwrite(STDOUT, "Administrator access granted.\n");
     exit(0);
@@ -72,7 +73,7 @@ if (mb_strlen($name) < 2 || !$strong) {
     exit(1);
 }
 
-$statement = $db->prepare("INSERT INTO users (full_name, email, phone, password_hash, role) VALUES (?, ?, ?, ?, 'admin')");
+$statement = $db->prepare("INSERT INTO users (full_name, email, phone, password_hash, role, staff_level) VALUES (?, ?, ?, ?, 'admin', 'owner')");
 $statement->execute([$name, $email, $phone !== '' ? $phone : null, password_hash($password, PASSWORD_DEFAULT)]);
 admin_audit_log('create_admin_cli', 'user', (int) $db->lastInsertId(), null, ['role' => 'admin'], 'Administrator account created through the protected CLI command.');
 fwrite(STDOUT, "Administrator account created.\n");

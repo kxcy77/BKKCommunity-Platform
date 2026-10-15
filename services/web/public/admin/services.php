@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
-require_admin();
+require_permission('content.write');
 $pageTitle = 'Manage local services';
 $bodyClass = 'admin-page';
 $activeNav = 'admin';

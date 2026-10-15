@@ -45,7 +45,7 @@ if [[ "$member_status" == 302 ]]; then
 fi
 ! curl -sS -b "$cookie_jar" "$base_url/admin/users.php" | contains '<table class="data-table">'
 echo 'PASS guests and members cannot read registered users'
-mysql_test "UPDATE users SET role='admin',auth_version=auth_version+1 WHERE email='$email';" >/dev/null
+mysql_test "UPDATE users SET role='admin',staff_level='owner',auth_version=auth_version+1 WHERE email='$email';" >/dev/null
 login
 curl -fsS -H 'Content-Type: application/json' \
   -d "{\"full_name\":\"Directory Android\",\"email\":\"$android_email\",\"phone\":\"0715550202\",\"password\":\"DirectoryPass26\",\"platform\":\"android\"}" "$base_url/api/v1/auth/register" >/dev/null

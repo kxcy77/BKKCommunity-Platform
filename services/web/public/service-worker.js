@@ -33,7 +33,8 @@ const isPrivatePath = (pathname) => {
     '/register.php',
     '/reset-password.php',
     '/new-password.php',
-    '/profile.php'
+    '/profile.php',
+    '/staff-invitation.php'
   ].includes(pathname);
 };
 

@@ -255,6 +255,7 @@ function save_contact_message(array $input): void
 
 function admin_metrics(): array
 {
+    require_permission('dashboard', false);
     $db = database();
     if (!$db) {
         return [
@@ -304,6 +305,7 @@ function admin_audit_log(string $action, string $entityType, ?int $entityId, ?ar
 
 function admin_recent_audit_log(int $limit = 100): array
 {
+    require_permission('audit', false);
     $limit = max(1, min(100, $limit));
     $db = database();
     if (!$db) {
@@ -321,6 +323,7 @@ function admin_recent_audit_log(int $limit = 100): array
 
 function admin_all_events(): array
 {
+    require_permission('content.write', false);
     $db = database();
     if (!$db) {
         $events = $_SESSION['demo_events'] ?? demo_events();
@@ -383,6 +386,7 @@ function admin_event_datetimes(array $event): array
 
 function admin_create_event(array $event): int
 {
+    require_permission('content.write');
     $db = database();
     if (!$db) {
         $events = $_SESSION['demo_events'] ?? demo_events();
@@ -413,6 +417,7 @@ function admin_create_event(array $event): int
 
 function admin_update_event(int $eventId, array $event): bool
 {
+    require_permission('content.write');
     $before = admin_get_event($eventId);
     if (!$before) {
         return false;
@@ -456,6 +461,7 @@ function admin_update_event(int $eventId, array $event): bool
 
 function admin_set_event_archived(int $eventId, bool $archived, string $reason): bool
 {
+    require_permission('content.write');
     $before = admin_get_event($eventId);
     if (!$before) {
         return false;
@@ -482,6 +488,7 @@ function admin_set_event_archived(int $eventId, bool $archived, string $reason):
 
 function admin_all_discounts(): array
 {
+    require_permission('content.write', false);
     $db = database();
     if (!$db) {
         return array_map(static fn (array $discount): array => $discount + ['title' => mb_substr((string) ($discount['deal'] ?? ''), 0, 190), 'valid_from' => '', 'valid_until' => '', 'is_active' => 1, 'is_demo' => 1, 'version' => 'demo-1'], $_SESSION['demo_discounts'] ?? demo_discounts());
@@ -519,6 +526,7 @@ function admin_discount_category_id(PDO $db, string $name): int
 
 function admin_create_discount(array $discount): int
 {
+    require_permission('content.write');
     $db = database();
     if (!$db) {
         $discounts = $_SESSION['demo_discounts'] ?? demo_discounts();
@@ -542,6 +550,7 @@ function admin_create_discount(array $discount): int
 
 function admin_update_discount(int $discountId, array $discount): bool
 {
+    require_permission('content.write');
     $before = admin_get_discount($discountId);
     if (!$before) {
         return false;
@@ -576,6 +585,7 @@ function admin_update_discount(int $discountId, array $discount): bool
 
 function admin_set_discount_archived(int $discountId, bool $archived, string $reason): bool
 {
+    require_permission('content.write');
     $before = admin_get_discount($discountId);
     if (!$before) {
         return false;
@@ -603,7 +613,7 @@ function admin_set_discount_archived(int $discountId, bool $archived, string $re
 /** Read-only directory; only the explicit public profile columns are selected. */
 function admin_registered_users(int $page = 1, string $search = '', string $platform = ''): array
 {
-    require_admin(false);
+    require_permission('users', false);
     $search = mb_substr(trim($search), 0, 100);
     $platform = in_array($platform, ['website', 'android', 'unknown'], true) ? $platform : '';
     $db = database();
@@ -643,6 +653,7 @@ function admin_registered_users(int $page = 1, string $search = '', string $plat
 
 function admin_contact_messages(int $page = 1, int $perPage = 25, string $search = '', string $status = ''): array
 {
+    require_permission('messages', false);
     $page = max(1, $page);
     $perPage = max(10, min(50, $perPage));
     $search = mb_substr(trim($search), 0, 100);
@@ -691,6 +702,7 @@ function admin_contact_messages(int $page = 1, int $perPage = 25, string $search
 
 function admin_update_contact_status(int $messageId, string $status): bool
 {
+    require_permission('messages');
     if (!in_array($status, ['new', 'read', 'resolved'], true)) {
         return false;
     }
@@ -722,6 +734,7 @@ function admin_update_contact_status(int $messageId, string $status): bool
 
 function admin_all_services(): array
 {
+    require_permission('content.write', false);
     $db = database();
     if (!$db) {
         return array_map(static function (array $service): array {
@@ -757,6 +770,7 @@ function admin_get_service(int $serviceId): ?array
 
 function admin_create_service(array $service): int
 {
+    require_permission('content.write');
     $db = database();
     if (!$db) {
         $services = $_SESSION['demo_services'] ?? demo_services();
@@ -782,6 +796,7 @@ function admin_create_service(array $service): int
 
 function admin_update_service(int $serviceId, array $service): bool
 {
+    require_permission('content.write');
     $before = admin_get_service($serviceId);
     if (!$before) {
         return false;
@@ -815,6 +830,7 @@ function admin_update_service(int $serviceId, array $service): bool
 
 function admin_set_service_archived(int $serviceId, bool $archived, string $reason): bool
 {
+    require_permission('content.write');
     $before = admin_get_service($serviceId);
     if (!$before) {
         return false;

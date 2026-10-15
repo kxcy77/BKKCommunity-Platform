@@ -6,6 +6,7 @@ CREATE TABLE users (
     signup_platform ENUM('website', 'android', 'unknown') NOT NULL DEFAULT 'unknown',
     password_hash VARCHAR(255) NOT NULL,
     role ENUM('member', 'admin') NOT NULL DEFAULT 'member',
+    staff_level ENUM('owner','editor','support','viewer') NOT NULL DEFAULT 'viewer',
     auth_version INT UNSIGNED NOT NULL DEFAULT 1,
     notifications_enabled BOOLEAN NOT NULL DEFAULT TRUE,
     event_reminders_enabled BOOLEAN NOT NULL DEFAULT TRUE,

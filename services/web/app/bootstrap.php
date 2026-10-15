@@ -51,6 +51,7 @@ require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/mail.php';
 require_once __DIR__ . '/password_reset.php';
 require_once __DIR__ . '/rate_limit.php';
+require_once __DIR__ . '/staff.php';
 
 function app_config(?string $key = null): mixed
 {

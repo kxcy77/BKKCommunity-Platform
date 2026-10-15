@@ -237,7 +237,10 @@ if ($action === 'delete_account') {
         redirect_to('profile.php');
     }
     if (($db = database()) && !empty($user['id'])) {
-        $db->prepare('DELETE FROM users WHERE id = ?')->execute([$user['id']]);
+        if (!delete_own_member_account((int) $user['id'])) {
+            flash('error', 'Staff access must be removed by an owner before deleting this account. The final owner must first hand over to another owner.');
+            redirect_to('profile.php');
+        }
     } else {
         unset($_SESSION['demo_registered_users'][strtolower((string) $user['email'])]);
     }

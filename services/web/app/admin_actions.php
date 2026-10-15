@@ -2,6 +2,74 @@
 
 declare(strict_types=1);
 
+// Enforce permissions for direct/forged POSTs before parsing action inputs.
+if (str_starts_with($action, 'admin_')) {
+    require_permission(match ($action) {
+        'admin_update_message' => 'messages',
+        'admin_invite_staff', 'admin_change_staff', 'admin_revoke_invitation' => 'staff',
+        default => 'content.write',
+    });
+}
+
+if (in_array($action, ['admin_invite_staff', 'admin_change_staff', 'admin_revoke_invitation'], true)) {
+    if (persistent_rate_limit_exceeded('staff-security-change', 10, 900, (string) current_user()['id'])) {
+        flash('error', 'Too many staff access attempts. Wait 15 minutes before trying again.');
+        redirect_to('admin/staff.php');
+    }
+    $reason = staff_post_text('reason');
+    $currentPassword = is_string($_POST['current_password'] ?? null) ? $_POST['current_password'] : '';
+    if (mb_strlen($reason) < 5 || mb_strlen($reason) > 255 || !staff_confirm_password($currentPassword)) {
+        flash('error', 'Enter your current password and a reason of 5 to 255 characters.');
+        redirect_to('admin/staff.php');
+    }
+    try {
+        if ($action === 'admin_invite_staff') {
+            $email = strtolower(staff_post_text('email'));
+            $code = staff_create_invitation($email, staff_post_text('staff_level'), $reason);
+            $_SESSION['new_staff_invitation'] = ['email' => $email, 'code' => $code];
+        } elseif ($action === 'admin_change_staff') {
+            $id = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
+            $version = filter_var($_POST['version'] ?? null, FILTER_VALIDATE_INT);
+            if (!$id || !$version) throw new DomainException('Reload the staff list and try again.');
+            staff_set_access((int) $id, staff_post_text('staff_level'), (int) $version, $reason);
+            if ((int) current_user()['id'] === (int) $id) {
+                logout_user();
+                flash('success', 'Your staff access changed. Sign in again.');
+                redirect_to('login.php');
+            }
+        } else {
+            $id = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
+            if (!$id) throw new DomainException('Choose a valid invitation.');
+            staff_revoke_invitation((int) $id, $reason);
+        }
+        flash('success', 'The staff access change was saved and recorded in the audit history.');
+    } catch (DomainException $e) {
+        flash('error', $e->getMessage());
+    } catch (Throwable $e) {
+        admin_failed_change($e, 'admin/staff.php');
+    }
+    redirect_to('admin/staff.php');
+}
+
+if ($action === 'accept_staff_invitation') {
+    require_login();
+    if (persistent_rate_limit_exceeded('staff-invitation-accept', 8, 900, (string) current_user()['id'])) {
+        flash('error', 'Too many invitation attempts. Wait 15 minutes before trying again.');
+        redirect_to('staff-invitation.php');
+    }
+    try {
+        staff_accept_invitation(staff_post_text('invitation_code'));
+        logout_user();
+        flash('success', 'Staff invitation accepted. Sign in again to use your new access.');
+        redirect_to('login.php');
+    } catch (DomainException $e) {
+        flash('error', $e->getMessage());
+    } catch (Throwable $e) {
+        admin_failed_change($e, 'staff-invitation.php');
+    }
+    redirect_to('staff-invitation.php');
+}
+
 function admin_text_length(string $value, int $minimum, int $maximum): bool
 {
     $length = mb_strlen($value);

@@ -12,6 +12,36 @@ function is_admin(): bool
     return (current_user()['role'] ?? null) === 'admin';
 }
 
+function staff_levels(): array
+{
+    return ['owner' => 'Owner', 'editor' => 'Content editor', 'support' => 'Support', 'viewer' => 'Read-only'];
+}
+
+function staff_can(string $permission): bool
+{
+    $user = current_user();
+    if (($user['role'] ?? '') !== 'admin') return false;
+    // A missing level is permitted only for the explicit, local demo fixture.
+    $level = $user['staff_level'] ?? (database() === null && app_config('allow_demo_mode') ? 'owner' : '');
+    $permissions = [
+        'owner' => ['dashboard', 'content.read', 'content.write', 'messages', 'attendance', 'users', 'audit', 'staff'],
+        'editor' => ['dashboard', 'content.read', 'content.write'],
+        'support' => ['dashboard', 'messages', 'attendance'],
+        'viewer' => ['dashboard', 'content.read'],
+    ];
+    return in_array($permission, $permissions[$level] ?? [], true);
+}
+
+function require_permission(string $permission, bool $recordActivity = true): void
+{
+    require_admin($recordActivity);
+    if (!staff_can($permission)) {
+        http_response_code(403);
+        header('Cache-Control: no-store, private');
+        exit('Access denied. Your staff access level does not allow this action.');
+    }
+}
+
 function demo_accounts(): array
 {
     $config = app_config();
@@ -65,7 +95,7 @@ function require_login(): void
 
     $db = database();
     if ($db && !empty($user['id'])) {
-        $statement = $db->prepare('SELECT id, full_name, email, phone, role, auth_version,
+        $statement = $db->prepare('SELECT id, full_name, email, phone, role, staff_level, auth_version,
             event_reminders_enabled AS event_reminders,
             discount_alerts_enabled AS discount_alerts
             FROM users WHERE id = ? AND deleted_at IS NULL LIMIT 1');
@@ -109,7 +139,7 @@ function require_admin(bool $recordActivity = true): void
 
     $db = database();
     if ($db && !empty($user['id'])) {
-        $statement = $db->prepare('SELECT id, full_name, email, phone, role, auth_version,
+        $statement = $db->prepare('SELECT id, full_name, email, phone, role, staff_level, auth_version,
             event_reminders_enabled AS event_reminders,
             discount_alerts_enabled AS discount_alerts
             FROM users WHERE id = ? AND deleted_at IS NULL LIMIT 1');
@@ -142,7 +172,7 @@ function attempt_login(string $email, string $password): bool
     $db = database();
 
     if ($db) {
-        $statement = $db->prepare('SELECT id, full_name, email, phone, role, auth_version, password_hash,
+        $statement = $db->prepare('SELECT id, full_name, email, phone, role, staff_level, auth_version, password_hash,
             event_reminders_enabled AS event_reminders,
             discount_alerts_enabled AS discount_alerts
             FROM users WHERE email = ? AND deleted_at IS NULL LIMIT 1');

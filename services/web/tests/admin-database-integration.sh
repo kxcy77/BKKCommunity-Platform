@@ -49,7 +49,7 @@ curl -fsS -b "$cookie_jar" -c "$cookie_jar" -o /dev/null \
   --data-urlencode 'phone=071 555 0201' --data-urlencode 'password=StrongAdmin26' \
   --data-urlencode 'password_confirmation=StrongAdmin26' --data-urlencode 'privacy_consent=1' \
   "${base_url}/actions.php"
-mysql_test "UPDATE users SET role='admin', auth_version=auth_version+1 WHERE email='${test_email}';" >/dev/null
+mysql_test "UPDATE users SET role='admin', staff_level='owner', auth_version=auth_version+1 WHERE email='${test_email}';" >/dev/null
 
 login_html="$(curl -fsS -b "$cookie_jar" -c "$cookie_jar" "${base_url}/login.php")"
 csrf="$(printf '%s' "$login_html" | csrf_from)"

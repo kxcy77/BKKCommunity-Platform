@@ -163,12 +163,16 @@ function api_health(): never
 function api_ready(): never
 {
     $db = api_database();
-    $requiredTables = ['users', 'auth_sessions', 'password_reset_tokens', 'events', 'discounts', 'local_services', 'api_rate_limits', 'schema_migrations'];
+    $requiredTables = ['users', 'auth_sessions', 'password_reset_tokens', 'events', 'discounts', 'local_services', 'api_rate_limits', 'schema_migrations', 'staff_invitations', 'staff_access_lock'];
     $placeholders = implode(',', array_fill(0, count($requiredTables), '?'));
     $statement = $db->prepare("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name IN ({$placeholders})");
     $statement->execute($requiredTables);
     if ((int) $statement->fetchColumn() !== count($requiredTables)) {
         api_error(503, 'The database schema is not ready.', 'schema_unavailable');
+    }
+    $staffColumn = (int) $db->query("SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'users' AND column_name = 'staff_level'")->fetchColumn();
+    if ($staffColumn !== 1 || (int) $db->query('SELECT id FROM staff_access_lock WHERE id = 1')->fetchColumn() !== 1) {
+        api_error(503, 'The staff access schema is not ready.', 'schema_unavailable');
     }
     $release = app_config('release');
     api_respond([
@@ -566,7 +570,9 @@ function api_dispatch(): never
     if ($method === 'GET' && $path === '/me/attendance') api_attendance_history();
     if ($method === 'DELETE' && $path === '/me') {
         $user = api_current_user();
-        api_database()->prepare('DELETE FROM users WHERE id = ?')->execute([$user['id']]);
+        if (!delete_own_member_account((int) $user['id'])) {
+            api_error(409, 'Ask an owner to remove your staff access before deleting this account. The final owner must hand over first.', 'staff_handover_required');
+        }
         api_respond(['deleted' => true]);
     }
     if ($method === 'GET' && $path === '/events') api_events();
