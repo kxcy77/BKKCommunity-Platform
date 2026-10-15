@@ -20,11 +20,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
           coverage: none
-      - name: Wait for Railway to deploy the tested commit
+      - name: Verify Railway serves the tested backend
         env:
           EXPECTED_COMMIT: ${{ github.event.workflow_run.head_sha }}
           PRODUCTION_BASE_URL: ${{ vars.PRODUCTION_BASE_URL || 'https://bkkcommunity-platform-2-production.up.railway.app' }}
@@ -32,19 +33,23 @@ jobs:
           set -euo pipefail
           HEALTH_URL="${PRODUCTION_BASE_URL%/}/health"
           READY_URL="${PRODUCTION_BASE_URL%/}/ready"
+          runtime_paths=(services/web/app services/web/bin services/web/database services/web/public services/web/docker services/web/composer.json services/web/composer.lock services/web/.env.example Dockerfile railway.json)
           for attempt in $(seq 1 30); do
             health="$(curl --fail --silent --show-error "$HEALTH_URL" || true)"
             deployed="$(jq -r '.data.commit // empty' <<<"$health" 2>/dev/null || true)"
-            if [[ "$deployed" == "$EXPECTED_COMMIT" ]]; then
+            # Android-only commits do not rebuild Railway. Compare backend runtime
+            # content rather than requiring an unrelated Android commit to deploy.
+            if [[ "$deployed" =~ ^[0-9a-f]{40}$ ]] && git cat-file -e "$deployed^{commit}" 2>/dev/null \
+              && git diff --quiet "$deployed" "$EXPECTED_COMMIT" -- "${runtime_paths[@]}"; then
               curl --fail --silent --show-error "$READY_URL" \
-                | jq -e --arg commit "$EXPECTED_COMMIT" \
+                | jq -e --arg commit "$deployed" \
                     '.data.status == "ready" and .data.commit == $commit'
-              echo "Production is ready on commit $EXPECTED_COMMIT"
+              echo "Production $deployed is ready and its backend runtime matches tested commit $EXPECTED_COMMIT"
               php services/web/tests/static-assets.php "$PRODUCTION_BASE_URL"
               exit 0
             fi
-            echo "Attempt $attempt: waiting for Railway commit $EXPECTED_COMMIT"
+            echo "Attempt $attempt: waiting for backend content matching $EXPECTED_COMMIT"
             sleep 20
           done
-          echo "Production did not reach the tested commit within ten minutes." >&2
+          echo "Production did not serve the tested backend content within ten minutes." >&2
           exit 1

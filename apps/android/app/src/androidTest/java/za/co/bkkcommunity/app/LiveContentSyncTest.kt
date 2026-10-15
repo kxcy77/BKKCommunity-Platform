@@ -88,7 +88,8 @@ class LiveContentSyncTest {
             compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Search events"))
             compose.onNodeWithText("Search events").performTextInput(marker)
             androidx.test.espresso.Espresso.closeSoftKeyboard()
-            compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText(marker))
+            compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText(marker) and !hasSetTextAction())
+            compose.onNode(hasText(marker) and !hasSetTextAction()).assertIsDisplayed()
             screenshot("android-event-before")
             fun version(page: String) = Regex("name=\"version\" value=\"([^\"]+)\"").find(get(page))!!.groupValues[1]
             post("admin/events.php", event + mapOf("action" to "admin_update_event", "id" to eventId.toString(), "version" to version("admin/events.php?edit=$eventId"), "title" to "$marker Updated"))
@@ -97,6 +98,7 @@ class LiveContentSyncTest {
             val started = System.currentTimeMillis()
             compose.waitUntil(35_000) { runBlocking { repository.eventStream.first().any { it.title == "$marker Updated" } && repository.discountStream.first().any { it.title == "$marker Updated" } && repository.serviceStream.first().any { it.name == "$marker Updated" } } }
             assertTrue("Foreground refresh exceeded 35 seconds including network time", System.currentTimeMillis() - started < 35_000)
+            compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("$marker Updated"))
             compose.onNodeWithText("$marker Updated").assertIsDisplayed()
             assertTrue(get("events.php").contains("$marker Updated"))
             assertTrue(get("discounts.php").contains("$marker Updated"))
