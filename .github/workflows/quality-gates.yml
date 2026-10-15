@@ -96,6 +96,8 @@ jobs:
         run: bash tests/staff-permissions-integration.sh
       - name: Verify concurrent owner handover safety
         run: php tests/staff-owner-concurrency.php
+      - name: Verify exact contact message rendering
+        run: bash tests/contact-message-integration.sh
       - name: Verify member workflows
         run: bash tests/database-integration.sh
       - name: Verify API authentication and security boundaries

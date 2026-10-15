@@ -665,7 +665,7 @@ function admin_contact_messages(int $page = 1, int $perPage = 25, string $search
         }, $_SESSION['demo_contact_messages'] ?? [], array_keys($_SESSION['demo_contact_messages'] ?? [])));
         $messages = array_values(array_filter($messages, static function (array $message) use ($search, $status): bool {
             $matchesStatus = $status === '' || ($message['status'] ?? 'new') === $status;
-            $haystack = strtolower(implode(' ', [$message['name'] ?? '', $message['email'] ?? '', $message['subject'] ?? '']));
+            $haystack = strtolower(implode(' ', [$message['name'] ?? '', $message['email'] ?? '', $message['subject'] ?? '', $message['message'] ?? '']));
             return $matchesStatus && ($search === '' || str_contains($haystack, strtolower($search)));
         }));
         $total = count($messages);
@@ -679,9 +679,9 @@ function admin_contact_messages(int $page = 1, int $perPage = 25, string $search
         $parameters[] = $status;
     }
     if ($search !== '') {
-        $where[] = '(name LIKE ? OR email LIKE ? OR subject LIKE ?)';
-        $term = '%' . $search . '%';
-        array_push($parameters, $term, $term, $term);
+        $where[] = "(name LIKE ? ESCAPE '!' OR email LIKE ? ESCAPE '!' OR subject LIKE ? ESCAPE '!' OR message LIKE ? ESCAPE '!')";
+        $term = '%' . strtr($search, ['!' => '!!', '%' => '!%', '_' => '!_']) . '%';
+        array_push($parameters, $term, $term, $term, $term);
     }
     $whereSql = $where ? ' WHERE ' . implode(' AND ', $where) : '';
     $count = $db->prepare('SELECT COUNT(*) FROM contact_messages' . $whereSql);
@@ -689,7 +689,7 @@ function admin_contact_messages(int $page = 1, int $perPage = 25, string $search
     $total = (int) $count->fetchColumn();
     $pages = max(1, (int) ceil($total / $perPage));
     $page = min($page, $pages);
-    $statement = $db->prepare('SELECT id, name, email, phone, subject, message, status, submitted_at FROM contact_messages' . $whereSql . ' ORDER BY submitted_at DESC LIMIT ? OFFSET ?');
+    $statement = $db->prepare('SELECT id, name, email, phone, subject, message, status, submitted_at FROM contact_messages' . $whereSql . ' ORDER BY submitted_at DESC, id DESC LIMIT ? OFFSET ?');
     $position = 1;
     foreach ($parameters as $parameter) {
         $statement->bindValue($position++, $parameter, PDO::PARAM_STR);

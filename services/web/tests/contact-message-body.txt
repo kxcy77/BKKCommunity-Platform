@@ -1,0 +1,7 @@
+Please explain the pharmacy offer — this is my own message, not a template.
+
+Does the 20% discount include prescriptions? I can't find the answer.
+Keep my line breaks, punctuation, café spelling and this symbol: ✓
+<script>alert("This must be displayed as text, not run")</script>
+<b>This is literal text, not bold formatting.</b>
+The last line of the message must also be visible.

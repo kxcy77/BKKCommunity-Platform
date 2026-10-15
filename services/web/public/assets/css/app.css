@@ -324,6 +324,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .data-table th, .data-table td { padding: 14px 16px; border-bottom: 1px solid var(--line); text-align: left; }
 .data-table th { background: var(--blue-soft); color: var(--navy); font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; }
 .data-table tr:last-child td { border-bottom: 0; }
+.message-copy { white-space: pre-wrap; overflow-wrap: anywhere; min-width: 18rem; max-width: 65ch; margin-top: 8px; }
 .admin-list-panel { margin-top: 24px; }
 .admin-table-hint { margin: 8px 0 14px; color: var(--muted); font-size: .82rem; }
 .admin-actions { min-width: 235px; display: grid; gap: 10px; }
