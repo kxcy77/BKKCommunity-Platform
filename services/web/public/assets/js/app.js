@@ -50,6 +50,60 @@
     });
   });
 
+  const directory = document.getElementById('registered-users-results');
+  if (directory) {
+    const status = document.getElementById('user-directory-status');
+    const refreshButton = document.getElementById('refresh-user-directory');
+    let checking = false;
+    let sessionExpired = false;
+    const refreshDirectory = async (manual = false) => {
+      if (checking || sessionExpired || document.hidden) return;
+      // Do not remove keyboard focus or interrupt someone editing their filters.
+      if (!manual && (document.activeElement?.matches('input, select, textarea') || directory.contains(document.activeElement))) return;
+      checking = true;
+      refreshButton.disabled = true;
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+      try {
+        const response = await fetch(window.location.href, {
+          credentials: 'same-origin', cache: 'no-store', signal: controller.signal,
+          headers: { 'X-BKK-Directory-Poll': manual ? '0' : '1' }
+        });
+        if (response.redirected || response.status === 401 || response.status === 403) {
+          sessionExpired = true;
+          status.textContent = 'Your administrator session ended. Sign in again to check registrations.';
+          return;
+        }
+        if (!response.ok) throw new Error('Directory request failed');
+        const updated = new DOMParser().parseFromString(await response.text(), 'text/html');
+        const results = updated.getElementById('registered-users-results');
+        const count = updated.getElementById('registered-users-count');
+        if (!results || !count) throw new Error('Directory response was incomplete');
+        const changed = directory.innerHTML !== results.innerHTML;
+        if (changed) {
+          const scrollLeft = directory.querySelector('.table-wrap')?.scrollLeft || 0;
+          directory.replaceChildren(...Array.from(results.childNodes, (node) => document.importNode(node, true)));
+          const table = directory.querySelector('.table-wrap');
+          if (table) table.scrollLeft = scrollLeft;
+        }
+        document.getElementById('registered-users-count').textContent = count.textContent;
+        status.textContent = `${changed ? 'Registration list updated. ' : ''}Last checked ${new Date().toLocaleTimeString()}. Checks every 10 seconds. Search and platform filters still apply.`;
+      } catch (error) {
+        status.textContent = 'Could not check for new registrations. Showing the saved list. Try Refresh now.';
+      } finally {
+        clearTimeout(timeout);
+        checking = false;
+        refreshButton.disabled = sessionExpired;
+      }
+    };
+    refreshButton.addEventListener('click', () => refreshDirectory(true));
+    setInterval(() => refreshDirectory(), 10000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshDirectory(); });
+    window.addEventListener('online', () => refreshDirectory());
+    // Browsers can restore an older page from their back/forward cache.
+    window.addEventListener('pageshow', () => refreshDirectory());
+  }
+
   if ('serviceWorker' in navigator && window.isSecureContext) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/service-worker.js').catch(() => {

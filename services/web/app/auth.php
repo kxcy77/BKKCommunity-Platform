@@ -80,7 +80,7 @@ function require_login(): void
     }
 }
 
-function require_admin(): void
+function require_admin(bool $recordActivity = true): void
 {
     $user = current_user();
     if (!$user) {
@@ -131,7 +131,9 @@ function require_admin(): void
         }
     }
 
-    $_SESSION['last_activity_at'] = $now;
+    if ($recordActivity) {
+        $_SESSION['last_activity_at'] = $now;
+    }
 }
 
 function attempt_login(string $email, string $password): bool

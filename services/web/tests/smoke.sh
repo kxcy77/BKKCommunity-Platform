@@ -80,6 +80,7 @@ echo 'PASS demonstration events are identified independently of their database I
 (cd "$project_dir" && php -r 'require "app/auth.php"; if (!administrator_session_expired(2000, 1000, 1900, 50, 5000)) exit(1); if (!administrator_session_expired(7000, 1000, 6990, 50, 5000)) exit(1); if (administrator_session_expired(2000, 1000, 1900, 150, 5000)) exit(1);') \
   || { echo 'FAIL administrator session expiry rules'; exit 1; }
 echo 'PASS administrator idle and absolute session-expiry rules'
+php "${project_dir}/tests/admin-poll-activity.php"
 
 health_code="$(curl -sS -o /tmp/bkk-health.json -w '%{http_code}' "${base_url}/health")"
 [[ "$health_code" == "200" ]] || { echo "FAIL health: HTTP ${health_code}"; exit 1; }

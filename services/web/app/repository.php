@@ -603,7 +603,7 @@ function admin_set_discount_archived(int $discountId, bool $archived, string $re
 /** Read-only directory; only the explicit public profile columns are selected. */
 function admin_registered_users(int $page = 1, string $search = '', string $platform = ''): array
 {
-    require_admin();
+    require_admin(false);
     $search = mb_substr(trim($search), 0, 100);
     $platform = in_array($platform, ['website', 'android', 'unknown'], true) ? $platform : '';
     $db = database();
