@@ -21,7 +21,7 @@ require dirname(__DIR__) . '/partials/header.php';
         <header class="admin-header"><div><p class="eyebrow">Community members</p><h1>Registered users</h1><p><?= (int) $result['total'] ?> matching accounts. Newest registrations first.</p></div></header>
         <section class="panel">
             <p class="privacy-note"><?= icon_svg('shield') ?><span>Personal information is available only to administrators. Signup platform records where an account was created, not its most recent login.</span></p>
-            <form class="admin-filter" method="get" action="<?= h(app_url('admin/users.php')) ?>">
+            <form class="admin-filter user-directory-filter" method="get" action="<?= h(app_url('admin/users.php')) ?>">
                 <div class="field"><label for="search">Search name, email or phone</label><input id="search" name="search" maxlength="100" value="<?= h($search) ?>"></div>
                 <div class="field"><label for="platform">Signup platform</label><select id="platform" name="platform"><option value="">All platforms</option><?php foreach ($platforms as $value => $label): ?><option value="<?= h($value) ?>" <?= $platform === $value ? 'selected' : '' ?>><?= h($label) ?></option><?php endforeach; ?></select></div>
                 <button class="button button-small" type="submit">Apply filters</button><a href="<?= h(app_url('admin/users.php')) ?>">Clear</a>

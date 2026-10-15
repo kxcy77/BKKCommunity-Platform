@@ -335,6 +335,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .privacy-note { display: flex; gap: 10px; align-items: flex-start; padding: 14px; border-left: 5px solid var(--gold); border-radius: 8px; background: #fff7e8; color: #533500; }
 .privacy-note .icon { flex: 0 0 auto; margin-top: 2px; }
 .admin-filter { display: grid; grid-template-columns: minmax(220px, 1fr) 220px auto auto; gap: 12px; align-items: end; margin: 20px 0; }
+.user-directory-filter { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.user-directory-filter .field { min-width: 0; }
 .pagination { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
 .pagination a { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--line); border-radius: 9px; text-decoration: none; font-weight: 800; }
 .pagination a[aria-current="page"] { border-color: var(--blue); background: var(--blue); color: #fff; }
