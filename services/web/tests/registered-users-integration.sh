@@ -38,7 +38,12 @@ login() {
     --data-urlencode "email=$email" --data-urlencode 'password=DirectoryPass26' "$base_url/actions.php"
 }
 login
-[[ "$(curl -sS -b "$cookie_jar" -o /dev/null -w '%{http_code}' "$base_url/admin/users.php")" == 403 ]]
+member_status="$(curl -sS -b "$cookie_jar" -o /dev/null -w '%{http_code}' "$base_url/admin/users.php")"
+[[ "$member_status" == 302 || "$member_status" == 403 ]]
+if [[ "$member_status" == 302 ]]; then
+  [[ "$(curl -sS -b "$cookie_jar" -o /dev/null -w '%{redirect_url}' "$base_url/admin/users.php")" == "$base_url/profile.php" ]]
+fi
+! curl -sS -b "$cookie_jar" "$base_url/admin/users.php" | contains '<table class="data-table">'
 echo 'PASS guests and members cannot read registered users'
 mysql_test "UPDATE users SET role='admin',auth_version=auth_version+1 WHERE email='$email';" >/dev/null
 login

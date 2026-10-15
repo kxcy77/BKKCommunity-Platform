@@ -77,7 +77,7 @@ class LiveContentSyncTest {
                 post("admin/discounts.php", discount + ("action" to "admin_create_discount"))
             }
             post("admin/services.php", service + ("action" to "admin_create_service"))
-            compose.onNodeWithText("Events", useUnmergedTree = true).performClick()
+            compose.onNode(hasText("Events") and isSelectable()).performClick()
             compose.waitUntil(35_000) { runBlocking { repository.eventStream.first().any { it.title == marker } && repository.discountStream.first().any { it.storeName == marker } && repository.serviceStream.first().any { it.name == marker } } }
             eventId = runBlocking { repository.eventStream.first().first { it.title == marker }.id }
             discountId = runBlocking { repository.discountStream.first().first { it.storeName == marker }.id }
@@ -85,10 +85,10 @@ class LiveContentSyncTest {
             assertTrue(get("events.php").contains(marker))
             assertTrue(get("discounts.php").contains(marker))
             assertTrue(get("info.php").contains(marker))
-            compose.onNode(hasScrollAction()).performScrollToNode(hasText("Search events"))
+            compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Search events"))
             compose.onNodeWithText("Search events").performTextInput(marker)
             androidx.test.espresso.Espresso.closeSoftKeyboard()
-            compose.onNode(hasScrollAction()).performScrollToNode(hasText(marker))
+            compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText(marker))
             screenshot("android-event-before")
             fun version(page: String) = Regex("name=\"version\" value=\"([^\"]+)\"").find(get(page))!!.groupValues[1]
             post("admin/events.php", event + mapOf("action" to "admin_update_event", "id" to eventId.toString(), "version" to version("admin/events.php?edit=$eventId"), "title" to "$marker Updated"))
