@@ -328,6 +328,12 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .download-layout { max-width: 850px; }
 .download-steps li { margin-bottom: 16px; }
 .download-checksum { display: block; overflow-wrap: anywhere; }
+.download-qr-card { display: grid; grid-template-columns: 240px minmax(0, 1fr); align-items: center; gap: 24px; margin-top: 28px; }
+.download-qr-card img { display: block; width: 240px; height: auto; background: #fff; }
+@media (max-width: 640px) {
+  .download-qr-card { grid-template-columns: minmax(0, 1fr); }
+  .download-qr-card img { width: min(100%, 260px); margin-inline: auto; }
+}
 .admin-list-panel { margin-top: 24px; }
 .admin-table-hint { margin: 8px 0 14px; color: var(--muted); font-size: .82rem; }
 .admin-actions { min-width: 235px; display: grid; gap: 10px; }

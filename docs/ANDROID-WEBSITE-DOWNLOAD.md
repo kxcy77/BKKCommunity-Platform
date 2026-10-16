@@ -26,6 +26,10 @@ In the local browser, clicking the actual website button downloaded the APK into
 
 ## Updating the download
 
+The download page also provides a scannable QR image and a printable A4 QR poster under `public/assets/downloads/`. Both encode the stable HTTPS download-page address, not a particular APK version or an external QR tracking service. Scanning opens the page; the visitor then selects Download Android APK. This keeps the same printed code useful after future APK updates and provides compatibility/safety instructions before installation.
+
+Rebuild these assets with `python3 services/web/bin/build-download-qr.py` from the repository root (requires Pillow and ReportLab). An independent ZXing decoder verified both the PNG and a rasterized copy of the PDF against the intended production URL. That is automated scan verification, not a claim of a physical-phone camera test.
+
 1. Build and test the next APK against the intended backend. For updates to an existing installation, preserve the package ID and signing key and increase the version code.
 2. Publish the APK as a new versioned GitHub release asset. Do not silently replace bytes under an already advertised filename/checksum.
 3. Update `services/web/app/android_download.php` with the version, asset URL, filename and computed SHA-256. Update download-page size/requirements if needed.

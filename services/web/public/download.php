@@ -15,6 +15,12 @@ require __DIR__ . '/partials/header.php';
         <p><a class="button" href="<?= h(app_url('download-apk.php')) ?>"><?= icon_svg('download') ?> Download Android APK</a></p>
         <p>This is a signed testing build, downloaded from our public GitHub release. It is not a Google Play release.</p>
         <p><strong>Using an iPhone?</strong> This APK works only on Android. You can use <a href="<?= h(app_url('index.php')) ?>">the BKK website</a> in your browser instead.</p>
+        <div class="panel download-qr-card">
+            <img src="<?= h(app_url('assets/downloads/bkk-android-download-qr.png')) ?>" width="820" height="820" alt="QR code linking to the BKK Android app download page">
+            <div><h2>Scan to get the app</h2><p>Open your Android phone’s camera and point it at this code. Tap the link that appears, then select <strong>Download Android APK</strong>.</p>
+            <p><a href="<?= h(app_url('assets/downloads/bkk-android-download-qr.png')) ?>" download>Save QR image (PNG)</a></p>
+            <p><a href="<?= h(app_url('assets/downloads/bkk-android-download-qr.pdf')) ?>" download>Download printable QR poster (PDF)</a></p></div>
+        </div>
     </div>
 </section>
 <section class="section section-white"><div class="shell download-layout">

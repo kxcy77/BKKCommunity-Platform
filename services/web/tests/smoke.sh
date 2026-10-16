@@ -49,6 +49,11 @@ download_html="$(curl -fsS "${base_url}/download.php")"
 printf '%s' "$download_html" | grep -F '803c2670b9912d01a382b65e38942ef8586a89dc568c9b7d108bb1358daede58' >/dev/null
 printf '%s' "$download_html" | grep -F 'Keep Play Protect switched on.' >/dev/null
 echo 'PASS public Android download page, fixed asset redirect, checksum and safe installation guidance'
+for asset in bkk-android-download-qr.png bkk-android-download-qr.pdf; do
+  [[ "$(curl -sS -o /dev/null -w '%{http_code}' "${base_url}/assets/downloads/${asset}")" == 200 ]] || { echo "FAIL download QR asset ${asset}"; exit 1; }
+done
+printf '%s' "$download_html" | grep -F 'QR code linking to the BKK Android app download page' >/dev/null
+echo 'PASS public QR image, printable QR PDF and accessible image description'
 
 calendar_html="$(curl -fsS "${base_url}/events.php?month=2024-02&category=Health")"
 printf '%s' "$calendar_html" | grep -q 'id="calendar-heading">February 2024' || { echo 'FAIL calendar requested month'; exit 1; }
