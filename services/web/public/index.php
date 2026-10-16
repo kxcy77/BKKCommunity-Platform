@@ -15,9 +15,9 @@ require __DIR__ . '/partials/header.php';
     <div class="shell hero-grid hero-grid-simple">
         <div class="hero-copy">
             <p class="eyebrow eyebrow-light">BKK Community Group</p>
-            <h1>What would you like to do today?</h1>
-            <p>Choose one option below. You can always use Home to start again.</p>
-            <div class="hero-actions"><a class="button button-outline" href="<?= h(app_url('download.php')) ?>"><?= icon_svg('download') ?> Get the Android app</a></div>
+            <h1>Stay connected with BKK</h1>
+            <p>BKK Community Group is a non-profit community organisation supporting older people in South Africa. Find community events, senior-discount information and local support in one easy-to-use place.</p>
+            <div class="hero-actions"><a class="button button-light" href="<?= h(app_url('about.php')) ?>">About BKK <?= icon_svg('arrow') ?></a><a class="button button-outline" href="<?= h(app_url('download.php')) ?>"><?= icon_svg('download') ?> Get the Android app</a></div>
         </div>
     </div>
 </section>
@@ -27,7 +27,7 @@ require __DIR__ . '/partials/header.php';
         <div class="section-heading">
             <div>
                 <p class="eyebrow">Start here</p>
-                <h2>Choose one task</h2>
+                <h2>What would you like to do today?</h2>
                 <p>Each option takes you directly to the information you need.</p>
             </div>
         </div>

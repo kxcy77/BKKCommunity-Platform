@@ -11,6 +11,7 @@
         <section>
             <h2>Explore</h2>
             <ul class="footer-links">
+                <li><a href="<?= h(app_url('about.php')) ?>">About BKK Community Group</a></li>
                 <li><a href="<?= h(app_url('events.php')) ?>">Upcoming events</a></li>
                 <li><a href="<?= h(app_url('discounts.php')) ?>">Senior discounts</a></li>
                 <li><a href="<?= h(app_url('info.php')) ?>">Local information</a></li>

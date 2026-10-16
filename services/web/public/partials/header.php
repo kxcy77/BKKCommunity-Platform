@@ -8,6 +8,7 @@ $navItems = [
     'events' => ['events.php', 'Events'],
     'discounts' => ['discounts.php', 'Discounts'],
     'info' => ['info.php', 'Local Info'],
+    'about' => ['about.php', 'About'],
 ];
 $accountPath = $user ? (is_admin() ? 'admin/index.php' : 'profile.php') : 'login.php';
 $accountLabel = $user ? (is_admin() ? 'Admin' : 'My account') : 'My account';
@@ -17,7 +18,7 @@ $accountLabel = $user ? (is_admin() ? 'Admin' : 'My account') : 'My account';
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="BKK Community Group events, senior discounts and local support information.">
+    <meta name="description" content="<?= h($pageDescription ?? 'BKK Community Group events, senior discounts and local support information.') ?>">
     <meta name="theme-color" content="#1F4E79">
     <meta name="application-name" content="BKK Community">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -48,7 +49,6 @@ $accountLabel = $user ? (is_admin() ? 'Admin' : 'My account') : 'My account';
                 <?php foreach ($navItems as $key => [$path, $label]): ?>
                     <a href="<?= h(app_url($path)) ?>" <?= $activeNav === $key ? 'aria-current="page"' : '' ?>><?= h($label) ?></a>
                 <?php endforeach; ?>
-                <a href="<?= h(app_url($accountPath)) ?>" <?= in_array($activeNav, ['account', 'admin'], true) ? 'aria-current="page"' : '' ?>><?= h($accountLabel) ?></a>
             </div>
             <?php if ($user): ?>
                 <div class="account-actions">
@@ -60,6 +60,7 @@ $accountLabel = $user ? (is_admin() ? 'Admin' : 'My account') : 'My account';
                 </div>
             <?php endif; ?>
         </nav>
+        <a class="button button-light header-account-link" href="<?= h(app_url($accountPath)) ?>" <?= in_array($activeNav, ['account', 'admin'], true) ? 'aria-current="page"' : '' ?>><?= h($accountLabel) ?></a>
     </div>
 </header>
 

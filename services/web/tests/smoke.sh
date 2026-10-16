@@ -35,7 +35,7 @@ for attempt in {1..20}; do
   sleep 0.2
 done
 
-for route in index.php events.php discounts.php info.php contact.php login.php register.php reset-password.php new-password.php download.php offline.html manifest.webmanifest service-worker.js; do
+for route in index.php events.php discounts.php info.php contact.php about.php login.php register.php reset-password.php new-password.php download.php offline.html manifest.webmanifest service-worker.js; do
   code="$(curl -sS -o /dev/null -w '%{http_code}' "${base_url}/${route}")"
   [[ "$code" == "200" ]] || { echo "FAIL ${route}: HTTP ${code}"; exit 1; }
   echo "PASS ${route}: HTTP ${code}"
@@ -78,6 +78,17 @@ nav_count="$(printf '%s' "$home_html" | php -r '$html=stream_get_contents(STDIN)
 [[ "$nav_count" == "5" ]] || { echo "FAIL primary navigation has ${nav_count} choices"; exit 1; }
 printf '%s' "$home_html" | grep -q 'What would you like to do today?' || { echo 'FAIL simplified home task prompt'; exit 1; }
 echo 'PASS primary navigation is limited to five choices and Home has a single task prompt'
+about_html="$(curl -fsS "${base_url}/about.php")"
+printf '%s' "$about_html" | grep -F 'Our founder is Andrew Spaumer.' >/dev/null
+printf '%s' "$about_html" | grep -F 'Why this platform exists' >/dev/null
+printf '%s' "$about_html" | grep -F 'Explore community events' >/dev/null
+printf '%s' "$about_html" | grep -F 'href="/about.php" aria-current="page"' >/dev/null
+printf '%s' "$home_html" | grep -F 'Stay connected with BKK' >/dev/null
+printf '%s' "$home_html" | grep -F 'supporting older people in South Africa' >/dev/null
+printf '%s' "$home_html" | grep -F 'header-account-link' >/dev/null
+! printf '%s' "$about_html" | grep -F '072 888 5030' >/dev/null
+! printf '%s' "$about_html" | grep -F 'andrew.spaumer@gmail.com' >/dev/null
+echo 'PASS factual About page, homepage introduction, active navigation and separate account access'
 
 curl -fsS "${base_url}/discounts.php" | php -r '$html=stream_get_contents(STDIN); if (str_contains($html, "Demonstration") || str_contains($html, "demo only") || !str_contains($html, "How to claim</dt>")) exit(1);' \
   || { echo 'FAIL public discounts still expose internal labels or omit claim instructions'; exit 1; }
