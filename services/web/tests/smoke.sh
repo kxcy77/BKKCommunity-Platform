@@ -35,11 +35,20 @@ for attempt in {1..20}; do
   sleep 0.2
 done
 
-for route in index.php events.php discounts.php info.php contact.php login.php register.php reset-password.php new-password.php offline.html manifest.webmanifest service-worker.js; do
+for route in index.php events.php discounts.php info.php contact.php login.php register.php reset-password.php new-password.php download.php offline.html manifest.webmanifest service-worker.js; do
   code="$(curl -sS -o /dev/null -w '%{http_code}' "${base_url}/${route}")"
   [[ "$code" == "200" ]] || { echo "FAIL ${route}: HTTP ${code}"; exit 1; }
   echo "PASS ${route}: HTTP ${code}"
 done
+
+download_headers="$(curl -sSI "${base_url}/download-apk.php?url=https://example.invalid/")"
+printf '%s' "$download_headers" | grep -F '302' >/dev/null
+printf '%s' "$download_headers" | grep -F 'Location: https://github.com/kxcy77/BKKCommunity-Platform/releases/download/android-test-v1.1.0/BKK-Community-1.1.0-testing.apk' >/dev/null
+[[ "$(curl -sS -o /dev/null -w '%{http_code}' -X POST "${base_url}/download-apk.php")" == 405 ]]
+download_html="$(curl -fsS "${base_url}/download.php")"
+printf '%s' "$download_html" | grep -F '803c2670b9912d01a382b65e38942ef8586a89dc568c9b7d108bb1358daede58' >/dev/null
+printf '%s' "$download_html" | grep -F 'Keep Play Protect switched on.' >/dev/null
+echo 'PASS public Android download page, fixed asset redirect, checksum and safe installation guidance'
 
 calendar_html="$(curl -fsS "${base_url}/events.php?month=2024-02&category=Health")"
 printf '%s' "$calendar_html" | grep -q 'id="calendar-heading">February 2024' || { echo 'FAIL calendar requested month'; exit 1; }

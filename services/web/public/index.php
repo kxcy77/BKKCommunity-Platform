@@ -17,6 +17,7 @@ require __DIR__ . '/partials/header.php';
             <p class="eyebrow eyebrow-light">BKK Community Group</p>
             <h1>What would you like to do today?</h1>
             <p>Choose one option below. You can always use Home to start again.</p>
+            <div class="hero-actions"><a class="button button-outline" href="<?= h(app_url('download.php')) ?>"><?= icon_svg('download') ?> Get the Android app</a></div>
         </div>
     </div>
 </section>

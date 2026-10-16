@@ -15,6 +15,7 @@
                 <li><a href="<?= h(app_url('discounts.php')) ?>">Senior discounts</a></li>
                 <li><a href="<?= h(app_url('info.php')) ?>">Local information</a></li>
                 <li><a href="<?= h(app_url('contact.php')) ?>">Contact the group</a></li>
+                <li><a href="<?= h(app_url('download.php')) ?>">Download Android app</a></li>
             </ul>
         </section>
         <section>

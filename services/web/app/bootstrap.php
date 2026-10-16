@@ -148,6 +148,7 @@ function safe_return_path(?string $value, string $fallback = 'index.php'): strin
 function icon_svg(string $name, string $class = 'icon'): string
 {
     $paths = [
+        'download' => '<path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/>',
         'calendar' => '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>',
         'tag' => '<path d="M20.6 13.6 11 23.2 1.8 14V4.8h9.2l9.6 9.6a2 2 0 0 1 0 2.8Z" transform="scale(.9) translate(1 0)"/><circle cx="7.5" cy="9" r="1.4"/>',
         'pin' => '<path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>',
