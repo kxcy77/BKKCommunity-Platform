@@ -41,7 +41,7 @@ require __DIR__ . '/partials/header.php';
                 <a class="button button-outline" href="<?= h(app_url('events.php' . event_calendar_query(null, $category))) ?>">Current month</a>
                 <?php if ($calendar['next'] !== null): ?><a class="button button-outline" href="<?= h(app_url('events.php' . event_calendar_query($calendar['next'], $category))) ?>">Next month</a><?php endif; ?>
             </nav>
-            <p>The calendar shows this month. The list below includes all upcoming events in the selected category.</p>
+            <p>Viewing <?= h($calendar['label']) ?>. The list below includes all upcoming events in the selected category.</p>
             <div class="calendar-scroll" tabindex="0" aria-label="<?= h('Scrollable ' . $calendar['label'] . ' event calendar') ?>"><div class="calendar-grid">
                 <?php foreach (['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] as $weekday): ?><div class="calendar-weekday"><?= h($weekday) ?></div><?php endforeach; ?>
                 <?php for ($blank = 0; $blank < $calendar['offset']; $blank++): ?><div class="calendar-day" aria-hidden="true"></div><?php endfor; ?>

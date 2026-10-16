@@ -12,13 +12,20 @@ require __DIR__ . '/partials/header.php';
 ?>
 
 <section class="hero">
-    <div class="shell hero-grid hero-grid-simple">
+    <div class="shell hero-grid home-hero-grid">
         <div class="hero-copy">
             <p class="eyebrow eyebrow-light">BKK Community Group</p>
             <h1>Stay connected with BKK</h1>
             <p>BKK Community Group is a non-profit community organisation supporting older people in South Africa. Find community events, senior-discount information and local support in one easy-to-use place.</p>
             <div class="hero-actions"><a class="button button-light" href="<?= h(app_url('about.php')) ?>">About BKK <?= icon_svg('arrow') ?></a><a class="button button-outline" href="<?= h(app_url('download.php')) ?>"><?= icon_svg('download') ?> Get the Android app</a></div>
         </div>
+        <aside class="community-guide" aria-label="Explore your community">
+            <p class="eyebrow">Your community, in one place</p>
+            <h2>A little more connection.<br>A simpler everyday.</h2>
+            <a href="<?= h(app_url('events.php')) ?>"><span class="guide-icon"><?= icon_svg('calendar') ?></span><span><strong>Make plans together</strong><span>Explore activities and events</span></span><?= icon_svg('arrow') ?></a>
+            <a href="<?= h(app_url('discounts.php')) ?>"><span class="guide-icon"><?= icon_svg('tag') ?></span><span><strong>Find useful savings</strong><span>Read senior-discount information</span></span><?= icon_svg('arrow') ?></a>
+            <a href="<?= h(app_url('info.php')) ?>"><span class="guide-icon"><?= icon_svg('pin') ?></span><span><strong>Know where to turn</strong><span>Find local services and support</span></span><?= icon_svg('arrow') ?></a>
+        </aside>
     </div>
 </section>
 

@@ -14,7 +14,7 @@ require __DIR__ . '/partials/header.php';
         <div class="hero-actions"><a class="button button-light" href="<?= h(app_url('events.php')) ?>">Explore community events <?= icon_svg('arrow') ?></a></div>
     </div></div>
 </section>
-<section class="section section-white"><div class="shell about-reading">
+<section class="section section-white"><div class="shell about-reading about-introduction">
     <p class="eyebrow">Who we are</p>
     <h2>Supporting older community members</h2>
     <p>BKK Community Group is a non-profit organisation in South Africa serving older community members. Our founder is Andrew Spaumer.</p>
